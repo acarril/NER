@@ -102,12 +102,14 @@ sim1
 
 El comando \verb|library(modelr)| carga el paquete \paq{modelr}. Este paquete incluye la base de datos \verb|sim1|, que contiene datos simulados. Al escribir \verb|sim1| imprimimos el encabezado de la base de datos. Vemos que la base tiene 30 observaciones ($n=30$).
 
-Podemos graficar estos datos usando \paq{ggplot2}, un paquete muy poderoso para crear gráficos. Lo cargamos y luego creamos un gráfico de puntos:
+Podemos graficar estos datos usando \paq{ggplot2}, un paquete muy poderoso para crear gráficos. Lo cargamos y luego creamos un gráfico de puntos con los datos:
 
 <<>>=
 library(ggplot2)
 ggplot(sim1, aes(x, y)) + geom_point()
 @
+
+Vemos que existe una evidente relación lineal entre $x$ e $y$: a mayor nivel de educaci
 
 Primero que nada conviene imprimir el encabezado de la base de datos, que corresponde a las primeras observaciones.
 
