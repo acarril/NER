@@ -1,0 +1,11 @@
+
+figure/*
+refs/*
+*.gz
+NER.run.xml
+NER.pdf
+*.log
+*.bbl
+NER-concordance.tex
+NER-blx.bib
+*.toc
