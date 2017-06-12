@@ -1,5 +1,5 @@
 
-figure/*
+figs/*
 refs/*
 *.gz
 NER.run.xml
