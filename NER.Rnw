@@ -8,17 +8,19 @@
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage[backend=bibtex,style=authoryear,citestyle=authoryear,doi=false,isbn=false,url=false]{biblatex}
-%  \addbibresource{NER-bib.bib}
+  \addbibresource{NER-bib.bib}
 \usepackage{hyperref}
 
 \newcommand*{\eng}[1]{\textsl{#1}}
 \newcommand*{\paq}[1]{\textbf{#1}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
 
 % Code chunk
 <<setup, include=FALSE>>=
 library(knitr)
 library(highr)
-knitr::opts_chunk$set(fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', dev='pdf')
+knitr::opts_chunk$set(fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', dev='pdf')
 @
 
 
@@ -86,38 +88,216 @@ x <- 1+2
 
 \section{Regresión lineal}
 
+<<echo=FALSE>>=
+rm(list=ls())
+@
+
 El modelo de regresión lineal es el caballo de batalla de la econometría aplicada.
 En su forma más simple usualmente se escribe como
 \begin{equation}
 y_i = \beta_0 + \beta_1 x_i + \mu_i.
+\label{eq:modelo_lineal_simple}
 \end{equation}
-donde $i = 1, \ldots, n$ es un índice que identifica a las observaciones (filas) en los datos. Podríamos tener $n$ personas, familias o empresas. Suponemos que la variable dependiente $y$ es una función lineal de la variable independiente, $x$.
+donde $i = 1, \ldots, n$ es un índice que identifica a las observaciones (filas) en los datos. Podríamos tener $n$ personas, familias o empresas. Los términos $x$ e $y$ son vectores de datos de tamaño $n$.
+
+En este modelo suponemos que la variable dependiente $y$ es una función lineal de la variable independiente, $x$. Entonces intentaremos buscar una combinación de parámetros $\beta_0$ y $\beta_1$ que se ajuste a nuestros datos. Como es posible que los datos no tengan una relación lineal perfecta, el modelo incluye un término de error $\mu_i$. Este vector indica la discrepancia entre la predicción del modelo y el valor observado, para cada unidad $i$. 
 
 Por ejemplo, podríamos tener un vector $y$ con los salarios de $n$ personas y modelarlo como una función lineal de los años de educación de esas personas, $x$. Resulta útil tener una base de datos concreta con estos vectores, por lo que usaremos 
 
-<<>>=
-library(modelr)
-sim1
+<<results=FALSE>>=
+simdatos <- read.csv(
+  "https://raw.githubusercontent.com/acarril/NER/master/datos/simdatos.csv")
+simdatos
 @
 
-El comando \verb|library(modelr)| carga el paquete \paq{modelr}. Este paquete incluye la base de datos \verb|sim1|, que contiene datos simulados. Al escribir \verb|sim1| imprimimos el encabezado de la base de datos. Vemos que la base tiene 30 observaciones ($n=30$).
+El comando \verb|read.csv()| permite leer bases de datos en formato CSV. Lo usamos para leer una base en línea y luego asignamos esos datos al objeto \verb|simdatos| (datos simulados). Al escribir \verb|simdatos| imprimimos los datos, y vemos que tienen 30 observaciones ($n=30$; omití el resultado aquí). La variable \verb|y| representa ingreso por hora (en miles de pesos) y la variable \verb|x| representa años de educación.
 
 Podemos graficar estos datos usando \paq{ggplot2}, un paquete muy poderoso para crear gráficos. Lo cargamos y luego creamos un gráfico de puntos con los datos:
 
 <<>>=
 library(ggplot2)
-ggplot(sim1, aes(x, y)) + geom_point()
+ggplot(simdatos, aes(x, y)) + geom_point()
 @
 
-Vemos que existe una evidente relación lineal entre $x$ e $y$: a mayor nivel de educaci
+Vemos que existe una evidente relación lineal entre $x$ e $y$: a mayor nivel de educación parece haber mayor nivel de ingreso. Cabe preguntarse ahora cuál es la manera óptima de elegir los parámetros que determinan dicha relación lineal, es decir, ¿cómo podemos elegir $\beta_0$ (el intercepto) y $\beta_1$ (la pendiente) en \eqref{eq:modelo_lineal_simple} para que la línea de ajuste sea la mejor posible?
 
-Primero que nada conviene imprimir el encabezado de la base de datos, que corresponde a las primeras observaciones.
+Podríamos elegir entre una infinita variedad de combinaciones de $\beta_0$ y $\beta_1$ para ajustarse a los datos. Por ejemplo, el código de abajo simula 150 líneas con interceptos y pendientes ``razonables'' para estos datos:
 
-<<eval=TRUE>>=
-sim1
+<<>>=
+set.seed(314)
+modelos <- data.frame(
+  beta1 = runif(150, -3, 1),
+  beta2 = runif(150, -1, 1)
+)
+ggplot(simdatos, aes(x, y)) +
+  geom_point() +
+  geom_abline(
+    aes(intercept = beta1, slope = beta2),
+    data = modelos, alpha = 1/4
+  )
 @
 
-Esto es lo primero que debieses hacer antes de empezar a utilizar datos nuevos, ya que permite tener una idea rápida sobre ellos. Vemos que hay 30 observaciones ($n=30$) y que \verb|x| solo toma valores enteros (y hay valores repetidos), mientras que \verb|y| es continua.
+Varias de estas líneas parecen ajustarse razonablemente bien a los datos, por lo que necesitamos un criterio riguroso para elegir los parámetros $\beta_0$ y $\beta_1$ que definen estas líneas. Esto es lo que haremos a continuación.
+
+
+\subsection{Mínimos Cuadrados Ordinarios}
+\label{sec:MCO}
+
+El método de Mínimos Cuadrados Ordinarios (MCO) es una respuesta directa a la pregunta que planteamos recién: ¿qué criterio conviene usar para elegir el modelo lineal que se ajuste ``mejor'' a los datos?
+Lo que propone MCO es minimizar la suma de los errores al cuadrado.
+Geométricamente, esto equivale a minimizar la distancia vertical entre los puntos y la recta definida por el modelo.
+
+<<echo=FALSE, message=FALSE>>=
+library(dplyr)
+dist1 <- simdatos %>% 
+  mutate(
+    dodge = rep(c(-1, 0, 1) / 20, 10),
+    x1 = x + dodge,
+    pred = -1 + x1 * 0.4
+  )
+
+ggplot(dist1, aes(x1, y)) + 
+  geom_abline(intercept = -1, slope = 0.4, colour = "grey40") +
+  geom_point(colour = "grey40") +
+  geom_linerange(aes(ymin = y, ymax = pred), colour = "blue")
+@
+
+La distancia entre un puntos y la recta el error de predicción del modelo, capturado por $\mu_i$. Es decir que para cada observación $i$ tenemos una medida de la magnitud del error que esta elección de $\beta_0$ y $\beta_1$ produce. El criterio de MCO entonces es elegir $\beta_0$ y $\beta_1$ tal que se minimice el promedio de los errores al cuadrado.\footnote{¿Por qué al cuadrado? Porque se asume que es irrelevante si el error es una subestimación o una sobreestimación, de forma que lo único que importa es la magnitud. ¿Por qué no se usa el valor absoluto entonces? Buena pregunta: \url{https://stats.stackexchange.com/q/46019/91358}.}
+Entonces el problema de minimización de MCO puede plantearse como
+
+\begin{align}
+\min_{\hat\beta_0,\hat\beta_1} \sum_{i=1}^n & \mu_i^2 \notag \\
+\Leftrightarrow \min_{\hat\beta_0,\hat\beta_1} \sum_{i=1}^n & (y_i - \hat\beta_0 - \hat\beta_1 x_i)^2.
+\end{align}
+
+Al resolver este problema obtenemos los estimadores MCO:
+
+\begin{align}
+\hat \beta_1 &= \sum_{i=1}^n \frac{\sum_{i=1}^n (x_i - \bar x)(y_i - \bar y)}{\sum_{i=1}^n (x_i - \bar x)^2} \notag \\
+ &= \frac{\Cov (x,y)}{\Var(x)} \\
+\hat \beta_0 &= \bar y - \hat\beta_1 \bar x
+\end{align}
+donde $\bar x$ e $\bar y$ son los promedios de $x_i$ e $y_i$, $\Var(x)$ es la varianza muestral de $x$ y $\Cov(x,y)$ es la covarianza muestral de $x$ e $y$.
+
+Esto significa que para encontrar la mejor línea de ajuste simplemente tenemos que calcular $\bar y$, $\bar x$, $\Cov (x,y)$ y $\Var (x,y)$. ¡Hagámoslo ahora!
+
+<<>>=
+# Indicar base de datos a usar
+attach(simdatos)
+# Promedios de 'x' e 'y'
+x.barra <- mean(x)
+y.barra <- mean(y)
+# Varianza de 'x' y covarianza entre 'x' e 'y'
+var.x <- var(x)
+cov.xy <- cov(x,y)
+# Parámetros MCO:
+(beta1 <- cov.xy/var.x)
+(beta0 <- y.barra - beta1*x.barra)
+# 'Desactivar' base de datos
+detach(simdatos)
+# Graficar línea de regresión MCO
+ggplot(simdatos, aes(x,y)) + 
+  expand_limits(x = 0, y = -2.5) +
+  geom_point() +
+  geom_abline(
+    intercept = beta0, slope = beta1, 
+    color = "blue", show.legend = FALSE )
+@
+
+Vemos que es fácil calcular los estimadores MCO y en este caso $\hat \beta_0 = 0.43$ y $\hat \beta_1 = -1.19$. La línea roja corresponde a la regresión MCO,
+
+\begin{equation*}
+\hat y = \hat \beta_0 + \hat \beta_1 x.
+\end{equation*}
+
+Si bien el método que acabamos de usar es útil para entender de manera más profunda qué es lo que estamos haciendo al estimar un modelo líneal por el método de MCO, no es demasiado sucinto. Podemos obtener los parámetros directamente usando la función \verb|lm()| de la siguiente forma:
+
+<<>>=
+lm(y ~ x, data = simdatos)
+@
+
+La función \verb|lm()| viene de \eng{linear model}, y permite calcular rápidamente los parámetros de un modelo lineal. El primer argumento de la función es una fórmula de R, que no es exactamente lo mismo que una fórmula en el sentido usual de la palabra. Por el momento basta entender que a la izquierda de \verb|~| indicamos la variable dependiente, mientras que a la derecha indicamos las variables independientes. Entonces \verb|lm()| toma una fórmula como \verb|y~x| y la traduce automáticamente a algo como \verb|y = beta0 + beta1 * x|.
+
+Una de las ventajas de usar \verb|lm()| es que podemos guardar sus resultados en un objeto, el que luego podemos manipular para extraer otro tipo de información útil del modelo. A continuación veremos cómo extraer, manipular e interpretar esta información, lo que nos dará una comprensión mucho más profunda de lo que estamos haciendo.
+
+
+\subsection{Interpretando un modelo lineal}
+
+Usaremos ahora la base \verb|wage2|, que es una de las bases usadas por \textcite{wooldridge_introductory_2013} y contiene información de ingresos (y otras variables) para 935 personas. Esta base es un subconjunto de los datos usados en \textcite{blackburn_unobserved_1992}.
+
+<<>>=
+library(foreign)
+ingresos <- read.dta("http://fmwww.bc.edu/ec-p/data/wooldridge/wage2.dta")
+ingresos <- ingresos[c("wage","educ")]
+@
+
+El paquete \paq{foreign} nos permite leer bases de datos en formatos de otros programas. En este caso usamos la función \verb|foreign::read.dta()| para leer una base de datos de Stata.
+Por el momento nos interesan dos variables: \verb|wage|, que es un vector de ingresos (en dólares menusales) y \verb|educ|, que es un vector con años de escolaridad de cada persona. La segunda línea guarda solamente esas dos variables en el objeto \verb|ingresos|.
+
+Al cargar nuevos datos yo siempre recomiendo:
+\begin{enumerate}
+\item Imprimir el encabezado
+\item Imprimir un resumen
+\item Graficarlos
+\end{enumerate}
+
+Escribimos lo siguiente para lograr estas tres cosas:
+
+<<>>=
+head(ingresos)
+summary(ingresos)
+ggplot(ingresos, aes(educ, wage)) + geom_point()
+@
+
+Es evidente que estos datos (reales) no presentan una relación lineal tan evidente. Más adelante nos haremos cargo de este problema. Sin embargo, por ahora podemos usar \verb|lm()| como ya lo hemos hecho, definiendo una fórmula donde \verb|wage| es la variable dependiente y \verb|educ| es la variable independiente. Encerramos \verb|lm()| dentro de \verb|summary()| para obtener información más detallada de las estimaciones del modelo.
+
+<<>>=
+summary(lm(wage ~ educ, data = ingresos))
+@
+
+<<echo=FALSE, cache=FALSE>>=
+options(digits = 2)
+modelo <- lm(wage ~ educ, data = ingresos)
+@
+
+Los coeficientes estimados de un modelo lineal como este pueden interpretarse fácilmente, recordando que nuestra predicción es
+\begin{equation*}
+\hat y = \hat \beta_0 + \hat \beta_1 x.
+\end{equation*}
+El intercepto de un modelo lineal nos indica que si las variables independientes son todas iguales a 0, el modelo predice, en promedio, un valor de $\hat \beta_0$ para $y$. En términos de este modelo en particular, la interpretación es que si una persona tiene 0 años de educación el modelo predice un ingreso mensual promedio de \Sexpr{coefficients(modelo)[1]} dólares.
+
+Los coeficientes estimados para las variables independientes ($\hat \beta_1$, en este caso) pueden interpretarse como el efecto promedio que un aumento de una unidad de $x$ tiene sobre $y$. Por ejemplo, nuestra estimación indica que un año adicional de educación tiene un efecto promedio de aumentar en \Sexpr{coefficients(modelo)[2]} dólares el ingreso de las personas. Si este coeficiente fuera negativo diríamos que un cambio en $x$ está correlacionado a una reducción de $y$.
+
+Los parámetros estimados, tal como los coeficientes de MCO, son estadísticos muestrales que usamos para hacer inferencias de los parámetros poblacionales. Es importante tener en cuenta que son estos parámetros poblacionales los que nos interesan en realidad, pero como no podemos observarlos directamente, debemos inferirlos por medio de una muestra finita.
+
+Es evidente que si tomáramos una muestra distinta a la actual, lo más probable es que estimaríamos parámetros diferentes. Si tomaras datos de otras 935 personas (o cualquier número, en realidad) es muy posible que al aplicar el mismo modelo obtengas valores de $\beta_0$ y $\beta_1$ distintos de \Sexpr{coefficients(modelo)[1]} y \Sexpr{coefficients(modelo)[2]}. Además es muy probable que nuevamente ninguno de los dos sea igual al verdadero parámetro poblacional, que es el que nos interesa. Si continuáramos este proceso de tomar diferentes muestras y estimar los mismos parámetros una y otra vez, veríamos que la frecuencia relativa de las estimaciones obtenidas sigue una distribución de probabilidad, y por el Teorema Central del Límite sabemos que es probable que esta distribución sea normal. Entonces es importante para nuestra estimación que cuantifiquemos la cantidad de incertidumbre en esta distribución poblacional desconocida. Ahí es donde entra el concepto de error estándar, que corresponde a nuestra estimación de la desviación estándar de la distribución de estos muestreos. En términos intuitivos, es una medida de la incertidumbre de $\hat\beta$.
+
+En el ejemplo, 
+
+<<>>=
+ggplot(ingresos, aes(educ, wage)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
+@
+
+
+Para guardar el modelo asignamos \verb|lm()| a un objeto:
+
+El objeto \verb|modelo| no solo incluye los coeficientes estimados, si no que una serie de otros elementos que son muy útiles ---veremos ahora por qué. En estricto rigor \verb|modelo| es lo que R llama una lista, y contiene una serie de otros objetos. Podemos imprimir los nombres de estos objetos escribiendo
+<<>>=
+names(modelo)
+@
+
+Para acceder a los objetos guardados usamos la notación de \verb|$|, como es usual en R. Por ejemplo, para imprimir los coeficientes del modelo escribimos
+<<>>=
+modelo$coefficients
+@
+
+Además de estos elementos directamente accesibles guardados en \verb|modelo|, existen una serie de funciones que podemos aplicar al objeto para realizar otros cálculos o resumir información útil. Por ejemplo, es muy común usar \verb|summary()| para obtener un resumen de información importante del modelo estimado:
+<<>>=
+summary(modelo)
+@
+
 
 \hrulefill
 
@@ -544,7 +724,7 @@ Otra manera común de estimar un modelo de efecto fijo es quitando el efecto fij
 
 Al estimar \eqref{eq:within_estimator} obtendremos el llamado \eng{within estimator}, que indica la variación promedio a lo largo de $t$ para cada grupo definido por $i$
  
-%\nocite{*}
-%\printbibliography
+\nocite{*}
+\printbibliography
 
 \end{document}
