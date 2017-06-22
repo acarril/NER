@@ -11,3 +11,5 @@ NER-blx.bib
 *.toc
 NER.tex
 *.tex
+*.pdf
+*.aux
