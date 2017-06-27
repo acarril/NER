@@ -1,4 +1,4 @@
-\documentclass{article}\usepackage[]{graphicx}\usepackage[]{color}
+\documentclass{report}\usepackage[]{graphicx}\usepackage[]{color}
 %% maxwidth is the original width if it is less than linewidth
 %% otherwise use linewidth (to make sure the graphics do not exceed the margin)
 \makeatletter
@@ -66,14 +66,26 @@
       }%
   \makeatother
 \usepackage{booktabs}
+\usepackage{makeidx}
+  \makeindex
 \usepackage[backend=bibtex,style=authoryear,citestyle=authoryear,doi=false,isbn=false,url=false]{biblatex}
   \addbibresource{NER-bib.bib}
 \usepackage[hidelinks,spanish]{hyperref}
 
+%pgfplot función normal
+\pgfmathdeclarefunction{gauss}{2}{%
+  \pgfmathparse{1/(#2*sqrt(2*pi))*exp(-((x-#1)^2)/(2*#2^2))}%
+}
+
 \newcommand*{\eng}[1]{\textsl{#1}}
-\newcommand*{\paq}[1]{\textbf{#1}}
+\newcommand*{\paq}[1]{\textbf{#1}\index{#1@\textbf{#1}}}
+\newcommand*{\kw}[1]{\textbf{#1}\index{#1}}
+
 \newcommand{\Var}{\operatorname{Var}}
 \newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\E}{\operatorname{E}}
+\newcommand{\sd}{\operatorname{de}}
+\newcommand{\se}{\operatorname{se}}
 
 % Eliminar numeración en títulos menores que secciones
 \setcounter{secnumdepth}{2}
@@ -95,7 +107,11 @@ Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acar
 
 \clearpage
 
-\section{Introducción}
+% Introducción, prefacio:
+
+
+
+\chapter{Introducción}
 
 En las últimas décadas la economía se ha ido apropiando de los computadores para realizar trabajo empírico y, sin embargo, el enfoque de los libros de econometría sigue siendo eminentemente teórico ---no \emph{aplicado}.
 
@@ -103,14 +119,14 @@ A mi parecer, existen actualmente dos maneras de abordar la enseñanza de econom
 
 Por otro lado hay quienes, de la mano con el crecimiento de la economía aplicada, abogan por una enseñanza aplicada de econometría, con énfasis en técnicas de 
 
-\subsection{Qué es R}
+\section{Qué es R}
 
-R es un ambiente de software y un lenguaje de programación interpretado para hacer análisis estadístico y gráficos. Es una implementación de S, un lenguaje de programación matemático orientado a objetos más antiguo. Es software libre y de código abierto, activamente usado y ampliado por estadísticos y colaboradores de otras disciplinas.
+R es un ambiente de software y un lenguaje de programación interpretado para hacer análisis estadístico y crear gráficos. Es una implementación de S, un lenguaje de programación matemático orientado a objetos más antiguo. Es software libre y de código abierto, constantemente desarrollado por estadísticos y colaboradores de otras disciplinas.
 
 R es mucho más flexible que la mayoría de los paquetes estadísticos normalmente usados por economistas. Es un lenguaje de programación completamente desarrollado, no sólo un programa con tests y métodos pre-programados.
 
 
-\subsection{Obtener R}
+\section{Obtener R}
 
 La instalación base de R puede obtenerse de \url{https://www.r-project.org/}. Una vez instalado puedes usar RGui para usarlo. Sin embargo, usualmente yo tomo dos pasos adicionales para obtener más flexibilidad. El primero es instalar RStudio, un IDE para R que incluye una consola, editor con resaltado de sintaxis, historial de comandos y varias otras vainas que lo hacen más útil que RGui, especialmente si eres principiante. Puedes descargar RStudio de \url{https://www.rstudio.com/}, y también es gratis.
 
@@ -169,8 +185,11 @@ La mayoría de las operaciones y funciones en R no guardan el resultado de su ej
 \end{knitrout}
 
 
+% Introducción, prefacio:
 
-\section{Regresión lineal}
+
+
+\chapter{Regresión lineal}
 
 
 
@@ -189,8 +208,9 @@ Por ejemplo, podríamos tener un vector $y$ con los salarios de $n$ personas y m
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{simdatos} \hlkwb{<-} \hlkwd{read.csv}\hlstd{(}
-  \hlstr{"https://raw.githubusercontent.com/acarril/NER/master/datos/simdatos.csv"}\hlstd{)}
+\hlcom{#simdatos <- read.csv(}
+\hlcom{#  "https://raw.githubusercontent.com/acarril/NER/master/datos/simdatos.csv")}
+\hlstd{simdatos} \hlkwb{<-} \hlkwd{read.csv}\hlstd{(}\hlstr{"datos/simdatos.csv"}\hlstd{)}
 \hlkwd{head}\hlstd{(simdatos)}
 \end{alltt}
 \begin{verbatim}
@@ -301,6 +321,7 @@ El método de MCO corresponde a elegir $\hat\beta_0$ y $\hat\beta_1$ en \eqref{e
 \begin{align}
 \min_{\hat\beta_0,\hat\beta_1} & \sum_{i=1}^n \hat\mu_i^2 \notag \\
 \Leftrightarrow \min_{\hat\beta_0,\hat\beta_1} & \sum_{i=1}^n (y_i - \hat\beta_0 - \hat\beta_1 x_i)^2.
+\label{eq:prob_min_MCO}
 \end{align}
 
 Al resolver este problema de minimización obtendremos los estimadores MCO:\footnote{La derivación paso a paso puede encontrarse, por ejemplo, en \textcite[cap. 2]{wooldridge_introductory_2013}.}
@@ -400,7 +421,8 @@ Usaremos ahora la base \verb|wage2|, que es uno de los datos usados por \textcit
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlkwd{library}\hlstd{(foreign)}
-\hlstd{ingresos} \hlkwb{<-} \hlkwd{read.dta}\hlstd{(}\hlstr{"http://fmwww.bc.edu/ec-p/data/wooldridge/wage2.dta"}\hlstd{)}
+\hlcom{#ingresos <- read.dta("http://fmwww.bc.edu/ec-p/data/wooldridge/wage2.dta")}
+\hlstd{ingresos} \hlkwb{<-} \hlkwd{read.dta}\hlstd{(}\hlstr{"datos/wage2.dta"}\hlstd{)}
 \hlstd{ingresos} \hlkwb{<-} \hlkwd{as.data.frame}\hlstd{(ingresos[}\hlkwd{c}\hlstd{(}\hlstr{"wage"}\hlstd{,}\hlstr{"educ"}\hlstd{)])}
 \end{alltt}
 \end{kframe}
@@ -729,401 +751,168 @@ Además de estos elementos directamente accesibles guardados en \verb|modelo|, e
 \end{kframe}
 \end{knitrout}
 
+\section{Valor esperado de los estimadores}
 
+Recordemos el hecho que los estimadores MCO ($\hat\beta_0$ y $\hat\beta_1$, o en general $\hat\beta$) tienen una distribución de probabilidad.
+Esto ocurre porque si tomáramos distintas muestras de tamaño $n$, obtendríamos distintos valores para $\hat\beta$.
+Entonces nuestra estimación de $\hat\beta$ es solo una realización de infinidad de posibilidades, como se muestra en la \autoref{fig:parametros_distribucion}.
 
-\hrulefill
+\begin{figure}[htb]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+    no markers, domain=0:8, samples=100,
+    axis lines*=left, xlabel=$x$, ylabel=$y$,
+    every axis y label/.style={at=(current axis.above origin),anchor=south},
+    every axis x label/.style={at=(current axis.right of origin),anchor=west},
+    height=4cm, width=6cm,
+    xtick={3},
+    xticklabels={$\hat\beta$},
+    ytick=\empty,
+    enlargelimits=false, clip=false, axis on top,
+    grid = major
+    ]
+    \addplot [very thick, black] {gauss(4,1)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Los parámetros estimados provienen de una distribución muestral}
+  \label{fig:parametros_distribucion}
+\end{figure}%
 
-El modelo de regresión lineal es el caballo de batalla de la econometría aplicada, y puede escribirse como
+Parece natural querer que nuestros estimadores estén centrados en torno al verdadero parámetro $\beta$, es decir,
 \begin{equation}
-y_i = x_i^T \beta + \epsilon_i,
+\E(\hat \beta) = \beta.
 \end{equation}
-donde $i = 1, \ldots, n$ es un índice que identifica a las observaciones (filas) en los datos. Podríamos tener $n$ personas, familias o empresas.
-También es común escribir el mismo modelo en forma matricial:
+Un estimador que cumple con esta propiedad se llama insesgado.
+La \autoref{fig:estimadores_sesgo} muestra la distribución de un estimador insesgado en azul, mientras que la distribución de un estimador sesgado está graficada en rojo.
+Notar que aunque ambos tienen igual varianza, el primero está centrado en torno al verdadero valor de $\beta$, y por lo tanto es insesgado.
+
+
+\begin{figure}[htb]
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+    no markers, domain=0:10, samples=100,
+    axis lines*=left, xlabel=$x$, ylabel=$y$,
+    every axis y label/.style={at=(current axis.above origin),anchor=south},
+    every axis x label/.style={at=(current axis.right of origin),anchor=west},
+    height=4cm, width=6cm,
+    xtick={4},
+    xticklabels={$\beta$},
+    ytick=\empty,
+    enlargelimits=false, clip=false, axis on top,
+    grid = major
+    ]
+    \addplot [very thick,cyan!50!black] {gauss(4,1)};
+    \addplot [very thick,magenta!50!black] {gauss(6,1)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Estimador insesgado (azul) vs. estimador sesgado (rojo)}
+  \label{fig:estimadores_sesgo}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+    no markers, domain=0:10, samples=100,
+    axis lines*=left, xlabel=$x$, ylabel=$y$,
+    every axis y label/.style={at=(current axis.above origin),anchor=south},
+    every axis x label/.style={at=(current axis.right of origin),anchor=west},
+    height=4cm, width=6cm,
+    xtick={5},
+    xticklabels={$\beta$},
+    ytick=\empty,
+    enlargelimits=false, clip=false, axis on top,
+    grid = major
+    ]
+    \addplot [very thick,cyan!50!black] {gauss(5,0.5)};
+    \addplot [very thick,magenta!50!black] {gauss(5,1.2)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Estimadores insesgados con distinta varianza}
+  \label{fig:estimadores_varianza}
+\end{subfigure}
+\caption{Heterocedasticidad}
+\label{fig:estimadores_OLS_propiedades}
+\end{figure}
+
+Además de requerir que el estimador se centre en torno al verdadero valor del parámetro, también queremos saber qué tan lejos podemos esperar que $\hat\beta$ se aleje de $\beta$ en promedio. Esto nos permitirá elegir el estimador más eficiente, es decir, de entre todos los estimadores insesgados elegir aquél que tenga la menor varianza.
+La \autoref{fig:estimadores_varianza} muestra la distribución de dos estimadores insesgados. Sin embargo, el estimador representado por la curva roja tiene relativamente mayor varianza que el representado por la azul.
+
+Nuestro objetivo es obtener ambas propiedades para nuestros estimadores MCO.
+Sin embargo, estas propiedades sólo existirán en la medida que se cumplan algunos supuestos. En esta sección veremos cuáles son estos supuestos y qué propiedades entregan.
+
+Es importante tener en cuenta que las propiedades estadísticas no tienen nada que ver con una muestra en particular, si no que es una propiedad que los estimadores cumplirán cuando se realice un muestreo aleatorio repetidamente.
+
+
+\paragraph{RLS.1: Lineal en parámetros} Esto corresponde al supuesto fundamental del modelo lineal, donde asumimos que la población sigue una función lineal:
 \begin{equation}
-y = X \beta + \epsilon.
+y = \beta_0 + \beta_1 x + \mu.
 \end{equation}
+Nuestro objetivo es estimar $\beta_0$ y (en especial) $\beta_1$ suponiendo que los datos se relacionan de forma lineal en parámetros y que $x$, $y$ y $\mu$ son variables aleatorias.
 
-En estas ecuaciones $y$ (o $y_i$) es un vector $n \times 1$ que representa la variable dependiente del modelo, es decir, la variable que queremos explicar. Por ejemplo, $y$ podría ser un vector de salario cuyos valores son los ingresos mensuales de $n$ personas.
-La variable dependiente es explicada por un conjunto de $k$ variables independientes, usalmente denotadas por $X$. Entonces $X$ es una matriz $n\times k$, ya que contiene información de $k$ variables (columnas) para $n$ observaciones (filas).
+\paragraph{RLS.2: Muestreo aleatorio} Suponemos que tenemos una muestra aleatoria de tamaño $n$ de la población total, de forma que en términos muestrales el modelo lineal es
+\begin{equation}
+y_i = \beta_0 + \beta_1 x_i + \mu_i, \quad i = 1,\ldots,n.
+\end{equation}
+Sí, es lo mismo que arriba, pero con el subíndice.
 
-Al estimar este tipo de modelos usualmente nos interesa determinar $\beta$, que representa la relación lineal entre $y$ y $X$, es decir, entre la variable dependiente y el conjunto de variables independientes que la explican. El vector $\beta$ contiene $k \times 1$ coeficientes de regresión, de forma que estimaremos un coeficiente por cada variable incluída en $X$.
-Finalmente $\epsilon$ es el llamado término de error, un vector $n \times 1$ que captura las discrepancias para cada observación $i$ que resulta de imponer una relación lineal entre $X$ e $y$.
+\paragraph{RLS.3: Variación en las variables independientes}
+Necesitamos que la (o las) variables independientes del modelo tengan algo de variación.
+Este supuesto es fácil, pero necesario matemáticamente.
+Por ejemplo, para estimar el modelo de Mincer es necesario tener una muestra donde la gente tenga distintos niveles de educación. Si todos tienen exactamente los mismos años de escolaridad entonces es imposible determinar la relación entre años de escolaridad e ingresos.
 
-Para entender bien todo esto resulta muy útil manipular un modelo simple. Para esto usaremos \verb|sim1|, una base de datos simulada que contiene dos variables: \verb|x| e \verb|y|. Cargamos el paquete \paq{modelr} para poder acceder esta base de datos, y además cargamos \paq{ggplot2} para crear gráficos:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(modelr)}
-\hlkwd{library}\hlstd{(ggplot2)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-Primero que nada conviene imprimir el encabezado de la base de datos, que corresponde a las primeras observaciones.
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{sim1}
-\end{alltt}
-\begin{verbatim}
-## # A tibble: 30 x 2
-##        x     y
-##    <int> <dbl>
-##  1     1   4.2
-##  2     1   7.5
-##  3     1   2.1
-##  4     2   9.0
-##  5     2  10.2
-##  6     2  11.3
-##  7     3   7.4
-##  8     3  10.5
-##  9     3  10.5
-## 10     4  12.4
-## # ... with 20 more rows
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-Esto es lo primero que debieses hacer antes de empezar a utilizar datos nuevos, ya que permite tener una idea rápida sobre ellos. Vemos que hay 30 observaciones ($n=30$) y que \verb|x| solo toma valores enteros (y hay valores repetidos), mientras que \verb|y| es continua.
-
-Ahora graficamos estos datos para hacernos una idea de la relación que existe entre ambos:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{ggplot}\hlstd{(sim1,} \hlkwd{aes}\hlstd{(x, y))} \hlopt{+} \hlkwd{geom_point}\hlstd{()}
-\end{alltt}
-\end{kframe}
-
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-32-1} 
-
-}
-
-
-
-\end{knitrout}
-
-Oh sorpresa, los datos simulados presentan una clara correlación positiva. Parece casi diseñado para ser modelado linealmente...
-%La pregunta relevante, sin embargo, es cuál línea usar.
-Recordemos que en este caso nuestro modelo lineal puede escribirse simplemente como
-
-\begin{equation*}
-y_i = \beta_0 + \beta_1 x_i + \epsilon_i 
-\end{equation*}
-
-Entonces la pregunta relevante es ``¿qué línea es la que mejor captura la relación entre $x$ e $y$?''.
-Notemos que en este caso bidimensional simple $\beta_0$ y $\beta_1$ representan el intercepto y la pendiente de la recta, respectivamente.
-Por lo tanto la pregunta también puede plantearse como: ¿cuáles son los valores de $\beta_0$ y $\beta_1$ que describen mejor esta relación?
-
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-33-1} 
-
-}
-
-
-
-\end{knitrout}
-
-\subsection{Mínimos Cuadrados Ordinarios}
-
-El método de Mínimos Cuadrados Ordinarios (MCO) es una respuesta directa a la pregunta que planteamos recién: ¿qué criterio conviene usar para elegir el modelo lineal que se ajuste ``mejor'' a los datos?
-Lo que propone MCO es minimizar la suma de los errores al cuadrado.
-Geométricamente, esto equivale a minimizar la distancia vertical entre los puntos y la recta definida por el modelo.
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-34-1} 
-
-}
-
-
-
-\end{knitrout}
-
-La distancia entre un puntos y la recta el error de predicción del modelo, capturado por $\epsilon_i$. Es decir que para cada observación $i$ tenemos una medida de la magnitud del error que esta elección de $\beta_0$ y $\beta_1$ produce. El criterio de MCO entonces es elegir $\beta_0$ y $\beta_1$ tal que se minimice el promedio de todos los errores al cuadrado.\footnote{¿Por qué al cuadrado? Porque se asume que es irrelevante si el error es una subestimación o una sobreestimación, de forma que lo único que importa es la magnitud. ¿Por qué no se usa el valor absoluto entonces? Buena pregunta.}
-
-
-
-\hrulefill
-%Para esta sección usaremos el paquete \paq{AER}, que incluye varias bases de datos para econometría. Ahora usaremos \verb|AER::CPS1988|, que contiene información de salarios de EE.UU. en Marzo de 1988.
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(AER)}
-\hlkwd{data}\hlstd{(}\hlstr{"CPS1988"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-Consideremos la vieja y confiable ecuación de salarios de Mincer:
+\paragraph{RLS.4: Media condicional cero}
+El error $u$ debe tener un valor esperado igual a cero, condicional a los valores de las variables independientes. En una muestra aleatoria esto significa que
 
 \begin{equation}
-\text{salario}_i = \beta_0 + \beta_1 \text{educación}_i + \beta_2 \text{experiencia}_i + \epsilon_i
-\label{eq:mincer}
+E(\mu_i | x_i) = 0 \quad \forall\; i = 1,\ldots, n
 \end{equation}
 
-En términos de la base \verb|CPS1988|, nos interesan por el momento las variables \verb|wage|, \verb|education| y \verb|experience|. Podemos estimar este modelo lineal simple escribiendo
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{lm}\hlstd{(wage} \hlopt{~} \hlstd{education} \hlopt{+} \hlstd{experience,} \hlkwc{data} \hlstd{= CPS1988)}
-\end{alltt}
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = wage ~ education + experience, data = CPS1988)
-## 
-## Coefficients:
-## (Intercept)    education   experience  
-##      -385.1         60.9         10.6
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-El resultado que imprime \verb|lm()| es una versión muy abreviada de todo lo que fue calculado, ya que sólo entrega las estimaciones de los coeficientes $\beta$ del modelo. Para ver más detalles podemos guardar los resultados de \verb|lm()| en el objeto \verb|mincer| y luego aplicarle la función \verb|summary()|:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{mincer} \hlkwb{<-} \hlkwd{lm}\hlstd{(wage} \hlopt{~} \hlstd{education} \hlopt{+} \hlstd{experience,} \hlkwc{data} \hlstd{= CPS1988)}
-\hlkwd{summary}\hlstd{(mincer)}
-\end{alltt}
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = wage ~ education + experience, data = CPS1988)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-##  -1136   -221    -48    154  18156 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) -385.083     13.243   -29.1   <2e-16 ***
-## education     60.896      0.883    69.0   <2e-16 ***
-## experience    10.606      0.196    54.2   <2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 412 on 28152 degrees of freedom
-## Multiple R-squared:  0.177,	Adjusted R-squared:  0.177 
-## F-statistic: 3.02e+03 on 2 and 28152 DF,  p-value: <2e-16
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-Normalmente se usa la función \verb|summary()| en objetos de datos, tales comos vectores o marcos de datos, para obtener estadística descriptiva del objeto (promedio, desviación estándar, etc.). Al usarla en un objeto con resultados de una estimación ---como en este caso--- nos entregará información importantes de dicha estimación, como el $R^2$ del modelo o los errores estándar de los coeficientes.
-
-Podemos extraer otro tipo de información y objetos del modelo. La función \verb|residuals()| entrega los residuos del modelo, y \verb|vcov()| entrega la matriz de varianzas-covarianzas de los coeficientes:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{# Residuos}
-\hlkwd{residuals}\hlstd{(mincer)}
-\hlcom{# Matriz de varianzas-covarianzas:}
-\hlkwd{vcov}\hlstd{(mincer)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-Obviamente estas funciones sólo sirven para realizar otras computaciones y no para ser impresas directamente, y es por eso que he omitido su resultado.
-
-Es común querer estimar un modelo sin intercepto, lo que se logra escribiendo el intercepto explícitamente en la fórmula, usualmente como 0:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{lm}\hlstd{(wage} \hlopt{~} \hlnum{0} \hlopt{+} \hlstd{education} \hlopt{+} \hlstd{experience,} \hlkwc{data} \hlstd{= CPS1988)}
-\end{alltt}
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = wage ~ 0 + education + experience, data = CPS1988)
-## 
-## Coefficients:
-##  education  experience  
-##      36.55        7.65
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-Podemos especificar formas funcionales más complejas para nuestro modelo básico expresado en \eqref{eq:mincer}, incluyendo términos interactuados con \verb|*| y términos cuadráticos encerrados en la función \verb|I()|:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{lm}\hlstd{(wage} \hlopt{~} \hlstd{experience} \hlopt{+} \hlkwd{I}\hlstd{(experience}\hlopt{^}\hlnum{2}\hlstd{)} \hlopt{+} \hlstd{education} \hlopt{+} \hlstd{education}\hlopt{*}\hlstd{parttime,}
-   \hlstd{CPS1988)}
-\end{alltt}
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = wage ~ experience + I(experience^2) + education + 
-##     education * parttime, data = CPS1988)
-## 
-## Coefficients:
-##           (Intercept)             experience        I(experience^2)  
-##              -432.942                 27.399                 -0.399  
-##             education            parttimeyes  education:parttimeyes  
-##                58.378                167.071                -33.804
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-También es posible aplicar a los vectores alguna transformación directamente, como el logaritmo o raíz cuadrada (con \verb|log()| y \verb|sqrt()|). Hay que ser cuidados con los valores que toman las variables a las que se aplican estas funciones, recordando que la raíz cuadrada no está definida para números negativos y que $\ln(0) \rightarrow -\infty$:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{sqrt}\hlstd{(}\hlopt{-}\hlnum{1}\hlstd{)}
-\end{alltt}
-\begin{verbatim}
-## [1] NaN
-\end{verbatim}
-\begin{alltt}
-\hlkwd{log}\hlstd{(}\hlnum{0}\hlstd{)}
-\end{alltt}
-\begin{verbatim}
-## [1] -Inf
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-
-\subsection{Extraer y calcular información de una regresión}
-
-Un objeto de clase \verb|lm| ---como \verb|mincer|--- es una lista que contiene varios atributos. Estos atributos son objetos calculados por \verb|lm()| con información a la que podemos acceder. Para imprimir una lista completa de los atributos de un objeto usamos \verb|attributes()|:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{attributes}\hlstd{(mincer)}
-\end{alltt}
-\begin{verbatim}
-## $names
-##  [1] "coefficients"  "residuals"     "effects"       "rank"         
-##  [5] "fitted.values" "assign"        "qr"            "df.residual"  
-##  [9] "xlevels"       "call"          "terms"         "model"        
-## 
-## $class
-## [1] "lm"
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-Para usar algún atributo necesitamos la notación de signo \verb|$|. Por ejemplo, podemos guardar el vector $\hat y$ con
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{yhat} \hlkwb{<-} \hlstd{mincer}\hlopt{$}\hlstd{fitted.values}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-Esto puede ser útil, por ejemplo, al implementar el método de variables instrumentales en dos etapas, donde tenemos que rescatar los valores estimados $\hat x$ en la primera etapa para luego incluirlos en la ecuación original. Escribiendo \verb|?lm| puedes obtener más información sobre todos estos atributos.
-
-Vimos que \verb|summary()| calcula e imprime otra información útil del resultado de una regresión. Análogo a \verb|lm()|, \verb|summary()| también tiene atributos a los que podemos acceder:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{mincer.summ} \hlkwb{<-} \hlkwd{summary}\hlstd{(mincer)}
-\hlkwd{attributes}\hlstd{(mincer.summ)}
-\end{alltt}
-\begin{verbatim}
-## $names
-##  [1] "call"          "terms"         "residuals"     "coefficients" 
-##  [5] "aliased"       "sigma"         "df"            "r.squared"    
-##  [9] "adj.r.squared" "fstatistic"    "cov.unscaled" 
-## 
-## $class
-## [1] "summary.lm"
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-Usando estos atributos podemos calcular fácilmente algunos resultados útiles. Por ejemplo, podemos obtener la matriz de varianzas-covarianzas del modelo:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{(mincer.summ}\hlopt{$}\hlstd{sigma)}\hlopt{^}\hlnum{2} \hlopt{*} \hlstd{mincer.summ}\hlopt{$}\hlstd{cov.unscaled}
-\end{alltt}
-\begin{verbatim}
-##             (Intercept) education experience
-## (Intercept)       175.4    -11.09     -1.345
-## education         -11.1      0.78      0.050
-## experience         -1.3      0.05      0.038
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-Finalmente, además de los cálculos que podemos efectuar directamente con estos atributos, existen muchas funciones que toman un objeto de clase \verb|lm| y calculan directamente algún resultado. Por ejemplo, podríamos haber calculado la matriz de varianzas-covarianzas directamente con \verb|vcov()|:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{vcov}\hlstd{(mincer)}
-\end{alltt}
-\begin{verbatim}
-##             (Intercept) education experience
-## (Intercept)       175.4    -11.09     -1.345
-## education         -11.1      0.78      0.050
-## experience         -1.3      0.05      0.038
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-Otras funciones útiles para usar con este tipo de objetos son:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{# Calcular suma de los cuadrados de los residuos (SSR):}
-\hlkwd{deviance}\hlstd{(mincer)}
-\hlcom{# Extraer log-likelihood (LL):}
-\hlkwd{logLik}\hlstd{(mincer)} \hlcom{# no tiene mucho sentido aquí porque no estimamos con MV}
-\hlcom{# Calcular el critero de información de Akaike (AIC):}
-\hlkwd{AIC}\hlstd{(mincer)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-Notar que \verb|AIC()| define el criterio como
+Usando los supuestos RLS.1 a RLS.4 se puede demostrar que los estimadores MCO son insesgados, es decir,
 \begin{equation}
-AIC = -2 \ln \widehat L(p) + K\cdot 2,
+\E(\hat\beta_0) = \beta_0 \text{ y } \E(\hat\beta_1) = \beta_1.
 \end{equation}
-donde $K$ es el número de parámetros estimados y $\widehat L(p)$ es la función de verosimilitud. En muchos casos se prefiere que el criterio sea $AIC/N$, es decir, usar el Criterio de Información Bayesiano (BIC). Esto es,
+
+En general, si cualquiera de los supuestos no se cumple entonces perderemos la propiedad de insesgamiento. RLS.1 requiere que $y$ y $x$ estén relacionados linealmente, lo que ciertamente puede no cumplirse. Hay que recordar, sin embargo, que la relación es solamente lineal en \emph{parámetros}, no en variables, por lo que ciertamente podemos transformar $x$ e $y$ para capturar relaciones no lineales más interesantes.
+RLS.2 asume que nuestros datos corresponden a una muestra aleatoria de la población, lo que claramente no siempre se cumple en datos de corte transversal. Por ejemplo, es posible que solamente tengamos datos de micro y pequeñas empresas, o que solamente observemos jefas de hogar de los quintiles más pobres.
+
+RLS.3 es extremadamente básico y con mucha seguridad se cumplirá en cualquier tipo de datos. Sin embargo, RSL.4 ciertamente representa un problema potencial. Si no se cumple que la media condicional del error es 0, esto es equivalente a decir que existe alguna correlación entre $x$ y $\mu$.
+Una razón por la que esto puede ocurrir es porque dejamos de incluir una variable relevante en nuestro modelo, de forma que esta afecta a $x$ por medio de $\mu$.
+
+\section{Varianza de los estimadores}
+
+Además de asegurarnos que la distribución muestral de $\hat\beta$ esté centrada alrededor de $\beta$ ---es decir, que $\hat\beta$ es insesgado---, es importante saber qué tan dispersa es esta distribución de $\hat\beta$.
+La \autoref{fig:estimadores_varianza} muestra el caso de dos estimadores insesgados donde uno tiene una distribución con mayor varianza que el otro.
+Parece lógico querer elegir, de entre todos los estimadores insesgados, aquel con menor varianza (ie. el azul).
+
+Para poder calcular la varianza de los estimadores MCO es necesario agregar un último supuesto:
+
+\paragraph{RLS.5: Homocedasticidad}\index{homocedasticidad} 
+Asumimos que el error $\mu$ tiene la misma varianza condicional para todos los valores de la variable independiente. Es decir,
 \begin{equation}
-BIC = -2 \ln \widehat L(p) + K \cdot \ln N,
+\Var(\mu | x) = \sigma^2.
 \end{equation}
-donde $N$ es el número de observaciones.
-Para calcular el BIC también usamos \verb|AIC()|, pero especificando un parámetro de penalización distinto:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{AIC}\hlstd{(mincer,} \hlkwc{k} \hlstd{=} \hlkwd{log}\hlstd{(}\hlkwd{NROW}\hlstd{(CPS1988)))} \hlcom{# fijar k=2 es igual que el AIC clásico}
-\end{alltt}
-\begin{verbatim}
-## [1] 418915
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
 
+Usando los supuestos SLR.1 a SLR.5 podemos demostrar que
 
-\subsection{Heterocedasticidad}
+\begin{align}
+\Var(\hat\beta_0) &= \frac{\sigma^2/n \sum_{i=1}^n x_i^2}{\sum_{i=1}^n (x_i - \overline x)^2} \label{eq:var_hat_beta0} \\
+\Var(\hat\beta_1) &= \frac{\sigma^2}{\sum_{i=1}^n (x_i - \overline x)^2}.\label{eq:var_hat_beta1}
+\end{align}
 
-La heterocedasticidad es un problema que es más difícil de pronunciar que de entender: ocurre cuando la dispersión de las variables dependientes no es constante para distintos valores de la variable independiente. La \autoref{fig:heterocedasticidad} muestra datos heterocedásticos para el caso de una regresión bivariada, tanto para una variable dependiente discreta como continua.
+Usualmente nos interesará $\Var(\hat\beta_1)$.
+Vemos que esta varianza depende positivamente de la varianza del error $\sigma^2$. Esto tiene sentido, ya que a mayor varianza de los factores no observables que afectan $y$, es más difícil estimar con precisión $\beta_1$.
+Por otro lado, $\Var(\hat\beta_1)$ depende negativamente de la variación total de $x$, representada por $SST_x = \sum_{i=1}^n (x_i - \overline x)^2$. Esto es así porque entre más dispersos estén los valores de la variable independiente, más fácil será detectar la relación entre $\E(y|x)$ y $x$.
+Además, a medida que el tamaño muestral aumente, también lo hará la variación total en $x_i$, de forma que una muestra más grande siempre resultará en una menor varianza de $\hat\beta_1$.
+
+Cuando $\Var(\mu | x)$ depende de $x$ (cambia con $x$) decimos que el término de error presenta \kw{heterocedasticidad}, o varianza no constante.
+La heterocedasticidad es un problema que es más difícil de pronunciar que de entender: ocurre cuando la dispersión de una variable dependiente no es constante para distintos valores de la variable independiente.
+
+La \autoref{fig:heterocedasticidad} muestra datos heterocedásticos para el caso de una regresión bivariada, tanto para una variable dependiente discreta como continua.
+En el eje $f(y|x)$ se grafica la densidad del término de error, la que en este ejemplo claramente claramente disminuye a medida que $x$ es mayor.
 
 \begin{figure}[htb]
 \pgfmathsetseed{112}
@@ -1160,7 +949,7 @@ declare function={
     ztick=\empty,
     xlabel=$x$, xlabel style={at={(rel axis cs:1,0,0)}, anchor=west},
     ylabel=$y$, ylabel style={at={(rel axis cs:0,1,0)}, anchor=south west},
-    zlabel=$f(\mu)$, zlabel style={at={(rel axis cs:0,0,1)}, anchor=south},
+    zlabel=$f(y|x)$, zlabel style={at={(rel axis cs:0,0,1)}, anchor=south},
     set layers, mark=cube
   ]
 
@@ -1218,7 +1007,7 @@ declare function={
     ztick=\empty,
     xlabel=$x$, xlabel style={at={(rel axis cs:1,0,0)}, anchor=west},
     ylabel=$y$, ylabel style={at={(rel axis cs:0,1,0)}, anchor=south west},
-    zlabel=$f(\mu)$, zlabel style={at={(rel axis cs:0,0,1)}, anchor=south},
+    zlabel=$f(y|x)$, zlabel style={at={(rel axis cs:0,0,1)}, anchor=south},
     set layers, mark=cube
   ]
 
@@ -1247,9 +1036,7 @@ declare function={
 \label{fig:heterocedasticidad}
 \end{figure}
 
-
-
-Podemos generar fácilmente un conjunto de datos que presenten el problema:
+Podemos generar fácilmente un conjunto de datos que presenten heterocedasticidad:
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -1266,7 +1053,7 @@ Podemos generar fácilmente un conjunto de datos que presenten el problema:
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-49-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-30-1} 
 
 }
 
@@ -1276,278 +1063,80 @@ Podemos generar fácilmente un conjunto de datos que presenten el problema:
 
 En presencia de heterocedasticidad una estimación por MCO seguirá entregando coeficientes consistentes e insesgados. Sin embargo, no podremos estimar correctamente la matriz de varianzas-covarianzas, lo que producirá que los errores estándar de los coeficientes estén sesgados. Esto conduce a errores en tests de inferencia, como (por ejemplo) al determinar si un coeficiente es significativo.
 
+\subsection{Estimando la varianza del error}
 
-\subsubsection{Test de Breusch-Pagan}
+Usando los supuesos de regresión lineal simple obtenemos la varianza de $\hat\beta_0$ y $\hat\beta_1$ indicadas en \eqref{eq:var_hat_beta0} y \eqref{eq:var_hat_beta1}.
+El problema es que estas ecuaciones contienen requieren que conozcamos la varianza del error $\sigma^2$, la que casi siempre es desconocida.
+Entonces nuestro objetivo ahora es usar nuestros datos para estimar $\sigma^2$, y así poder estimar la varianza de los parámetros.
 
-El test de Breusch-Pagan es uno de los más clásicos para testear homocedasticidad. El estadístico se distribuye $n\chi^2$ con $k$ grados de libertad. La hipótesis nula corresponde a un modelo homocedástico, de forma que si el estadístico tiene un $p$-value menor a un límite razonable (ej. $p<0.05$) entonces rechazamos la nula y decimos que el modelo es heterocedástico.
-
-Podemos usar \verb|car::ncvTest()| para realizar el test de Breusch-Pagan original:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(car)}
-\hlkwd{ncvTest}\hlstd{(modelo)}
-\end{alltt}
-\begin{verbatim}
-## Non-constant Variance Score Test 
-## Variance formula: ~ fitted.values 
-## Chisquare = 68    Df = 1     p = 1.4e-16
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-Sabemos que \verb|modelo| es heterocedástico (así lo construimos), y esto se confirma con un valor de $p$ muy cercano a 0: tiene 15 ceros a la derecha del separador de decimales!.
-
-También es posible calcular la versión ``estudientizada'' del test, propuesta por \textcite{koenker_note_1981}. Esta versión más robusta que la original\footnote{Más detalles de las diferencias en \url{https://stats.stackexchange.com/a/193070/91358} y en \textcite{koenker_note_1981}.}, y puede ser calculada con \verb|lmtest::bptest()|:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(lmtest)}
-\hlkwd{bptest}\hlstd{(modelo)}
-\end{alltt}
-\begin{verbatim}
-## 
-## 	studentized Breusch-Pagan test
-## 
-## data:  modelo
-## BP = 70, df = 1, p-value <2e-16
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-
-\subsubsection{Matriz de covarianza robusta}
-\label{sec:matriz_cov_robusta}
-
-Como mencioné, en presencia de heterocedasticidad los coeficientes estimados por MCO se mantienen insesgados, pero su varianza estimada será incorrecta. Para calcular una matriz de covarianzas robusta a heterocedasticidad usamos la función \verb|cars::hccm()| o \verb|sandwich::vcovHC()|.
-
-Por ejemplo, continuando con nuestro modelo guardado en \verb|mincer|, podemos verificar que presenta heterocedasticidad y luego calcular la matriz de covarianzas corregida:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{# Testear existencia de heterocedasticidad:}
-\hlkwd{ncvTest}\hlstd{(mincer)}
-\end{alltt}
-\begin{verbatim}
-## Non-constant Variance Score Test 
-## Variance formula: ~ fitted.values 
-## Chisquare = 3135    Df = 1     p = 0
-\end{verbatim}
-\begin{alltt}
-\hlcom{# Calcular matriz de covarianzas robusta:}
-\hlkwd{hccm}\hlstd{(mincer)}
-\end{alltt}
-\begin{verbatim}
-##             (Intercept) education experience
-## (Intercept)       210.4   -14.479     -1.602
-## education         -14.5     1.075      0.068
-## experience         -1.6     0.068      0.050
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-\verb|hccm()| aplica la llamada ``corrección de White'' para el cálculo de la matriz. 
-Es interesante verificar empíricamente una consecuencia importante a la hora de usar esta corrección: los errores robustos serán insesgados (que es lo que queremos), pero el costo es pérdida de eficiencia, es decir, errores más grandes. Compara el resultado anterior con la matriz que calculamos al usar \verb|vcov(mincer)|.
-
-También podemos usar \verb|vcovHC()| para calcular la matriz. Esta función toma como método ``base'' la corrección de White, pero tiene disponibles otros métodos que son variaciones esa base. El método por defecto es HC3, que es equivalente a la opción \verb|robust| del comando \verb|regress| de Stata.\footnote{Ver \url{https://stats.stackexchange.com/q/117052/91358} para una explicación breve sobre replicar el método de Stata. \textcite{long_using_2000} conducen varias simulaciones para estudiar los distintos estimadores HC implementados en \texttt{vcovHC()}.}
-
-Si no nos interesa la matriz de covarianzas en sí misma y sólo queremos obtener nuestros resultados con errores estándar robustos, podemos usar \verb|summary()| con la opción \verb|robust=TRUE|. Esta opción internamente usa \verb|vcovHC()| con HC3 (ver nota al pie):
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{summary}\hlstd{(mincer,} \hlkwc{robust} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-%todo: seccion de autocorrelacion
-
-\subsection{Tests de hipótesis lineal}
-
-El paquete \paq{car} incluye la función \verb|linearHypothesis()| para realizar tests de hipótesis lineal. Puede realizarse un test F o test de Wald, usando la matriz de covarianza regular o ajustada, dependiendo de nuestras especificaciones. Para realizar un test tenemos que construir una matriz de hipótesis y un vector de resultados. Por ejemplo, supongamos que tenemos un modelo lineal con 5 parámetros (incluyendo el intercepto):
-\begin{equation*}
-y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4
-\end{equation*}
-y queremos testear
-
-\begin{equation*}
-H_0 : \; \beta_0 = 0 \; \wedge \; \beta_2 + \beta_3 = 1.
-\end{equation*}
-
-En este caso la matriz de hipótesis y el vector de resultado serían
-
-\begin{equation*}
-\begin{bmatrix}
-    1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 1 & 1 & 0 \\
-\end{bmatrix}
-\beta = 
-\begin{bmatrix}
-    0 \\
-    1 \\
-\end{bmatrix}
-\end{equation*}
-
-En R implementamos esto de la siguiente forma:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{modelo} \hlkwb{<-} \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x1} \hlopt{+} \hlstd{x2} \hlopt{+} \hlstd{x3} \hlopt{+} \hlstd{x4)}
-\hlstd{mh} \hlkwb{<-} \hlkwd{rbind}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{0}\hlstd{,}\hlnum{0}\hlstd{,}\hlnum{0}\hlstd{,}\hlnum{0}\hlstd{),} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{,}\hlnum{0}\hlstd{))}
-\hlstd{vr} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{)}
-\hlkwd{linearHypothesis}\hlstd{(modelo, mh, vr)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-Si \verb|modelo| es un objeto \verb|lm| (como en este caso), se realizará un test $F$ por defecto, mientras que si el objeto es \verb|glm| entonces se realizará un test de Wald $\chi^2$. El tipo de test puede cambiarse por medio de la opción \verb|type|. Asegúrate de revisar el documento de ayuda escribiendo \verb|?linearHypothesis| para ver más detalles.
-
-Podemos realizar un test de hipótesis usando una matriz de covarianzas robusta. La manera más simple de aplicar la corrección de White es con el argumento \verb|white.adjust|:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{linearHypothesis}\hlstd{(modelo, mh, vr,} \hlkwc{white.adjust} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-En términos más generales, podemos pasar a \verb|linearHypothesis()| la matriz de covarianzas que queramos (como las que calculamos en \ref{sec:matriz_cov_robusta}) por medio del argumento \verb|vcov|. Por ejemplo, podríamos pasar una matriz de covarianzas con la corrección de Newey-West al test de hipótesis lineal escribiendo
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{linearHypothesis}\hlstd{(modelo, mh, vr,} \hlkwc{vcov} \hlstd{=} \hlkwd{NeweyWest}\hlstd{(modelo))}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-Entonces \verb|white.adjust = TRUE| es equivalente a escribir \verb|vcov = hccm(modelo)|.
-
-
-\subsection{Mínimos cuadrados ponderados}
-
-Un modelo de mínimos cuadrados ponderados es una respuesta directa al problema de heterocedasticidad. En el modelo lineal simple asumimos que la variación del error es constante para todos los valores de las variables dependientes. Si este supuesto no se cumple, entonces hay puntos que en realidad entregan menos información sobre el proceso que estamos tratando de explicar, y parece razonable entonces penalizar estos puntos en la ponderación. Mínimos cuadrados ponderados es una implementación de esta idea, y permite maximizar la eficiencia de los parámetros estimados en presencia de heterocedasticidad.
-
-Para realizar una estimación por mínimos cuadrados ponderados tenemos que pasar un vector con las ponderaciones al argumento \verb|weights| de \verb|lm()|:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{modelo.mcp} \hlkwb{<-} \hlkwd{lm}\hlstd{(smokes} \hlopt{~} \hlnum{0} \hlopt{+} \hlstd{male,} \hlkwc{data} \hlstd{= smokerdata,} \hlkwc{weights} \hlstd{= ponderaciones)}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.data.frame(data): object 'smokerdata' not found}}\end{kframe}
-\end{knitrout}
-
-
-\subsection{Modelos con variables categóricas}
-
-Una variable categórica es cualquiera donde los valores no tienen valor numérico en sí mismo, si no que representan grupos o categorías. Por ejemplo, una variable que indica la región de Chile en la que se ubica una empresa es categórica. Cada región tiene un número asignado, pero dicho número solo codifica un significado; no el valor en sí no debe usarse como un número.
-
-En R las variables categóricas se denominan factores. Puedes chequear que una variable sea factor con la función \verb|is.factor()|:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{is.factor}\hlstd{(algo)}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.factor(algo): object 'algo' not found}}\end{kframe}
-\end{knitrout}
-
-Si una variable es un factor, entonces al incluirla en la regresión se producirá automáticamente un conjunto de dummies por cada nivel del factor.
-
-En caso de que una variable no esté guardada como factor, puedes usar \verb|factor()| para transformarla. Esto funciona dentro de la regresión también:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{summary}\hlstd{(}\hlkwd{lm}\hlstd{(pc} \hlopt{~} \hlstd{emple} \hlopt{+} \hlkwd{factor}\hlstd{(region)))}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(predvars, data, env): object 'pc' not found}}\end{kframe}
-\end{knitrout}
-
-
-\section{Datos de panel}
-
-Una base de datos de corte transversal (como las que hemos visto hasta ahora) posee una estructura interna unidimensional. Cada unidad (persona, empresa, familia) está indexada por $i$, y la base de datos es una colección de observaciones independientes.
-En un panel los datos poseen una estructura interna indexada por un arreglo de dos dimensiones: una dimensión transversal de unidades indexadas por $i$, y una dimensión temporal indexada por $t$. En términos intuitivos, un panel es equivalente a tener varias bases de corte transversal donde observamos a las mismas unidades en distintos períodos.
-
-\begin{table}[h]
-\centering
-\caption{Ejemplo simple de la estructura de un panel}
-\label{tab:panel_simple}
-\ttfamily
-\begin{tabular}{rrr}
-  \toprule
-  ID & Periodo & X \\
-  \midrule
-  101 & 2015 & 6.5 \\
-  102 & 2015 & 5.2 \\
-  103 & 2015 & 5.9 \\
-  \midrule
-  101 & 2016 & 6.7 \\
-  102 & 2016 & 5.5 \\
-  103 & 2016 & 6.0 \\
-  \bottomrule
-\end{tabular}
-\end{table}
-
-%todo: hacer dibujo de arreglo 3d
-
-%todo: 2 tablas side by side mostrando estructuras transversal y panel
-
-En estricto rigor la nueva dimensión del panel, indexada por $t$, no tiene que representar períodos. Por ejemplo, podríamos tener un panel donde observamos a los mismos estudiantes en distintas asignaturas, y de esa forma $t$ sería un índice de asignatura. Sin embargo, en la gran mayoría de los casos se asume implícitamente que la nueva dimensión del panel representa períodos de algún tipo.
-
-En el contexto de econometría, los modelos de efecto fijo y de efecto aleatorio son modelos de datos de panel que toman en cuenta la variación transversal de los datos. Sea $i=1,\ldots,n$ el índice transversal y $t=1,\ldots,T$ el índice temporal (o más en general, el índice que varía dentro de un grupo). Definimos un modelo de efecto fijo como
-
+Usando los supuestos RLS.1 a RLS.5 es posible demostrar que
 \begin{equation}
-y_{it} = \alpha + u_i + \beta X_{it} + \epsilon_{it}.
-\label{eq:FE-RE}
+\E(\hat\sigma^2) = \sigma^2.
 \end{equation}
-
-Podemos entender este modelo, por ejemplo, como un panel de 30 estudiantes que son observados en tres períodos: 4\textsuperscript{to} básico, 8\textsuperscript{vo} básico y 4\textsuperscript{to} medio. Cada estudiante está identificado por el subíndice $i=1,\ldots,30$ y cada período en el tiempo está identificado por el subíndice $t=1,2,3$. Los valores que toman los indicadores no son relevantes, de forma que $i$ podría haber sido una variable de ID de alumno y $t$ podría haber sido una variable del grado del estudiante.
-
-En este modelo cada unidad identificada por $i$ tiene un intercepto que es invariante en el tiempo, $\alpha + u_i$. En términos del ejemplo, cada estudiante tiene un intercepto distinto. Es por esto que usualmente nos interesa solo incluir el efecto, pero los sigue interesando solamente $\beta$.
-
-Un modelo de efecto aleatorio se define por la misma ecuación, pero se impone la restricción adicional de que el efecto específico a cada unidad no está correlacionado con las variables independientes $X_{it}$, es decir, $\mathrm{E}[u_i, X_{it}] = 0$. En términos intuitivos esto corresponde a una versión más estricta del efecto fijo, ya que este último permite correlación entre dicho efecto y las variables independientes. Es lamentable que el nombre de ``efecto fijo'' y ``efecto aleatorio'' tengan poca relación con lo que realmente significa cada uno.
-
-\subsection{Efectos fijos}
-
-La manera más directa de definir un modelo de efecto fijo es incluyendo una dummy por cada unidad, es decir, haciendo que el indicador transversal $i$ sea un factor.
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{lm}\hlstd{(y} \hlopt{~} \hlkwd{factor}\hlstd{(index)} \hlopt{+} \hlstd{x)}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in unique.default(x, nmax = nmax): unique() applies only to vectors}}\end{kframe}
-\end{knitrout}
-
-Sin embargo esta solución puede resultar incómoda si el número de unidades es muy grande. Por ejemplo, si tenemos un panel de 3000 estudiantes entonces se calculará explícitamente dicha cantidad de coeficientes ($u_i$), los cuales no nos interesan.
-
-Otra manera común de estimar un modelo de efecto fijo es quitando el efecto fijo por la vía de estimar un modelo de diferencia de medias:
-
+Entonces podríamos definir definir el estimador $1/n \sum_{i=1}^n \hat\mu_i^2$ para . Lamentablemente este estimador es sesgado, ya que no toma en cuenta dos restricciones que deben satisfacer los residuos de MCO:
+\begin{align*}
+\sum_{i=1}^n \hat\mu_i &= 0 \\
+\sum_{i=1}^n x_i\hat\mu_i &= 0
+\end{align*}
+Estas restricciones vienen de las condiciones de primer orden del problema de minimización de MCO planteado en \eqref{eq:prob_min_MCO}.
+Una manera de entender cómo influyen estas restricciones al estimador planteado recién es pensando que si conociéramos $n-2$ residuos, siempre podríamos obtener los últimos 2 usando estas restricciones (piensa por qué).
+Esto implica que si bien tenemos $n$ grados de libertad para los errores, existen $n-2$ grados de libertad para los residuos de MCO.
+Entonces el estimador insesgado de $\sigma^2$ corrige el estimador propuesto recién por este cambio en grados de libertad:
 \begin{equation}
-(y_{it} - \overline{y}_i) = \alpha + \beta (X_{it} - \overline{X}_i)  + \zeta{it}.
-\label{eq:within_estimator}
+\hat\sigma^2 = \frac{1}{n-2} \sum_{i=1}^n \hat \mu_i^2.
 \end{equation}
+Este estimador a veces es denotado por $S^2$.
+Una vez que obtenemos $\hat\sigma^2$ podemos usarlo en las ecuaciones \eqref{eq:var_hat_beta0} y \eqref{eq:var_hat_beta1} para calcular $\Var(\hat\beta_0)$ y $\Var(\hat\beta_1)$.
 
-Al estimar \eqref{eq:within_estimator} obtendremos el llamado \eng{within estimator}, que indica la variación promedio a lo largo de $t$ para cada grupo definido por $i$
+\subsection{Error estándar (de los estimadores)}
+
+Parece natural pensar que un estimador para la desviación estándar del error es
+\begin{equation}
+\hat\sigma = \sqrt{\hat\sigma^2}.
+\end{equation}
+A este término se le conoce como el \kw{error estándar de la regresión}. Lamentablemente $\hat\sigma$ no es un estimador insesgado de $\sigma$, pero es consistente: a medida que la cantidad de datos aumenta, el estimador converge en probabilidad al verdadero parámetro $\sigma$.
+Esta situación está representada en la \autoref{fig:estimador_sesgado_consistente}.
+
+\begin{figure}[htb]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+    no markers, domain=0:8, samples=100,
+    axis lines*=left, xlabel=$x$, ylabel=$y$,
+    every axis y label/.style={at=(current axis.above origin),anchor=south},
+    every axis x label/.style={at=(current axis.right of origin),anchor=west},
+    height=4cm, width=6cm,
+    xtick={6},
+    xticklabels={$\sigma$},
+    ytick=\empty,
+    enlargelimits=false, clip=false, axis on top,
+    grid = major
+    ]
+    \addplot [very thick, magenta!80!black] {gauss(4,1)};
+    \addplot [very thick, magenta!50!black] {gauss(5,.5)};
+    \addplot [very thick, magenta!20!black] {gauss(5.75,.25)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Estimador sesgado consistente}
+  \label{fig:estimador_sesgado_consistente}
+\end{figure}%
+
+La estimación $\hat\sigma$ es interesante en sí misma porque representa la desviación estándar de $y$ una vez que hemos eliminado los efectos de $x$.
+Sin embargo, el principal uso de $\hat\sigma$ es para estimar la desviación estándar de $\hat\beta_1$.
+Dado que $\sd(\hat\beta_1) = \sigma / \sqrt{SST_x}$, el estimador natural para esta desviación estándar es
+\begin{equation}
+\se(\hat\beta_1) = \frac{\hat\sigma}{(\sum_{i=1}^n(x_i - \overline x)^2)^{1/2}}.
+\end{equation}
+A este término se le conoce como el \kw{error estándar} de $\hat\beta_1$.
+El error estándar de un estimador nos dá una idea de cuán dispersa es nuestra estimación. Debido a esto, el error estándar juega un rol importante en econometría, y lo usaremos para construir tests estadísticos e intervalos de confianza para distintos métodos que veremos más adelante.
+
+%% Introducción, prefacio:
+%<<cap_OLD, child='cap_OLD.Rnw'>>=
+%@
  
 \nocite{*}
 \printbibliography
+\printindex
+
 
 \end{document}
