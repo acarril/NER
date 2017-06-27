@@ -13,3 +13,9 @@ NER.tex
 *.tex
 *.pdf
 *.aux
+*.idx
+*.ilg
+*.ind
+*.xml
+*-blx.bib
+*.gnuplot
