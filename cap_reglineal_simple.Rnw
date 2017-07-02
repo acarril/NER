@@ -9,6 +9,68 @@ rm(list=ls())
 @
 
 El modelo de regresión lineal es el caballo de batalla de la econometría aplicada.
+Muchas de las preguntas que abordaremos comienzan con dos variables, digamos $x$ e $y$. Nos interesará entonces ``explicar $y$ en términos de $x$''.
+Por ejemplo, $y$ podría ser la tasa de crímenes de varios barrios e $x$ el número de parques construidos en esos barrios.
+O $y$ podría ser el porcentaje de los votos obtenidos por un partido y $x$ su gasto en la campaña electoral, etc.
+
+La \autoref{fig:votos_plot} muestra la relación entre el porcentaje gastado por el partido A (un nombre creativo, sin duda) y el porcentaje de votos obtenido por dicho partido.
+En este ejemplo el porcentaje de votos es $y$, el que es explicado por el gasto $x$.
+El código para crear el gráfico se muestra a continuación:
+<<'votos_plot', fig.cap="Relación entre porcentaje de gasto (\\texttt{shareA}) y porcentaje de votos obtenidos (\\texttt{voteA})">>=
+library(foreign)
+library(ggplot2)
+votos <- read.dta("http://fmwww.bc.edu/ec-p/data/wooldridge/vote1.dta")
+ggplot(votos, aes(shareA, voteA)) + geom_point()
+@
+
+
+%Implícitamente en estos ejemplos definimos $x$ e $y$ como una columna de datos, o un vector. Volveremos sobre este punto en breve.
+
+Al intentar modelar la relación entre $x$ e $y$ surgen una serie de preguntas. Quizás la más inmediata es: ``¿Cuál es la relación funcional entre ambas variables?''
+Nuestro primer supuesto será que las variables se relacionan de manera lineal, es decir,
+\begin{equation*}
+y = ax + b.
+\end{equation*}
+Notemos que esta ecuación es idéntica a la clásica función lineal de colegio, y su interpretación geométrica es la misma: $a$ es un término que representa la pendiente de la recta y $b$ es el intercepto.
+Este supuesto de relación lineal parece cumplirse bastante bien para nuestro ejemplo de la \autoref{fig:votos_plot}.
+
+Sin embargo, hasta ahora nuestro modelo asume que existe una relación lineal \emph{perfecta} entre $x$ e $y$, lo que es \sout{imposible} altamente restrictivo. 
+En términos de la \autoref{fig:votos_plot} es como decir que podríamos trazar una recta que pasara por \emph{todos} los puntos, lo que evidentemente no se puede.
+Entonces surge naturalmente la pregunta de si es posible permitir que otros factores ---distintos de $x$--- afecten en cierta medida a $y$, de forma que nuestro modelo tenga un margen de error.
+Esto se logra agregando un \kw{término de error}, denotado por $\mu$, al modelo lineal.
+
+Adicionalmente, por un simple tema de convención llamaremos $\beta_0$ al parámetro del intercepto y $\beta_1$ al parámetro de la pendiente.
+Entonces podemos reescribir nuestro modelo, que ahora es
+\begin{equation}
+y = \beta_0 + \beta_1x + \mu.
+\label{eq:modelo_lineal_simple}
+\end{equation}
+Esta ecuación define el \kw{modelo de regresión lineal simple}. Entendamos bien qué quiere decir cada palabra de este título:
+\begin{itemize}
+\item \textbf{modelo}, porque es un intento de simplificar la realidad para enfocarnos en algunos aspectos que nos interesan
+\item \textbf{de}, una preposición en la gramática del español
+\item \textbf{regresión} es el término usado originalmente por \textcite{galton_regression_1886}, aunque conceptualmente no guarda mucha relación con lo que hacemos ahora\footnote{\textcite{stigler_history_1986} cuenta una historia más detallada al respecto.} (pero el nombre es \eng{cool})
+\item \textbf{lineal}, porque estamos asumiendo que los aspectos de la realidad que nos interesan ---las variables $x$ e $y$--- se relacionan de manera lineal
+\item \textbf{simple}, porque estamos restringiendo el análisis a solamente dos variables (por el momento).
+\end{itemize}
+
+Muchos libros tienen nombres distintos para $x$ e $y$. Yo uso la convención (bastante establecida) de referirme a $y$ como la \kw{variable dependiente} del modelo, y a $x$ como la \kw{variable independiente} del modelo. Estas son las variables que ya tenemos, y que intentaremos relacionar.
+Ya mencionamos que $\mu$ es el llamado \kw{término de error}, que captura factores que afectan a $y$ que no hemos incluido en el modelo. Ojo que $\mu$ no es igual a $u$, y se pronuncia <<mu>>. Esto es sólo para enredar, claro.
+
+En conjunto nos referiremos a $\beta_0$ y $\beta_1$ como los \kw{parámetros} del modelo. Estos son simples números, pero como no los tenemos, intentaremos \emph{estimarlos}.
+Encontrar una forma razonable de estimar estos parámetros será el objetivo de este capítulo (y más allá).
+
+\subsection*{Resumen/Nuestro objetivo}
+
+Después de esta breve introducción ya tenemos todos los ingredientes para plantear nuestro objetivo principal, el que ya mencioné recién. Resumamos lo que tenemos:
+
+\begin{itemize}
+\item Tenemos dos variables $x$ e $y$ que representan vectores con datos. Intentaremos relacionar estas variables por medio de un modelo lineal, escrito explícitamente en la \autoref{eq:modelo_lineal_simple}
+\end{itemize}
+
+
+\hrulefill
+
 En su forma más simple usualmente se escribe como
 \begin{equation}
 y_i = \beta_0 + \beta_1 x_i + \mu_i.
@@ -62,7 +124,7 @@ Si bien hay muchas líneas que claramente no se ajustan bien a los datos, varias
 Necesitamos un criterio riguroso para elegir los parámetros $\beta_0$ y $\beta_1$ de manera óptima, y esto es lo que haremos a continuación.
 
 
-\subsection{Mínimos Cuadrados Ordinarios}
+\section{Mínimos Cuadrados Ordinarios}
 \label{sec:MCO}
 
 El método de Mínimos Cuadrados Ordinarios (MCO) es una respuesta directa a la pregunta que planteamos recién: ¿qué criterio conviene usar para elegir el modelo lineal que se ajuste ``mejor'' a los datos?
