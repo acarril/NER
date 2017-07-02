@@ -19,3 +19,5 @@ NER.tex
 *.xml
 *-blx.bib
 *.gnuplot
+cache/*
+*.tex
