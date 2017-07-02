@@ -6,6 +6,7 @@
 \usepackage{geometry}
 \usepackage{parskip}
 \usepackage{amsmath}
+\usepackage[normalem]{ulem} % strikethrough
 \usepackage{subcaption}
 \usepackage{pgfplots}
   \pgfplotsset{compat=1.12}
@@ -44,7 +45,7 @@
 <<setup, include=FALSE>>=
 library(knitr)
 library(highr)
-knitr::opts_chunk$set(fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', dev='pdf')
+knitr::opts_chunk$set(cache = TRUE, fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', dev='pdf')
 @
 
 
