@@ -55,8 +55,9 @@
 \usepackage{fontspec}
 \usepackage{geometry}
 \usepackage{parskip}
-\usepackage{amsmath}
-\usepackage[normalem]{ulem} % strikethrough
+\usepackage{mathtools}
+  \newtagform{brackets}{[}{]}
+  \usetagform{brackets}
 \usepackage{subcaption}
 \usepackage{pgfplots}
   \pgfplotsset{compat=1.12}
@@ -109,82 +110,8 @@ Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acar
 \clearpage
 
 % Introducción, prefacio:
-
-
-
-\chapter{Introducción}
-
-En las últimas décadas la economía se ha ido apropiando de los computadores para realizar trabajo empírico y, sin embargo, el enfoque de los libros de econometría sigue siendo eminentemente teórico ---no \emph{aplicado}.
-
-A mi parecer, existen actualmente dos maneras de abordar la enseñanza de econometría. La primera es la clásica, o \emph{matemática}: derivando los modelos desde como ejercicios de álgebra lineal, y en general priorizando aspectos técnicos por sobre los conceptuales o aplicados. Vemos esto en libros que discuten en extensión los supuestos detrás de las formas funcionales o supuestos de distribución, pero que dedican pocas palabras a técnicas aplicadas como métodos de regresión discontinua.
-
-Por otro lado hay quienes, de la mano con el crecimiento de la economía aplicada, abogan por una enseñanza aplicada de econometría, con énfasis en técnicas de 
-
-\section{Qué es R}
-
-R es un ambiente de software y un lenguaje de programación interpretado para hacer análisis estadístico y crear gráficos. Es una implementación de S, un lenguaje de programación matemático orientado a objetos más antiguo. Es software libre y de código abierto, constantemente desarrollado por estadísticos y colaboradores de otras disciplinas.
-
-R es mucho más flexible que la mayoría de los paquetes estadísticos normalmente usados por economistas. Es un lenguaje de programación completamente desarrollado, no sólo un programa con tests y métodos pre-programados.
-
-
-\section{Obtener R}
-
-La instalación base de R puede obtenerse de \url{https://www.r-project.org/}. Una vez instalado puedes usar RGui para usarlo. Sin embargo, usualmente yo tomo dos pasos adicionales para obtener más flexibilidad. El primero es instalar RStudio, un IDE para R que incluye una consola, editor con resaltado de sintaxis, historial de comandos y varias otras vainas que lo hacen más útil que RGui, especialmente si eres principiante. Puedes descargar RStudio de \url{https://www.rstudio.com/}, y también es gratis.
-
-Finalmente, a mi me gusta poder interactuar con R desde la línea de comandos, igual que puedo hacer con Python o Julia. Para poder hacer esto en Windows tenemos que ejecutar R:
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstr{"C:\textbackslash{}Program Files\textbackslash{}R\textbackslash{}R-3.4.0\textbackslash{}bin\textbackslash{}x64\textbackslash{}R"}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-Obviamente, tienes que reemplazar este directorio por el que corresponde a tu instalación. 
-
-\includegraphics[width=\linewidth]{sss/r-win-command-prompt}
-
-\subsection{Usar R interactivamente y a través de scripts}
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{getwd}\hlstd{()}
-\end{alltt}
-\begin{verbatim}
-## [1] "/Users/alvaro/Dropbox (Personal)/Proyectos/NER"
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-
-
-\section{Trabajando con datos}
-
-\subsection{Objetos y asignaciones}
-
-R es un lenguaje interpretado, lo que significa que ejecuta nuestras instrucciones directamente, sin compilar un programa previo. Podemos usar R interactivamente a través de la consola:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlnum{1}\hlopt{+}\hlnum{2}
-\end{alltt}
-\begin{verbatim}
-## [1] 3
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-La mayoría de las operaciones y funciones en R no guardan el resultado de su ejecución. Por ejemplo, el resultado anterior (\verb|3|) es calculado pero no puede ser reutilizado sin volverse a calcular. Para lograr esto tenemos que asignar el resultado de la operación a un objeto:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{x} \hlkwb{<-} \hlnum{1}\hlopt{+}\hlnum{2}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
+%<<cap_intro, child='cap_intro.Rnw'>>=
+%@
 
 % Introducción, prefacio:
 
@@ -199,8 +126,8 @@ Muchas de las preguntas que abordaremos comienzan con dos variables, digamos $x$
 Por ejemplo, $y$ podría ser la tasa de crímenes de varios barrios e $x$ el número de parques construidos en esos barrios.
 O $y$ podría ser el porcentaje de los votos obtenidos por un partido y $x$ su gasto en la campaña electoral, etc.
 
-La \autoref{fig:votos_plot} muestra la relación entre el porcentaje gastado por el partido A (un nombre creativo, sin duda) y el porcentaje de votos obtenido por dicho partido.
-En este ejemplo el porcentaje de votos es $y$, el que es explicado por el gasto $x$.
+La \autoref{fig:votos_plot} muestra datos para 173 campañas entre dos candidatos en EE.UU, enfocándose en el ``candidato A'' (un nombre del que Kafka sin duda estaría orgulloso).
+El eje $x$ corresponde al porcentaje gastado por el candidato A (\verb|shareA|), mientras que el eje $y$ indica el porcentaje de los votos obtenidos por dicho candidato (\verb|voteA|).
 El código para crear el gráfico se muestra a continuación:
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -222,19 +149,17 @@ El código para crear el gráfico se muestra a continuación:
 
 \end{knitrout}
 
-
-%Implícitamente en estos ejemplos definimos $x$ e $y$ como una columna de datos, o un vector. Volveremos sobre este punto en breve.
-
 Al intentar modelar la relación entre $x$ e $y$ surgen una serie de preguntas. Quizás la más inmediata es: ``¿Cuál es la relación funcional entre ambas variables?''
 Nuestro primer supuesto será que las variables se relacionan de manera lineal, es decir,
-\begin{equation*}
+\begin{equation}
 y = ax + b.
-\end{equation*}
+\label{eq:ec_lin}
+\end{equation}
 Notemos que esta ecuación es idéntica a la clásica función lineal de colegio, y su interpretación geométrica es la misma: $a$ es un término que representa la pendiente de la recta y $b$ es el intercepto.
-Este supuesto de relación lineal parece cumplirse bastante bien para nuestro ejemplo de la \autoref{fig:votos_plot}.
+Este supuesto de relación lineal parece cumplirse bastante bien para nuestro ejemplo de la \autoref{fig:votos_plot}: no sabemos qué valores deberían tomar $a$ y $b$, pero definitivamente pareciera existir alguna combinación de valores de $a$ y $b$ tal que una línea se ajuste ``bien'' a los datos.
 
-Sin embargo, hasta ahora nuestro modelo asume que existe una relación lineal \emph{perfecta} entre $x$ e $y$, lo que es \sout{imposible} altamente restrictivo. 
-En términos de la \autoref{fig:votos_plot} es como decir que podríamos trazar una recta que pasara por \emph{todos} los puntos, lo que evidentemente no se puede.
+Sin embargo, hasta ahora nuestro modelo expresado en \eqref{eq:ec_lin} asume que existe una relación lineal \emph{perfecta} entre $x$ e $y$, lo que es altamente restrictivo. 
+En términos de la \autoref{fig:votos_plot}, es como suponer que podríamos trazar una recta que pasara por \emph{todos} los puntos, lo que evidentemente no se puede.
 Entonces surge naturalmente la pregunta de si es posible permitir que otros factores ---distintos de $x$--- afecten en cierta medida a $y$, de forma que nuestro modelo tenga un margen de error.
 Esto se logra agregando un \kw{término de error}, denotado por $\mu$, al modelo lineal.
 
@@ -242,7 +167,7 @@ Adicionalmente, por un simple tema de convención llamaremos $\beta_0$ al parám
 Entonces podemos reescribir nuestro modelo, que ahora es
 \begin{equation}
 y = \beta_0 + \beta_1x + \mu.
-\label{eq:modelo_lineal_simple}
+\label{eq:modelo_lineal_simple_poblacional}
 \end{equation}
 Esta ecuación define el \kw{modelo de regresión lineal simple}. Entendamos bien qué quiere decir cada palabra de este título:
 \begin{itemize}
@@ -257,36 +182,30 @@ Muchos libros tienen nombres distintos para $x$ e $y$. Yo uso la convención (ba
 Ya mencionamos que $\mu$ es el llamado \kw{término de error}, que captura factores que afectan a $y$ que no hemos incluido en el modelo. Ojo que $\mu$ no es igual a $u$, y se pronuncia <<mu>>. Esto es sólo para enredar, claro.
 
 En conjunto nos referiremos a $\beta_0$ y $\beta_1$ como los \kw{parámetros} del modelo. Estos son simples números, pero como no los tenemos, intentaremos \emph{estimarlos}.
-Encontrar una forma razonable de estimar estos parámetros será el objetivo de este capítulo (y más allá).
+Encontrar una forma razonable de estimar estos parámetros será el objetivo de este capítulo (y más allá!), y eso es lo que veremos a continuación.
 
-\subsection*{Resumen/Nuestro objetivo}
+\section{Estimando los parámetros del modelo}
 
-Después de esta breve introducción ya tenemos todos los ingredientes para plantear nuestro objetivo principal, el que ya mencioné recién. Resumamos lo que tenemos:
-
-\begin{itemize}
-\item Tenemos dos variables $x$ e $y$ que representan vectores con datos. Intentaremos relacionar estas variables por medio de un modelo lineal, escrito explícitamente en la \autoref{eq:modelo_lineal_simple}
-\end{itemize}
-
-
-\hrulefill
-
-En su forma más simple usualmente se escribe como
+Nuestro objetivo principal es estimar los parámetros $\beta_0$ y $\beta_1$ del modelo lineal simple explicitado en \eqref{eq:modelo_lineal_simple_poblacional}. Para lograrlo es necesario suponer que contamos con una muestra de la población completa. Llamamos ${(x_i, y_i): i = 1, \ldots, n}$ a una muestra aleatoria de tamaño $n$ de la población, es decir, $x_i$ e $y_i$ son vectores con $n$ observaciones. Entonces reescribimos el modelo en términos de esta muestra:
 \begin{equation}
-y_i = \beta_0 + \beta_1 x_i + \mu_i.
+y_i = \beta_0 + \beta_1 x_i + \mu_i,
 \label{eq:modelo_lineal_simple}
 \end{equation}
-donde $i = 1, \ldots, n$ es un índice que identifica a las observaciones (filas) en los datos. Podríamos tener $n$ personas, familias o empresas. Los términos $x$ e $y$ son vectores de datos de tamaño $n$.
+para todo $i$, donde $i = 1, \ldots, n$ es un índice que identifica a las observaciones (filas) en los datos. Podríamos tener $n$ personas, familias o empresas.
 
-En este modelo suponemos que la variable dependiente $y$ es una función lineal de la variable independiente, $x$. Entonces intentaremos buscar ---o \emph{estimar}--- una combinación de parámetros $\beta_0$ y $\beta_1$ que se ajuste a nuestros datos. Como es posible que los datos no tengan una relación lineal perfecta, el modelo incluye un término de error $\mu_i$. Este término representa otras variables que afectan a $y_i$ que no sean $x_i$.
+Esta ecuación, que sólo se diferencia de \eqref{eq:modelo_lineal_simple_poblacional} por ese pequeño subíndice $i$, es la versión \emph{muestral} del modelo lineal simple.
+Recordemos que hemos supuesto que la variable dependiente $y_i$ es una función lineal de la variable independiente, $x_i$.
+Entonces intentaremos buscar ---o \emph{estimar}--- una combinación de parámetros $\beta_0$ y $\beta_1$ que se ajuste a nuestros datos. Como es posible que los datos no tengan una relación lineal perfecta, el modelo incluye un término de error $\mu_i$. Este término representa todas las variables que afectan a $y_i$ que no son $x_i$.
 
-Por ejemplo, podríamos tener un vector $y$ con los salarios de $n$ personas y modelarlo como una función lineal de los años de educación de esas personas, $x$. Resulta útil tener una base de datos concreta con estos vectores, por lo que usaremos 
+Por ejemplo, podríamos tener un vector $y_i$ con los salarios de $n$ personas y modelarlo como una función lineal de los años de educación de esas personas, $x_i$. Resulta útil tener una base de datos concreta con estos vectores, por lo que usaremos una pequeña muestra de datos simulados.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlcom{#simdatos <- read.csv(}
-\hlcom{#  "https://raw.githubusercontent.com/acarril/NER/master/datos/simdatos.csv")}
-\hlstd{simdatos} \hlkwb{<-} \hlkwd{read.csv}\hlstd{(}\hlstr{"datos/simdatos.csv"}\hlstd{)}
+\hlcom{# Leer datos CSV de internet}
+\hlstd{simdatos} \hlkwb{<-} \hlkwd{read.csv}\hlstd{(}
+  \hlstr{"https://raw.githubusercontent.com/acarril/NER/master/datos/simdatos.csv"}\hlstd{)}
+\hlcom{# Imprimir las primeras filas de los datos}
 \hlkwd{head}\hlstd{(simdatos)}
 \end{alltt}
 \begin{verbatim}
@@ -315,7 +234,7 @@ Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha inf
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-7-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-3-1} 
 
 }
 
@@ -346,7 +265,7 @@ Podríamos elegir entre una infinita variedad de combinaciones de $\beta_0$ y $\
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-8-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-4-1} 
 
 }
 
@@ -355,7 +274,8 @@ Podríamos elegir entre una infinita variedad de combinaciones de $\beta_0$ y $\
 \end{knitrout}
 
 Si bien hay muchas líneas que claramente no se ajustan bien a los datos, varias otras sí lo hacen, y resulta difícil determinar cuál es ``la mejor'' (asumiendo que tal línea existe).
-Necesitamos un criterio riguroso para elegir los parámetros $\beta_0$ y $\beta_1$ de manera óptima, y esto es lo que haremos a continuación.
+Es evidente que necesitamos un criterio riguroso para elegir los parámetros $\beta_0$ y $\beta_1$ de manera óptima.
+Esto es lo que veremos a continuación.
 
 
 \section{Mínimos Cuadrados Ordinarios}
@@ -365,17 +285,19 @@ El método de Mínimos Cuadrados Ordinarios (MCO) es una respuesta directa a la 
 Geométricamente, el método de MCO equivale a minimizar la distancia vertical entre los puntos y la recta definida por el modelo.
 
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-9-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/MCO-1} 
 
 }
 
+\caption[Línea de ajuste (rojo) y residuos (azul) del modelo lineal simple]{Línea de ajuste (rojo) y residuos (azul) del modelo lineal simple}\label{fig:MCO}
+\end{figure}
 
 
 \end{knitrout}
 
-Recordemos que nuestro modelo original es
+Recordemos que estamos trabajando con la versión muestral del modelo lineal simple, es decir,
 \begin{equation*}
 y_i = \beta_0 + \beta_1 x_i + \mu_i.
 \end{equation*}
@@ -457,7 +379,7 @@ Ahora podemos usar los parámetros estimados para graficar $\hat y_i$ sobre los 
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-11-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-6-1} 
 
 }
 
@@ -489,7 +411,7 @@ La función \verb|lm()| viene de \eng{linear model}, y permite calcular rápidam
 Una de las ventajas de usar \verb|lm()| es que podemos guardar sus resultados en un objeto, el que luego podemos manipular para extraer otro tipo de información útil del modelo. A continuación veremos cómo extraer, manipular e interpretar esta información, lo que nos dará una comprensión mucho más profunda de lo que estamos haciendo.
 
 
-\subsection{Interpretando un modelo lineal}
+\section{Interpretando un modelo lineal}
 
 Usaremos ahora la base \verb|wage2|, que es uno de los datos usados por \textcite{wooldridge_introductory_2013} y contiene información de ingresos (y otras variables) para 935 personas. \footnote{Esta base es un subconjunto de los datos del estudio de \textcite{blackburn_unobserved_1992}.}
 
@@ -547,7 +469,7 @@ Escribimos lo siguiente para lograr estas tres cosas:
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-14-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-9-1} 
 
 }
 
@@ -637,7 +559,7 @@ En el ejemplo, ...
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-18-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-13-1} 
 
 }
 
@@ -754,7 +676,7 @@ Podemos graficar nuestra predicción sobre los datos para inspeccionar visualmen
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-26-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-21-1} 
 
 }
 
@@ -773,7 +695,7 @@ También resulta interesante analizar los residuos, que son ``la otra cara de la
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-27-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-22-1} 
 
 }
 
@@ -790,7 +712,7 @@ También resulta interesante analizar los residuos, que son ``la otra cara de la
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-28-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-23-1} 
 
 }
 
@@ -1129,7 +1051,7 @@ Podemos generar fácilmente un conjunto de datos que presenten heterocedasticida
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-30-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-25-1} 
 
 }
 

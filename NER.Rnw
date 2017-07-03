@@ -5,8 +5,9 @@
 \usepackage{fontspec}
 \usepackage{geometry}
 \usepackage{parskip}
-\usepackage{amsmath}
-\usepackage[normalem]{ulem} % strikethrough
+\usepackage{mathtools}
+  \newtagform{brackets}{[}{]}
+  \usetagform{brackets}
 \usepackage{subcaption}
 \usepackage{pgfplots}
   \pgfplotsset{compat=1.12}
@@ -65,8 +66,8 @@ Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acar
 \clearpage
 
 % Introducción, prefacio:
-<<cap_intro, child='cap_intro.Rnw'>>=
-@
+%<<cap_intro, child='cap_intro.Rnw'>>=
+%@
 
 % Introducción, prefacio:
 <<cap_reglineal_simple, child='cap_reglineal_simple.Rnw'>>=
