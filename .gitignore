@@ -21,3 +21,4 @@ NER.tex
 *.gnuplot
 cache/*
 *.tex
+NER.tex
