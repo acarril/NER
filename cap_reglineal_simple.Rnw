@@ -277,7 +277,7 @@ Usamos \verb|read.dta()| (del paquete \paq{foreign}) para leer bases de datos de
 
 %Es evidente que estos datos (reales) no presentan una relación lineal tan evidente. Más adelante nos haremos cargo de este problema.
 
-Podemos escribir la línea de regresión definida en \eqref{eq:linea_regresion} usando los nombres de las variables que nos interesan. Luego estimamos los coeficientes del modelo con \verb|lm()|, esta vez definiendo una fórmula donde \verb|wage| es la variable dependiente y \verb|educ| es la variable independiente.
+Podemos escribir la línea de regresión definida en \eqref{eq:linea_regresion} usando los nombres de las variables que nos interesan: salario mensual en dólares (\verb|wage|) y años de educación (\verb|educ|). Luego estimamos los coeficientes del modelo con \verb|lm()|, esta vez definiendo una fórmula donde \verb|wage| es la variable dependiente y \verb|educ| es la variable independiente.
 \begin{align*}
 \hat y &= \hat\beta_0 + \hat\beta_1 x \\
 \widehat\text{wage} &= \hat\beta_0 + \hat\beta_1 \text{educ}.
@@ -296,11 +296,11 @@ Por otro lado, el coeficiente estimado para la pendiente ($\hat\beta_1$) nos dic
 \begin{equation*}
 \Delta \hat y = \Delta \hat y / \Delta x.
 \end{equation*}
-Por ejemplo, en la estimación anterior hemos obtenido que $\hat\beta_1 = \Sexpr{coefficients(modelo)[1]}$.
-Esto puede interpretarse como que un aumento de un año de educación ($x$ aumenta en una unidad) está asociado a un aumento promedio de (casi) \Sexpr{round(coefficients(modelo)[1])} dólares en el salario.
+Por ejemplo, en la estimación anterior hemos obtenido que $\hat\beta_1 = \Sexpr{coefficients(modelo)[2]}$.
+Esto puede interpretarse como que un aumento de un año de educación ($x$ aumenta en una unidad) está asociado a un aumento promedio de (casi) \Sexpr{round(coefficients(modelo)[2])} dólares en el salario.
 Podemos asegurar que un aumento de $x$ produce un aumento en $\hat y$ porque el signo del coeficiente estimado es positivo; si el coeficiente estimado hubiese sido negativo, entonces diríamos que un año adicional de educación \emph{reduce} el salario promedio (¿tendría sentido esto?).
 
-Notar que hemos sido muy cuidadosos en no darle interpretación causal a la variable independiente. En otras palabras, evitamos decir que un año adicional de educación \emph{provoca} un aumento promedio de \Sexpr{round(coefficients(modelo)[1])} dólares en el ingreso. La pregunta de causalidad es importante, y un tema muy estudiado en econometría. Sin embargo, sólo podremos hablar de causalidad más adelante, cuando hayamos estudiado las propiedades estadísticas de los estimadores de MCO e impongamos supuestos más fuertes sobre la población.
+Notar que hemos sido muy cuidadosos en no darle interpretación causal a la variable independiente. En otras palabras, evitamos decir que un año adicional de educación \emph{provoca} un aumento promedio de \Sexpr{round(coefficients(modelo)[2])} dólares en el ingreso. La pregunta de causalidad es importante, y un tema muy estudiado en econometría. Sin embargo, sólo podremos hablar de causalidad más adelante, cuando hayamos estudiado las propiedades estadísticas de los estimadores de MCO e impongamos supuestos más fuertes sobre la población.
 
 %\subsubsection{Errores estándar de los coeficientes}
 
@@ -324,6 +324,60 @@ Notar que hemos sido muy cuidadosos en no darle interpretación causal a la vari
 
 
 \section{Valor esperado de los estimadores}
+
+Hasta ahora hemos aprendido a calcular e interpretar los parámetros de un modelo lineal simple. Sin embargo, recordemos que nuestra estimación de $\hat\beta_0$ y $\hat\beta_1$ proviene de una muestra aleatoria de la población.
+En esta sección analizaremos las propiedades estadísticas de $\hat\beta_0$ y $\hat\beta_1$, lo que nos dará herramientas para estimar qué tanto se acercan nuestras estimaciones a los verdaderos parámetros poblacionales.
+
+Primero nos detendremos a entender el problema en sí: ¿en qué se diferencian los parámetros estimados ($\hat\beta_0$ y $\hat\beta_1$) de los verdaderos parámetros poblacionales ($\beta_0$ y $\beta_1$)?
+
+Cuando planteamos el modelo de regresión lineal simple (ecuación \eqref{eq:modelo_lineal_simple_poblacional}), supusimos que las variables $x$ e $y$ se relacionaban por medio de una función lineal, y que 
+
+Si bien en estricto rigor suponemos que el ``tamaño'' de la población es infinito, fijamos $N=1.000.000$ para efectos de nuestra población simulada.
+Luego definimos un error \verb|u| con media 0 (es uno de nuestros supuestos) y desviación estándar \verb|sigma| $=5$. Finalmente generamos \verb|y| como una función lineal de \verb|x|, con intercepto 2 y pendiente 10, e incluyendo nuestro error \verb|u|$\sim \mathcal{N}(0, 5)$.\footnote{No es necesario asumir que $\mu \sim \mathcal{N}$, ya que bastaría con que $\E(\mu)=0$. Es un error común pensar que MCO requiere errores con distribución normal.}
+
+<<>>=
+# Parámetros iniciales
+set.seed(03072017)
+N <- 1000000
+sigma <- 5
+
+# Variables poblacionales
+x <- runif(N)
+u <- rnorm(N, 0, sigma)
+y <- 2 + 10*x + u
+poblacion <- data.frame(y,x)
+@
+
+Al haber creado nosotros mismos los datos poblacionales, estamos seguros de los verdaderos valores de los parámetros: $\beta_0=2$ y $\beta_1=10$. La única desviación que se dará en nuestra simulación es debido a que la población no es infinita (aunque se le acerca bastante).
+
+<<>>=
+# Estimar parámetros poblacionales
+lm(y~x, data = poblacion)
+@
+
+Verificamos que en nuestra población simulada los parámetros son ...
+A continuación extraemos una muestra aleatoria de 100 observaciones ($n=100$) de la población. Esto es lo que nosotros suponemos que hacemos cuando tenemos, por ejemplo, una base de datos con puntajes SIMCE para de 100 estudiantes.
+Luego estimamos los coeficientes $\hat\beta_0$ y $\hat\beta_1$ para esta muestra en particular.
+
+<<echo=-4>>=
+# Extraer una muestra aleatoria de la población y estimar sus parámetros
+muestra <- poblacion[sample(1:N, 100),]
+lm(y~x, data = muestra)
+modelo_muestral <- lm(y~x, data = muestra)
+coefficients(modelo_muestral)
+@
+
+Observamos que los coeficientes estimados en esta muestra particular son bastante distintos de los reales: $\hat\beta_0 = \Sexpr{coefficients(modelo_muestral)[1]}$ y $\hat\beta_1 = \Sexpr{coefficients(modelo_muestral)[2]}$.
+Este fenómeno no es exclusivo a los estimadores, y en realidad ocurre para cualquier tipo de estadística que es calculada para la muestra de una población.
+
+Por ejemplo, supón una población (un poco ridícula) de 4 personas, y observamos sus pesos en kilogramos:
+\begin{equation*}
+P = \{74, 62, 65, 71\}.
+\end{equation*}
+Si tomamos muestras de 2 personas repetidas veces, obtendremos distintas estimaciones del promedio poblacional. Algunos promedios muestrales serán iguales al promedio poblacional, mientras que otros no. Lo importante es que al tomar varias muestras y guardar registro de los promedios muestrales,
+
+ninguna muestra de menos de 2 observaciones nos entregará este promedio. Al extraer repetidas muestras obtendremos una distribución muestral: algunos promedios de nuestra muestra se repetirán más que otros.
+\hrulefill
 
 Recordemos el hecho que los estimadores MCO ($\hat\beta_0$ y $\hat\beta_1$, o en general $\hat\beta$) tienen una distribución de probabilidad.
 Esto ocurre porque si tomáramos distintas muestras de tamaño $n$, obtendríamos distintos valores para $\hat\beta$.
