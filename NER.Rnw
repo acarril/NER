@@ -5,6 +5,7 @@
 \usepackage{fontspec}
 \usepackage{geometry}
 \usepackage{parskip}
+\usepackage{tcolorbox}
 \usepackage{mathtools}
   \newtagform{brackets}{[}{]}
   \usetagform{brackets}
@@ -42,11 +43,36 @@
 % Eliminar numeración en títulos menores que secciones
 \setcounter{secnumdepth}{2}
 
+% Color box para R
+% new tcolorbox environment
+% #1: tcolorbox options
+% #2: color
+% #3: box title
+\newtcolorbox{Rbox}[1][]
+{
+  title = El c\'odigo R,
+  fonttitle=\sffamily\bfseries,
+  colbacktitle=black!35!white,
+  colframe=black!35!white,
+  fontupper=\sffamily,
+  colupper=black!80!white
+  #1,
+}
+
 % Code chunk
 <<setup, include=FALSE>>=
 library(knitr)
 library(highr)
 knitr::opts_chunk$set(cache = TRUE, fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', dev='pdf')
+## First have a look at the default inline hook function
+knit_hooks$get("inline")
+
+## Then customize it to your own liking
+inline_hook <- function(x) {
+    if(is.numeric(x)) x <- round(x, 2)
+    paste(as.character(x), collapse=", ")
+}
+knit_hooks$set(inline = inline_hook)
 @
 
 

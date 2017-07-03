@@ -55,6 +55,7 @@
 \usepackage{fontspec}
 \usepackage{geometry}
 \usepackage{parskip}
+\usepackage{tcolorbox}
 \usepackage{mathtools}
   \newtagform{brackets}{[}{]}
   \usetagform{brackets}
@@ -91,6 +92,22 @@
 
 % Eliminar numeración en títulos menores que secciones
 \setcounter{secnumdepth}{2}
+
+% Color box para R
+% new tcolorbox environment
+% #1: tcolorbox options
+% #2: color
+% #3: box title
+\newtcolorbox{Rbox}[1][]
+{
+  title = El c\'odigo R,
+  fonttitle=\sffamily\bfseries,
+  colbacktitle=black!35!white,
+  colframe=black!35!white,
+  fontupper=\sffamily,
+  colupper=black!80!white
+  #1,
+}
 
 % Code chunk
 
@@ -148,6 +165,9 @@ El código para crear el gráfico se muestra a continuación:
 
 
 \end{knitrout}
+\begin{Rbox}
+El comando \verb|library()| permite cargar paquetes de R, los que contienen más funciones y datos. \paq{foreign} es un paquete que nos permite usar la función \verb|read.dta()| para leer una base de datos de Stata, y \paq{ggplot2} nos permite usar la funciones \verb|ggplot()| y \verb|geom_point()| para crear un gráfico de puntos.
+\end{Rbox}
 
 Al intentar modelar la relación entre $x$ e $y$ surgen una serie de preguntas. Quizás la más inmediata es: ``¿Cuál es la relación funcional entre ambas variables?''
 Nuestro primer supuesto será que las variables se relacionan de manera lineal, es decir,
@@ -220,16 +240,18 @@ Por ejemplo, podríamos tener un vector $y_i$ con los salarios de $n$ personas y
 \end{kframe}
 \end{knitrout}
 
-El comando \verb|read.csv()| permite leer bases de datos en formato CSV. Lo usamos para leer una base en línea y luego asignamos esos datos al objeto \verb|simdatos| (datos simulados). 
-La función \verb|head()| sirve para imprimir el encabezado de los datos, lo que permite hacernos una idea rápida de las variables y sus valores.
-Esta base tiene 30 observaciones (puedes imprimirla completa ejecutado \verb|simdatos|). La variable \verb|y| representa ingreso por hora (en miles de pesos) y la variable \verb|x| representa años de educación.
+\begin{Rbox}
+\verb|read.csv()| permite leer bases de datos en formato CSV. Lo usamos para leer una base en línea y luego asignamos esos datos al objeto \verb|simdatos| (datos simulados). 
+Usamos \verb|head()| para imprimir el encabezado de los datos, lo que permite hacernos una idea rápida de las variables y sus valores (puedes imprimir la base completa ejecutado \verb|simdatos|).
+Esta base tiene solamente 30 observaciones.
+\end{Rbox}
 
-Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha información y revela patrones. Para esto usaremos \paq{ggplot2}, un paquete muy poderoso para crear gráficos de distintos tipos. Lo cargamos y luego creamos un gráfico de puntos con los datos:
+En esta base la variable \verb|y| representa ingreso por hora (en miles de pesos) y la variable \verb|x| representa años de educación.
+Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha información y revela patrones que son difíciles de ver en los datos.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{library}\hlstd{(ggplot2)}
 \hlkwd{ggplot}\hlstd{(simdatos,} \hlkwd{aes}\hlstd{(x, y))} \hlopt{+} \hlkwd{geom_point}\hlstd{()}
 \end{alltt}
 \end{kframe}
@@ -241,6 +263,10 @@ Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha inf
 
 
 \end{knitrout}
+
+\begin{Rbox}
+\paq{ggplot2} es un paquete muy poderoso para crear gráficos de distintos tipos. Su principal función es \verb|ggplot()|, que permite definir los datos y las variables que usaremos (dentro de \verb|aes()|). Luego usamos \kw{funciones geom} para definir el tipo de gráfico; en este caso \verb|geom_point()| crea un gráfico de puntos.
+\end{Rbox}
 
 Vemos que existe una evidente relación lineal entre $x$ e $y$: a mayor nivel de educación parece haber mayor nivel de ingreso.
 Esto es bueno para nosotros, ya que queremos ajustar los datos a un modelo lineal como el que escribimos en \eqref{eq:modelo_lineal_simple}.
@@ -322,7 +348,7 @@ El método de MCO corresponde a elegir $\hat\beta_0$ y $\hat\beta_1$ en \eqref{e
 \label{eq:prob_min_MCO}
 \end{align}
 
-Al resolver este problema de minimización obtendremos los estimadores MCO:\footnote{La derivación paso a paso puede encontrarse, por ejemplo, en \textcite[cap. 2]{wooldridge_introductory_2013}.}
+Al resolver este problema de minimización obtendremos los estimadores MCO:\footnote{La derivación paso a paso puede encontrarse, por ejemplo, en \textcite[cap. 2]{wooldridge_introductory_2016}.}
 
 \begin{align}
 \hat \beta_1 &= \sum_{i=1}^n \frac{\sum_{i=1}^n (x_i - \bar x)(y_i - \bar y)}{\sum_{i=1}^n (x_i - \bar x)^2} \notag \\
@@ -413,7 +439,7 @@ Una de las ventajas de usar \verb|lm()| es que podemos guardar sus resultados en
 
 \section{Interpretando un modelo lineal}
 
-Usaremos ahora la base \verb|wage2|, que es uno de los datos usados por \textcite{wooldridge_introductory_2013} y contiene información de ingresos (y otras variables) para 935 personas. \footnote{Esta base es un subconjunto de los datos del estudio de \textcite{blackburn_unobserved_1992}.}
+Usaremos ahora la base \verb|wage2|, que es uno de los datos usados por \textcite{wooldridge_introductory_2016} y contiene información de ingresos (y otras variables) para 935 personas. \footnote{Esta base es un subconjunto de los datos del estudio de \textcite{blackburn_unobserved_1992}.}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
