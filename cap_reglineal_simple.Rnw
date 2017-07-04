@@ -16,28 +16,31 @@ O $y$ podría ser el porcentaje de los votos obtenidos por un partido y $x$ su g
 Tomemos este último ejemplo y construyamos un caso concreto.
 La \autoref{fig:votos_plot} muestra datos de 173 campañas entre los dos candidatos finalistas en elecciones estadounidenses.
 Nos enfocamos en el ``candidato A'' (un nombre del que Kafka sin duda estaría orgulloso).
-El eje $x$ corresponde al porcentaje gastado por el candidato A (\verb|shareA|), mientras que el eje $y$ indica el porcentaje de los votos obtenidos por dicho candidato (\verb|voteA|).
-El código para crear el gráfico se muestra a continuación:
+El eje $x$ corresponde al porcentaje gastado por este candidato (\verb|shareA|), mientras que el eje $y$ indica el porcentaje de los votos que obtuvo (\verb|voteA|).
+El código para leer los datos y crear el gráfico se muestra a continuación:
+
 <<'votos_plot', fig.cap="Relación entre porcentaje de gasto (\\texttt{shareA}) y porcentaje de votos obtenidos (\\texttt{voteA})">>=
 library(foreign)
 library(ggplot2)
 votos <- read.dta("http://fmwww.bc.edu/ec-p/data/wooldridge/vote1.dta")
 ggplot(votos, aes(shareA, voteA)) + geom_point()
 @
+
 \begin{Rbox}
 \verb|library()| permite cargar paquetes de R, los que contienen más funciones y datos. \paq{foreign} es un paquete que nos permite usar la función \verb|read.dta()| para leer una base de datos de Stata, y \paq{ggplot2} nos permite usar la funciones \verb|ggplot()| y \verb|geom_point()| para crear un gráfico de puntos.
 \end{Rbox}
 
-Al intentar modelar la relación entre $x$ e $y$ surgen una serie de preguntas. Quizás la más inmediata es: ``¿Cuál es la relación funcional entre ambas variables?''
+Al intentar modelar la relación entre $x$ e $y$ surgen una serie de preguntas. Quizás la más inmediata es: ``¿cuál es la relación funcional entre ambas variables?''
 Nuestro primer supuesto será que las variables se relacionan de manera lineal, es decir,
 \begin{equation}
 y = ax + b.
 \label{eq:ec_lin}
 \end{equation}
-Notemos que esta ecuación es idéntica a la clásica función lineal de colegio, y su interpretación geométrica es la misma: $a$ es un término que representa la pendiente de la recta y $b$ es el intercepto.
+
+La ecuación \eqref{eq:ec_lin} corresponde a la clásica función lineal de colegio, y su interpretación geométrica es la misma: $a$ es un término que representa la pendiente de una recta, y $b$ es su intercepto.
 Este supuesto de relación lineal parece cumplirse bastante bien para nuestro ejemplo de la \autoref{fig:votos_plot}: no sabemos qué valores deberían tomar $a$ y $b$, pero definitivamente pareciera existir alguna combinación de valores de $a$ y $b$ tal que una línea se ajuste ``bien'' a los datos.
 
-Sin embargo, hasta ahora nuestro modelo expresado en \eqref{eq:ec_lin} asume que existe una relación lineal \emph{perfecta} entre $x$ e $y$, lo que es altamente restrictivo. 
+Sin embargo, el modelo expresado en \eqref{eq:ec_lin} asume que existe una relación lineal \emph{perfecta} entre $x$ e $y$, lo que es altamente restrictivo. 
 En términos de la \autoref{fig:votos_plot}, es como suponer que podríamos trazar una recta que pasara por \emph{todos} los puntos, lo que evidentemente no se puede.
 Entonces surge naturalmente la pregunta de si es posible permitir que otros factores ---distintos de $x$--- afecten en cierta medida a $y$, de forma que nuestro modelo tenga un margen de error.
 Esto se logra agregando un \kw{término de error}, denotado por $\mu$, al modelo lineal.
@@ -53,30 +56,35 @@ Esta ecuación define el \kw{modelo de regresión lineal simple}. Entendamos bie
 \item \textbf{modelo}, porque es un intento de simplificar la realidad para enfocarnos en algunos aspectos que nos interesan
 \item \textbf{de}, una preposición en la gramática del español
 \item \textbf{regresión} es el término usado originalmente por \textcite{galton_regression_1886}, aunque conceptualmente no guarda mucha relación con lo que hacemos ahora\footnote{\textcite{stigler_history_1986} cuenta una historia más detallada al respecto.} (pero el nombre es \eng{cool})
-\item \textbf{lineal}, porque estamos asumiendo que los aspectos de la realidad que nos interesan ---las variables $x$ e $y$--- se relacionan de manera lineal
+\item \textbf{lineal}, porque estamos asumiendo que los aspectos de la realidad que nos interesan ---las variables $x$ e $y$--- se relacionan de manera lineal en parámetros
 \item \textbf{simple}, porque estamos restringiendo el análisis a solamente dos variables (por el momento).
 \end{itemize}
 
 Muchos libros tienen nombres distintos para $x$ e $y$. Yo uso la convención (bastante establecida) de referirme a $y$ como la \kw{variable dependiente} del modelo, y a $x$ como la \kw{variable independiente} del modelo. Estas son las variables que ya tenemos, y que intentaremos relacionar.
 Ya mencionamos que $\mu$ es el llamado \kw{término de error}, que captura factores que afectan a $y$ que no hemos incluido en el modelo. Ojo que $\mu$ no es igual a $u$, y se pronuncia <<mu>>. Esto es sólo para enredar, claro.
 
-En conjunto nos referiremos a $\beta_0$ y $\beta_1$ como los \kw{parámetros} del modelo. Estos son simples números, pero como no los tenemos, intentaremos \emph{estimarlos}.
-Encontrar una forma razonable de estimar estos parámetros será el objetivo de este capítulo (y más allá!), y eso es lo que veremos a continuación.
+En conjunto nos referiremos a $\beta_0$ y $\beta_1$ como los \kw{parámetros} (o coeficientes) del modelo.
+Estos son simples números, pero como no los tenemos, intentaremos \emph{estimarlos}.
+Encontrar una forma razonable de estimar estos parámetros será el objetivo de este capítulo (¡y más allá!).
+Emprendemos esta tarea a continuación.
 
 \section{Estimando los parámetros del modelo}
 
-Nuestro objetivo principal es estimar los parámetros $\beta_0$ y $\beta_1$ del modelo lineal simple explicitado en \eqref{eq:modelo_lineal_simple_poblacional}. Para lograrlo es necesario suponer que contamos con una muestra de la población completa. Llamamos ${(x_i, y_i): i = 1, \ldots, n}$ a una muestra aleatoria de tamaño $n$ de la población, es decir, $x_i$ e $y_i$ son vectores con $n$ observaciones. Entonces reescribimos el modelo en términos de esta muestra:
+Nuestro objetivo ahora es estimar los parámetros $\beta_0$ y $\beta_1$ del modelo de regresión simple explicitado en \eqref{eq:modelo_lineal_simple_poblacional}. En términos geométricos, queremos encontrar una forma de estimar el intercepto y la pendiente de una recta para que esta se ajuste ``bien'' a los datos.
+
+Para lograrlo es necesario suponer que contamos con una muestra de la población completa. Llamamos ${(x_i, y_i): i = 1, \ldots, n}$ a una muestra aleatoria de tamaño $n$ de la población, es decir, $x_i$ e $y_i$ son vectores con $n$ observaciones. Entonces reescribimos el modelo en términos de esta muestra:
 \begin{equation}
 y_i = \beta_0 + \beta_1 x_i + \mu_i,
 \label{eq:modelo_lineal_simple}
 \end{equation}
-para todo $i$, donde $i = 1, \ldots, n$ es un índice que identifica a las observaciones (filas) en los datos. Podríamos tener $n$ personas, familias o empresas.
+para todo $i$, donde $i = 1, \ldots, n$ es un índice que identifica a las observaciones (filas) en los datos.
+Podríamos tener $n$ personas, familias o empresas en nuestra muestra.
 
-Esta ecuación, que sólo se diferencia de \eqref{eq:modelo_lineal_simple_poblacional} por ese pequeño subíndice $i$, es la versión \emph{muestral} del modelo lineal simple.
-Recordemos que hemos supuesto que la variable dependiente $y_i$ es una función lineal de la variable independiente, $x_i$.
-Entonces intentaremos buscar ---o \emph{estimar}--- una combinación de parámetros $\beta_0$ y $\beta_1$ que se ajuste a nuestros datos. Como es posible que los datos no tengan una relación lineal perfecta, el modelo incluye un término de error $\mu_i$. Este término representa todas las variables que afectan a $y_i$ que no son $x_i$.
+La ecuación \eqref{eq:modelo_lineal_simple}, que sólo se diferencia de \eqref{eq:modelo_lineal_simple_poblacional} por ese pequeño subíndice $i$, es la versión \emph{muestral} del modelo lineal simple.
+Como hemos supuesto que tenemos una muestra aleatoria, todavía podemos pensar que la variable dependiente $y_i$ es una función lineal de la variable independiente $x_i$, y que tenemos un término de error $\mu_i$ para capturar el efecto que otros factores tienen sobre $y_i$.
+%Entonces intentaremos buscar ---o \emph{estimar}--- una combinación de parámetros $\beta_0$ y $\beta_1$ que se ajuste a los datos de nuestra muestra.
 
-Por ejemplo, podríamos tener un vector $y_i$ con los salarios de $n$ personas y modelarlo como una función lineal de los años de educación de esas personas, $x_i$. Resulta útil tener una base de datos concreta con estos vectores, por lo que usaremos una pequeña muestra de datos simulados.
+Por ejemplo, podríamos tener un vector $y_i$ con los salarios de $n=30$ personas, y modelarlo como una función lineal de los años de educación de esas personas, $x_i$. Resulta útil tener una base de datos concreta con estos vectores, por lo que usaremos una pequeña muestra de datos simulados.
 
 <<results=TRUE>>=
 # Leer datos CSV de internet
@@ -92,8 +100,9 @@ Usamos \verb|head()| para imprimir el encabezado de los datos, lo que permite ha
 Esta base tiene solamente \Sexpr{nrow(simdatos)} observaciones.
 \end{Rbox}
 
-En esta base la variable \verb|y| representa ingreso por hora (en miles de pesos) y la variable \verb|x| representa años de educación.
-Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha información y revela patrones que son difíciles de ver en los datos.
+En esta base la variable \verb|y| contiene salarios por hora (en miles de pesos) y la variable \verb|x| contiene años de educación.
+Cada fila representa una observación (en este caso, una persona) distinta.
+Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha información y revela patrones que son difíciles de ver en los datos. Creamos un gráfico simple con \paq{ggplot2}:
 
 <<>>=
 ggplot(simdatos, aes(x, y)) + geom_point()
@@ -103,11 +112,11 @@ ggplot(simdatos, aes(x, y)) + geom_point()
 \paq{ggplot2} es un paquete muy poderoso para crear gráficos de distintos tipos. Su principal función es \verb|ggplot()|, que permite definir los datos y las variables que usaremos (dentro de \verb|aes()|). Luego usamos \kw{funciones geom} para definir el tipo de gráfico; en este caso \verb|geom_point()| crea un gráfico de puntos.
 \end{Rbox}
 
-Vemos que existe una evidente relación lineal entre $x$ e $y$: a mayor nivel de educación parece haber mayor nivel de ingreso.
+Vemos que existe una evidente relación lineal entre $x_i$ e $y_i$: a mayor nivel de educación parece haber mayor nivel de ingreso.
 Esto es bueno para nosotros, ya que queremos ajustar los datos al modelo lineal que escribimos en \eqref{eq:modelo_lineal_simple}.
-Cabe preguntarse ahora cuál es la manera óptima de elegir los parámetros que determinan dicha relación lineal, es decir, ¿cómo podemos elegir $\beta_0$ (el intercepto) y $\beta_1$ (la pendiente) para que la predicción se ajuste lo mejor posible a los datos?
+Cabe preguntarse ahora cuál es la manera óptima de elegir los parámetros que determinan dicha relación lineal, es decir, ¿cómo podemos elegir $\beta_0$ (el intercepto) y $\beta_1$ (la pendiente) para que nuestra predicción de $y_i$ sea lo mejor posible?
 
-Podríamos elegir entre una infinita variedad de combinaciones de $\beta_0$ y $\beta_1$ para modelar los datos. Por ejemplo, el código de abajo simula 150 líneas con interceptos y pendientes ``razonables'':
+Es claro que podemos elegir entre una infinita variedad de combinaciones de $\beta_0$ y $\beta_1$ para modelar los datos. Por ejemplo, el código de abajo simula 150 líneas con interceptos y pendientes ``razonables'':
 
 <<>>=
 set.seed(314)
@@ -132,7 +141,8 @@ Esto es lo que veremos a continuación.
 \label{sec:MCO}
 
 El método de Mínimos Cuadrados Ordinarios (MCO) es una respuesta directa a la pregunta que planteamos recién: ¿qué criterio conviene usar para elegir el modelo lineal que se ajuste ``mejor'' a los datos?
-Intuitivamente, la idea es minimizar el error de ajuste entre la recta definida por nuestra elección de $\beta_0$ y $\beta_1$ y los puntos de datos.
+Intuitivamente, la idea es minimizar el error de ajuste entre la predicción de $y_i$ definida por nuestra elección de $\beta_0$ y $\beta_1$, y los valores reales de $y_i$.
+
 %Geométricamente, el método de MCO equivale a minimizar la distancia vertical entre los puntos y la recta definida por el modelo.
 
 <<'MCO', fig.cap="Línea de regresión (azul) y residuos (rojo) del modelo lineal simple", echo=FALSE, message=FALSE>>=
@@ -151,17 +161,19 @@ ggplot(dist1, aes(x, y)) +
 @
 
 Ahora formalizaremos un poco esta intuición.
-Recordemos que estamos trabajando con la versión muestral del modelo lineal simple, es decir,
+Recordemos que estamos trabajando con \eqref{eq:modelo_lineal_simple}, que es la versión muestral del modelo lineal simple (reimpresa a continuación para comodidad del lector):
 \begin{equation*}
 y_i = \beta_0 + \beta_1 x_i + \mu_i.
 \end{equation*}
-Dada una muestra de datos (como \verb|simdatos|), llamaremos $\hat\beta_0$ y $\hat\beta_1$ a nuestra estimación de los coeficientes.
-Entonces la \kw{línea de regresión por MCO} $\hat y_i$ está definida como
+Dada una muestra de datos, llamaremos $\hat\beta_0$ y $\hat\beta_1$ a nuestra estimación de los coeficientes.
+Entonces la \kw{línea de regresión por MCO}, denotada por $\hat y_i$, está definida como
 \begin{equation}
 \hat y_i = \hat\beta_0 + \hat\beta_1 x_i.
 \label{eq:linea_regresion}
 \end{equation}
-Geométricamente, la predicción $\hat y_i$ del modelo es simplemente la recta que resulta de elegir valores particulares para $\hat\beta_0$ y $\hat\beta_1$, dibujada con azul en la \autoref{fig:MCO}.
+Algebraicamente, la predicción $\hat y_i$ corresponde al vector resultante cuando elegimos $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:linea_regresion}.
+Geométricamente $\hat y_i$ es simplemente una recta que resulta de multiplicar el vector $x_i$ por el escalar $\hat\beta_1$ y luego sumarle $\hat\beta_0$. 
+Dicha recta está dibujada con azul en la \autoref{fig:MCO}.
 
 Ahora, si tomamos la diferencia entre $y_i$ (los datos) y $\hat y_i$ (nuestra predicción) obtenemos $\hat\mu_i$, el \kw{residuo} de nuestra estimación:
 \begin{align}
@@ -172,7 +184,7 @@ Ahora, si tomamos la diferencia entre $y_i$ (los datos) y $\hat y_i$ (nuestra pr
 Gráficamente el residuo corresponde a la distancia vertical entre cada punto (los datos $y_i$) y la recta (la predicción $\hat y_i$), dibujado con líneas rojas en la \autoref{fig:MCO}.
 Es decir que para cada observación $i$ tenemos una medida de la magnitud del error que una elección particular de $\hat\beta_0$ y $\hat\beta_1$ produce.
 
-El método de MCO corresponde a elegir $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:residuos} tal que se minimice la suma de los residuos al cuadrado:\footnote{¿Por qué al cuadrado? Porque se asume que es irrelevante si el error es una subestimación o una sobreestimación, de forma que lo único que importa es la magnitud. ¿Por qué no se usa el valor absoluto entonces? Buena pregunta: \url{https://stats.stackexchange.com/q/46019/91358}. Básicamente, porque es algebraicamente más simple manejar valores al cuadrado, y no hace ninguna diferencia en el resultado final.}
+El método de MCO consiste en elegir $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:residuos} tal que se minimice la suma de los residuos al cuadrado:\footnote{¿Por qué al cuadrado? Porque se asume que es irrelevante si el error es una subestimación o una sobreestimación, de forma que lo único que importa es la magnitud. ¿Por qué no se usa el valor absoluto entonces? Buena pregunta: \url{https://stats.stackexchange.com/q/46019/91358}. Básicamente, porque es algebraicamente más simple manejar valores al cuadrado, y no hace ninguna diferencia en el resultado final.}
 
 \begin{align}
 \min_{\hat\beta_0,\hat\beta_1} & \sum_{i=1}^n \hat\mu_i^2 \notag \\
@@ -242,6 +254,8 @@ La función \verb|lm()| viene de \eng{linear model}, y permite calcular rápidam
 
 %Una de las ventajas de usar \verb|lm()| es que podemos guardar sus resultados en un objeto, el que luego podemos manipular para extraer otro tipo de información útil del modelo. A continuación veremos cómo extraer, manipular e interpretar esta información, lo que nos dará una comprensión mucho más profunda de lo que estamos haciendo.
 
+Ahora que hemos calculado los parámetros del modelo, ¿podemos darles una interpretación? Es decir, dado que usamos datos de años de escolaridad y salarios, ¿podemos decir algo sobre la relación entre estas variables?
+Saber interpretar correctamente los parámetros de un modelo de regresión es un arte, y comenzamos a explorarlo a continuación.
 
 \section{Interpretando los parámetros estimados}
 
