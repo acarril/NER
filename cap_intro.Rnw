@@ -10,14 +10,16 @@ A mi parecer, existen actualmente dos maneras de abordar la enseñanza de econom
 
 Por otro lado hay quienes, de la mano con el crecimiento de la economía aplicada, abogan por una enseñanza aplicada de econometría, con énfasis en técnicas de 
 
-\section{Qué es R}
+\section{R}
+
+\subsection{Qué es R}
 
 R es un ambiente de software y un lenguaje de programación interpretado para hacer análisis estadístico y crear gráficos. Es una implementación de S, un lenguaje de programación matemático orientado a objetos más antiguo. Es software libre y de código abierto, constantemente desarrollado por estadísticos y colaboradores de otras disciplinas.
 
 R es mucho más flexible que la mayoría de los paquetes estadísticos normalmente usados por economistas. Es un lenguaje de programación completamente desarrollado, no sólo un programa con tests y métodos pre-programados.
 
 
-\section{Obtener R}
+\subsection{Obtener R}
 
 La instalación base de R puede obtenerse de \url{https://www.r-project.org/}. Una vez instalado puedes usar RGui para usarlo. Sin embargo, usualmente yo tomo dos pasos adicionales para obtener más flexibilidad. El primero es instalar RStudio, un IDE para R que incluye una consola, editor con resaltado de sintaxis, historial de comandos y varias otras vainas que lo hacen más útil que RGui, especialmente si eres principiante. Puedes descargar RStudio de \url{https://www.rstudio.com/}, y también es gratis.
 
@@ -39,9 +41,9 @@ getwd()
 
 
 
-\section{Trabajando con datos}
+\subsection{Trabajando con datos}
 
-\subsection{Objetos y asignaciones}
+\subsubsection{Objetos y asignaciones}
 
 R es un lenguaje interpretado, lo que significa que ejecuta nuestras instrucciones directamente, sin compilar un programa previo. Podemos usar R interactivamente a través de la consola:
 <<>>=
@@ -53,3 +55,34 @@ La mayoría de las operaciones y funciones en R no guardan el resultado de su ej
 x <- 1+2
 @
 
+\subsection{R base vs. tidyverse}
+
+Una de las críticas más comunes que se hace a R es que hay muchas (¿demasiadas?) maneras de lograr un mismo resultado. Por ejemplo, R base tiene un sistema propio para crear gráficos, pero también existe \paq{ggplot2} para lograr el mismo objetivo.
+Esta multiplicidad de métodos puede hacer que R sea más difícil de aprender que lo necesario.
+
+R es un lenguaje antiguo, y muchas de sus funcionalidades básicas ---lo que llamamos \kw{R base}--- operan bajo paradigmas anticuados. Uno de los más grandes aportes a la programación en R del útltimo tiempo fue realizado por Hadley Wickham, autor del \paq{tidyverse}. Este es un conjunto de paquetes que modernizan cómo usamos R para manipular datos, y están diseñados para trabajar bien entre ellos.
+
+En un artículo para R-bloggers\footnote{\url{https://www.r-bloggers.com/teach-the-tidyverse-to-beginners/}}, David Robinson resume los dos principales ``curriculums'' de aprendizaje de R:
+\begin{itemize}
+\item \textbf{R base primero}: enseñar elementos de sintaxis como \verb|$| y \verb|[[]]|, loops, condicionales, tipos de datos y funciones base como \verb|tapply()|. Este enfoque no se concentra en un sólo marco de datos.
+\item \textbf{tidyverse primero}: comenzar usando \paq{dplyr} para manipular marcos de datos y \paq{ggplot2} para crear gráficos. Luego introducir rápidamente el uso de \paq{tidyr} y \paq{purrr}. Usar el operador \verb|%>%| casi inmediatamente, pero dejar el uso de \verb|$| y \verb|[[]]| para más adelante. Este enfoque se concentra en un sólo marco de datos.
+\end{itemize}
+
+Mi opinión (y la de muchos otros) es que aprender a usar las herramientas del \paq{tidyverse} es más fácil y más productivo. La filosofía detrás del \paq{tidyverse} es similar a la de Python: "Debería haber una ---y preferiblemente sólo una--- forma obvia de lograr algo''. Esta filosofía es buena al aprender un lenguaje de programación, ya que entrega consistencia y evita confusiones.
+Es por esto que en este documento prefiero usar herramientas del \paq{tidyverse} cada vez que sea posible.
+
+Por ejemplo, en R base existen al menos tres formas de crear una variable nueva a partir de otra existente.
+Por otro lado, con el \paq{tidyverse} hay una sóla forma de lograr esto, que además (a mi) me parece más legible:
+
+<<eval=FALSE>>=
+# Agregar una variable con R base
+mtcars$libras <- mt$wt * 1000
+mtcars[["libras"]] <- mtcars[["wt"]] / 1000
+mtcars[, "libras"] <- mtcars[, "wt"] / 1000
+
+# Agregar una variable con el tidyverse
+mtcars <- mtcars %>% mutate(libras = wt / 1000)
+@
+
+
+Sin embargo, también hay elementos de R base que son importantes de aprender; de hecho, muchas cosas en R no son posibles sin ellos. Iremos introduciendo estos elementos a medida que nos sean útil para el tema en cuestión.

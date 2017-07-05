@@ -41,7 +41,7 @@
 \newcommand{\se}{\operatorname{se}}
 
 % Eliminar numeración en títulos menores que secciones
-\setcounter{secnumdepth}{2}
+\setcounter{secnumdepth}{1}
 
 % Color box para R
 % new tcolorbox environment
@@ -63,7 +63,7 @@
 <<setup, include=FALSE>>=
 library(knitr)
 library(highr)
-knitr::opts_chunk$set(cache = TRUE, fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', dev='pdf')
+knitr::opts_chunk$set(cache = FALSE, fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', dev='pdf')
 ## First have a look at the default inline hook function
 knit_hooks$get("inline")
 
@@ -92,8 +92,8 @@ Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acar
 \clearpage
 
 % Introducción, prefacio:
-%<<cap_intro, child='cap_intro.Rnw'>>=
-%@
+<<cap_intro, child='cap_intro.Rnw'>>=
+@
 
 % Introducción, prefacio:
 <<cap_reglineal_simple, child='cap_reglineal_simple.Rnw'>>=
