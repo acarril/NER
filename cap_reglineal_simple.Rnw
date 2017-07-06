@@ -14,20 +14,20 @@ Por ejemplo, $y$ podría ser la tasa de crímenes de varios barrios y $x$ el nú
 O $y$ podría ser el porcentaje de los votos obtenidos por un partido y $x$ su gasto en la campaña electoral, etc.
 
 Tomemos este último ejemplo y construyamos un caso concreto.
-La \autoref{fig:votos_plot} muestra datos de 173 campañas entre los dos candidatos finalistas en elecciones estadounidenses.
-Nos enfocamos en el ``candidato A'' (un nombre del que Kafka sin duda estaría orgulloso).
+La \autoref{fig:votos_plot} muestra datos de 173 campañas entre los dos candidatos finalistas en elecciones de congreso estadounidenses.
+Nos enfocamos en las variables de gasto y votos obtenidos por el ``candidato A'' (un nombre del que Kafka sin duda estaría orgulloso).
 El eje $x$ corresponde al porcentaje gastado por este candidato (\verb|shareA|), mientras que el eje $y$ indica el porcentaje de los votos que obtuvo (\verb|voteA|).
 El código para leer los datos y crear el gráfico se muestra a continuación:
 
-<<'votos_plot', fig.cap="Relación entre porcentaje de gasto (\\texttt{shareA}) y porcentaje de votos obtenidos (\\texttt{voteA})">>=
-library(foreign)
-library(ggplot2)
-votos <- read.dta("http://fmwww.bc.edu/ec-p/data/wooldridge/vote1.dta")
+<<'votos_plot', message=FALSE, fig.cap="Relación entre porcentaje de gasto (\\texttt{shareA}) y porcentaje de votos obtenidos (\\texttt{voteA})">>=
+library(tidyverse)
+library(haven)
+votos <- read_dta("http://fmwww.bc.edu/ec-p/data/wooldridge/vote1.dta")
 ggplot(votos, aes(shareA, voteA)) + geom_point()
 @
 
 \begin{Rbox}
-\verb|library()| permite cargar paquetes de R, los que contienen más funciones y datos. \paq{foreign} es un paquete que nos permite usar la función \verb|read.dta()| para leer una base de datos de Stata, y \paq{ggplot2} nos permite usar la funciones \verb|ggplot()| y \verb|geom_point()| para crear un gráfico de puntos.
+\verb|library()| permite cargar paquetes de R, los que contienen más funciones y datos. \paq{haven} es un paquete que nos permite usar la función \verb|read_dta()| para leer una base de datos de Stata (con extensión \verb|dta|), y \paq{tidyverse} carga \paq{ggplot2}, un paquete que nos permite usar las funciones \verb|ggplot()| y \verb|geom_point()| para crear el gráfico de puntos.
 \end{Rbox}
 
 Al intentar modelar la relación entre $x$ e $y$ surgen una serie de preguntas. Quizás la más inmediata es: ``¿cuál es la relación funcional entre ambas variables?''
@@ -42,16 +42,17 @@ Este supuesto de relación lineal parece cumplirse bastante bien para nuestro ej
 
 Sin embargo, el modelo expresado en \eqref{eq:ec_lin} asume que existe una relación lineal \emph{perfecta} entre $x$ e $y$, lo que es altamente restrictivo. 
 En términos de la \autoref{fig:votos_plot}, es como suponer que podríamos trazar una recta que pasara por \emph{todos} los puntos, lo que evidentemente no se puede.
-Entonces surge naturalmente la pregunta de si es posible permitir que otros factores ---distintos de $x$--- afecten en cierta medida a $y$, de forma que nuestro modelo tenga un margen de error.
+Entonces surge naturalmente la necesidad de permitir que otros factores ---distintos de $x$--- afecten en cierta medida a $y$, de forma que nuestro modelo tenga un margen de error.
 Esto se logra agregando un \kw{término de error}, denotado por $\mu$, al modelo lineal.
 
-Adicionalmente, por un simple tema de convención llamaremos $\beta_0$ al parámetro del intercepto y $\beta_1$ al parámetro de la pendiente.
+Adicionalmente, por un simple tema de convención llamaremos $\beta_0$ al parámetro del intercepto y $\beta_1$ al parámetro de la pendiente desde ahora en adelante.
 Entonces podemos reescribir nuestro modelo, que ahora es
 \begin{equation}
 y = \beta_0 + \beta_1x + \mu.
 \label{eq:modelo_lineal_simple_poblacional}
 \end{equation}
 Esta ecuación define el \kw{modelo de regresión lineal simple}. Entendamos bien qué quiere decir cada palabra de este título:
+
 \begin{itemize}
 \item \textbf{modelo}, porque es un intento de simplificar la realidad para enfocarnos en algunos aspectos que nos interesan
 \item \textbf{de}, una preposición en la gramática del español
@@ -72,7 +73,10 @@ Emprendemos esta tarea a continuación.
 
 Nuestro objetivo ahora es estimar los parámetros $\beta_0$ y $\beta_1$ del modelo de regresión simple explicitado en \eqref{eq:modelo_lineal_simple_poblacional}. En términos geométricos, queremos encontrar una forma de estimar el intercepto y la pendiente de una recta para que esta se ajuste ``bien'' a los datos.
 
-Para lograrlo es necesario suponer que contamos con una muestra de la población completa. Llamamos ${(x_i, y_i): i = 1, \ldots, n}$ a una muestra aleatoria de tamaño $n$ de la población, es decir, $x_i$ e $y_i$ son vectores con $n$ observaciones. Entonces reescribimos el modelo en términos de esta muestra:
+El modelo expresado en \eqref{eq:modelo_lineal_simple_poblacional} es nuestro supuesto de cómo se relacionan variables \emph{poblacionales}.
+Sin embargo, nosotros (con alta probabilidad) no tendremos acceso a datos de la población completa, si no que a una \emph{muestra}.
+Entonces tenemos que adaptar nuestra ecuación para que represente un \kw{modelo muestral}.
+Logramos esto simplemente suponiendo que contamos con una muestra aleatoria de la población completa. Llamamos ${(x_i, y_i): i = 1, \ldots, n}$ a una muestra aleatoria de tamaño $n$ de la población, es decir, $x_i$ e $y_i$ son vectores con $n$ observaciones. Entonces reescribimos el modelo en términos de esta muestra:
 \begin{equation}
 y_i = \beta_0 + \beta_1 x_i + \mu_i,
 \label{eq:modelo_lineal_simple}
@@ -86,21 +90,21 @@ Como hemos supuesto que tenemos una muestra aleatoria, todavía podemos pensar q
 
 Por ejemplo, podríamos tener un vector $y_i$ con los salarios de $n=30$ personas, y modelarlo como una función lineal de los años de educación de esas personas, $x_i$. Resulta útil tener una base de datos concreta con estos vectores, por lo que usaremos una pequeña muestra de datos simulados.
 
-<<results=TRUE>>=
+<<message=FALSE>>=
 # Leer datos CSV de internet
-simdatos <- read.csv(
+simdatos <- read_csv(
   "https://raw.githubusercontent.com/acarril/NER/master/datos/simdatos.csv")
-# Imprimir las primeras filas de los datos
-head(simdatos)
+# Imprimir las primeras observaciones de los datos
+simdatos
 @
 
 \begin{Rbox}
-\verb|read.csv()| permite leer bases de datos en formato CSV. Lo usamos para leer una base en línea y luego asignamos esos datos al objeto \verb|simdatos| (datos simulados). 
-Usamos \verb|head()| para imprimir el encabezado de los datos, lo que permite hacernos una idea rápida de las variables y sus valores (puedes imprimir la base completa ejecutado \verb|simdatos|).
-Esta base tiene solamente \Sexpr{nrow(simdatos)} observaciones.
+\verb|read_csv()| permite leer bases de datos en formato CSV. Lo usamos para leer una base en línea y luego asignamos esos datos al objeto \verb|simdatos| (datos simulados).
+Luego escribimos el nombre del objeto (\verb|simdatos|) para imprimirlo. Como es un \eng{tibble} (una base de datos), R imprime solamente las primeras 10 observaciones.
+Esto es útil para hacernos una idea rápida de las variables de la base y los valores que éstas toman.
 \end{Rbox}
 
-En esta base la variable \verb|y| contiene salarios por hora (en miles de pesos) y la variable \verb|x| contiene años de educación.
+En estos datos la variable \verb|y| contiene salarios por hora (en miles de pesos) y la variable \verb|x| contiene años de educación.
 Cada fila representa una observación (en este caso, una persona) distinta.
 Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha información y revela patrones que son difíciles de ver en los datos. Creamos un gráfico simple con \paq{ggplot2}:
 
@@ -116,11 +120,11 @@ Vemos que existe una evidente relación lineal entre $x_i$ e $y_i$: a mayor nive
 Esto es bueno para nosotros, ya que queremos ajustar los datos al modelo lineal que escribimos en \eqref{eq:modelo_lineal_simple}.
 Cabe preguntarse ahora cuál es la manera óptima de elegir los parámetros que determinan dicha relación lineal, es decir, ¿cómo podemos elegir $\beta_0$ (el intercepto) y $\beta_1$ (la pendiente) para que nuestra predicción de $y_i$ sea lo mejor posible?
 
-Es claro que podemos elegir entre una infinita variedad de combinaciones de $\beta_0$ y $\beta_1$ para modelar los datos. Por ejemplo, el código de abajo simula 150 líneas con interceptos y pendientes ``razonables'':
+Es claro que podríamos elegir entre una infinita variedad de combinaciones de $\beta_0$ y $\beta_1$ para modelar los datos. Por ejemplo, el código de abajo simula 150 líneas con interceptos y pendientes ``razonables'', los que se grafican a continuación.
 
 <<>>=
 set.seed(314)
-modelos <- data.frame(
+modelos <- tibble(
   beta1 = runif(150, -3, 1),
   beta2 = runif(150, -1, 1)
 )
@@ -132,7 +136,7 @@ ggplot(simdatos, aes(x, y)) +
   )
 @
 
-Si bien hay muchas líneas que claramente no se ajustan bien a los datos, varias otras sí lo hacen, y resulta difícil determinar cuál es ``la mejor'' (asumiendo que tal línea existe).
+Si bien hay muchas líneas que claramente no se ajustan bien a los datos, varias otras sí lo hacen, y resulta difícil determinar a simple vista cuál es ``la mejor'' (asumiendo que tal línea existe).
 Es evidente que necesitamos un criterio riguroso para elegir los parámetros $\beta_0$ y $\beta_1$ de manera óptima.
 Esto es lo que veremos a continuación.
 
@@ -145,8 +149,24 @@ Intuitivamente, la idea es minimizar el error de ajuste entre la predicción de 
 
 %Geométricamente, el método de MCO equivale a minimizar la distancia vertical entre los puntos y la recta definida por el modelo.
 
-<<'MCO', fig.cap="Línea de regresión (azul) y residuos (rojo) del modelo lineal simple", echo=FALSE, message=FALSE>>=
-library(dplyr)
+
+
+Ahora formalizaremos esta intuición, y para esto necesitamos introducir un poco de notación nueva.
+Recordemos que estamos trabajando con \eqref{eq:modelo_lineal_simple}, que es la versión muestral del modelo lineal simple (reimpresa a continuación para comodidad del lector):
+\begin{equation*}
+y_i = \beta_0 + \beta_1 x_i + \mu_i.
+\end{equation*}
+Dada una muestra de datos, llamaremos $\hat\beta_0$ y $\hat\beta_1$ a nuestra estimación de los coeficientes.
+Entonces la \kw{línea de regresión por MCO}, denotada por $\hat y_i$, está definida como
+\begin{equation}
+\hat y_i = \hat\beta_0 + \hat\beta_1 x_i.
+\label{eq:linea_regresion}
+\end{equation}
+Algebraicamente, $\hat y_i$ es el vector que resulta de multiplicar el vector $x_i$ por el escalar $\hat\beta_1$ y luego sumarle $\hat\beta_0$.
+Geométricamente, $\hat y_i$ es simplemente una recta que resulta de aplicar una transformación lineal a $x_i$, donde el intercepto y la pendiente dependen de nuestra elección de $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:linea_regresion}.
+Esta recta está dibujada con azul en la \autoref{fig:MCO}.
+
+<<'MCO', fig.cap="Línea de regresión $\\hat y_i$ en azul y residuo $\\hat \\mu_i$ en rojo", echo=FALSE, message=FALSE>>=
 dist1 <- simdatos %>% 
   mutate(
     dodge = rep(c(-1, 0, 1) / 20, 10),
@@ -160,21 +180,6 @@ ggplot(dist1, aes(x, y)) +
   geom_point(colour = "grey40")
 @
 
-Ahora formalizaremos un poco esta intuición.
-Recordemos que estamos trabajando con \eqref{eq:modelo_lineal_simple}, que es la versión muestral del modelo lineal simple (reimpresa a continuación para comodidad del lector):
-\begin{equation*}
-y_i = \beta_0 + \beta_1 x_i + \mu_i.
-\end{equation*}
-Dada una muestra de datos, llamaremos $\hat\beta_0$ y $\hat\beta_1$ a nuestra estimación de los coeficientes.
-Entonces la \kw{línea de regresión por MCO}, denotada por $\hat y_i$, está definida como
-\begin{equation}
-\hat y_i = \hat\beta_0 + \hat\beta_1 x_i.
-\label{eq:linea_regresion}
-\end{equation}
-Algebraicamente, la predicción $\hat y_i$ corresponde al vector resultante cuando elegimos $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:linea_regresion}.
-Geométricamente $\hat y_i$ es simplemente una recta que resulta de multiplicar el vector $x_i$ por el escalar $\hat\beta_1$ y luego sumarle $\hat\beta_0$. 
-Dicha recta está dibujada con azul en la \autoref{fig:MCO}.
-
 Ahora, si tomamos la diferencia entre $y_i$ (los datos) y $\hat y_i$ (nuestra predicción) obtenemos $\hat\mu_i$, el \kw{residuo} de nuestra estimación:
 \begin{align}
 \hat \mu_i &= y_i - \hat y_i \notag \\
@@ -182,27 +187,29 @@ Ahora, si tomamos la diferencia entre $y_i$ (los datos) y $\hat y_i$ (nuestra pr
 \label{eq:residuos}
 \end{align}
 Gráficamente el residuo corresponde a la distancia vertical entre cada punto (los datos $y_i$) y la recta (la predicción $\hat y_i$), dibujado con líneas rojas en la \autoref{fig:MCO}.
-Es decir que para cada observación $i$ tenemos una medida de la magnitud del error que una elección particular de $\hat\beta_0$ y $\hat\beta_1$ produce.
+Es decir que para cada observación $i$ tenemos una medida de la magnitud del error que unos valores en particular de $\hat\beta_0$ y $\hat\beta_1$ producen.
 
-El método de MCO consiste en elegir $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:residuos} tal que se minimice la suma de los residuos al cuadrado:\footnote{¿Por qué al cuadrado? Porque se asume que es irrelevante si el error es una subestimación o una sobreestimación, de forma que lo único que importa es la magnitud. ¿Por qué no se usa el valor absoluto entonces? Buena pregunta: \url{https://stats.stackexchange.com/q/46019/91358}. Básicamente, porque es algebraicamente más simple manejar valores al cuadrado, y no hace ninguna diferencia en el resultado final.}
-
+¿Cómo elegir elegimos los parámetros entonces?
+El método de MCO consiste en elegir $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:residuos} tal que se minimice la suma de los residuos al cuadrado.\footnote{¿Por qué al cuadrado? Porque se asume que es irrelevante si el error es una subestimación o una sobreestimación, de forma que lo único que importa es la magnitud. ¿Por qué no se usa el valor absoluto entonces? Buena pregunta: \url{https://stats.stackexchange.com/q/46019/91358}. Básicamente, porque es algebraicamente más simple manejar valores al cuadrado, y no hace ninguna diferencia en el resultado final.}
+Geométricamente esto es equivalente a minimizar la suma de las distancias verticales entre todos los puntos y la línea de regresión (las líneas rojas de la \autoref{fig:MCO}).
+Matemáticamente el problema es
 \begin{align}
 \min_{\hat\beta_0,\hat\beta_1} & \sum_{i=1}^n \hat\mu_i^2 \notag \\
 \Leftrightarrow \min_{\hat\beta_0,\hat\beta_1} & \sum_{i=1}^n (y_i - \hat\beta_0 - \hat\beta_1 x_i)^2.
 \label{eq:prob_min_MCO}
 \end{align}
 
-Al resolver este problema de minimización obtendremos los estimadores MCO:\footnote{La derivación paso a paso puede encontrarse, por ejemplo, en \textcite[cap. 2]{wooldridge_introductory_2016}.}
-
+Al resolver esta minimización obtendremos los estimadores MCO.\footnote{La derivación paso a paso puede encontrarse, por ejemplo, en \textcite[cap. 2]{wooldridge_introductory_2016}.}
+Estos corresponden a la elección óptima de $\hat\beta_0$ y $\hat\beta_1$ que hemos estado buscando:
 \begin{align}
 \hat \beta_1 &= \sum_{i=1}^n \frac{\sum_{i=1}^n (x_i - \bar x)(y_i - \bar y)}{\sum_{i=1}^n (x_i - \bar x)^2} \notag \\
  &= \frac{\Cov (x,y)}{\Var(x)} \label{eq:MCO_beta1} \\
-\hat \beta_0 &= \bar y - \hat\beta_1 \bar x \label{eq:MCO_beta0}
+\hat \beta_0 &= \bar y - \hat\beta_1 \bar x, \label{eq:MCO_beta0}
 \end{align}
 donde $\bar x$ e $\bar y$ son los promedios de $x_i$ e $y_i$, $\Var(x)$ es la varianza muestral de $x$ y $\Cov(x,y)$ es la covarianza muestral de $x$ e $y$.
 
 ¡Hemos logrado nuestro objetivo!
-Lo anterior significa que para encontrar los estimadores MCO y obtener la línea de mejor ajuste simplemente tenemos que calcular cuatro cosas: $\bar y$, $\bar x$, $\Cov (x,y)$ y $\Var (x,y)$. ¡Hagámoslo ahora!
+Lo anterior significa que para encontrar los estimadores MCO y obtener la línea de regresión que mejor se ajuste a los datos solo tenemos que calcular cuatro cosas: $\bar y$, $\bar x$, $\Cov (x,y)$ y $\Var (x,y)$. ¡Hagámoslo ahora!
 
 <<>>=
 # Indicar base de datos a usar
@@ -241,7 +248,11 @@ ggplot(simdatos, aes(x,y)) +
     color = "blue", show.legend = FALSE )
 @
 
-Hemos visto que el método de MCO encuentra los parámetros del modelo lineal por via de minimizar la suma de errores al cuadrado. Los estimadores MCO ($\hat\beta_0$ y $\hat\beta_1$) que resultan de esta minimización corresponden a las ecuaciones \eqref{eq:MCO_beta0} y \eqref{eq:MCO_beta1}. Finalmente calculamos estos estimadores de manera explícita, lo que es útil para entender de manera más profunda qué es lo que estamos haciendo.
+\begin{Rbox}
+La función \verb|attach()| es útil para indicar que vamos a usar una base de datos en particular para todas las funciones que siguen. Entonces cuando calculamos el promedio de \verb|x| con \verb|mean(x)|, R sabe que se trata de la variable \verb|x| en el marco \verb|simdatos| (y no de \verb|votos|, por ejemplo). Luego usamos \verb|detach()| para ``desactivar'' el uso de la base que indicamos previamente.
+\end{Rbox}
+
+Hemos visto que el método de MCO encuentra los parámetros del modelo lineal por via de minimizar la suma de errores al cuadrado. Los estimadores MCO ($\hat\beta_0$ y $\hat\beta_1$) que resultan de esta minimización corresponden a las ecuaciones \eqref{eq:MCO_beta0} y \eqref{eq:MCO_beta1}. Con el código anterior calculamos estos estimadores de manera explícita, lo que es útil para entender de manera más profunda qué es lo que estamos haciendo.
 Sin embargo, la mayoría de los programas estadísticos permiten calcular los estimadores MCO de manera mucho más directa, y R no es la excepción:
 
 <<>>=
@@ -259,17 +270,17 @@ Saber interpretar correctamente los parámetros de un modelo de regresión es un
 
 \section{Interpretando los parámetros estimados}
 
-Una vez obtenidos los parámetros del modelo, nos interesa poder interpretarlos de manera útil: ¿qué es lo que quiere decir que hayamos obtenido ciertos valores de $\hat\beta_0$ y $\hat\beta_1$?
+Una vez obtenidos los parámetros del modelo, nos interesa poder interpretarlos de manera útil. ¿Qué es lo que quiere decir que hayamos obtenido ciertos valores de $\hat\beta_0$ y $\hat\beta_1$, más allá de ser el intercepto y la pendiente de una ecuación?
 Para explorar este tema dejaremos de usar datos simulados y pasaremos a datos reales.
-Analizaremos \verb|wage2|, que es uno de los datos usados por \textcite{wooldridge_introductory_2016} y contiene información de ingresos (y otras variables) para 935 personas.\footnote{Esta base es un subconjunto de los datos del estudio de \textcite{blackburn_unobserved_1992}.}
+En particular, usaremos \verb|wage2|, que es una de las bases usadas en \textcite{wooldridge_introductory_2016} y contiene información de años de educación e ingresos para 935 personas.\footnote{Esta base es un subconjunto de los datos del estudio de \textcite{blackburn_unobserved_1992}.}
 
 <<>>=
-ingresos <- read.dta("http://fmwww.bc.edu/ec-p/data/wooldridge/wage2.dta")
-ingresos <- as.data.frame(ingresos[c("wage","educ")])
+ingresos <- read_dta("http://fmwww.bc.edu/ec-p/data/wooldridge/wage2.dta")
+ingresos <- select(ingresos, wage, educ)
 @
 
 \begin{Rbox}
-Usamos \verb|read.dta()| (del paquete \paq{foreign}) para leer bases de datos de Stata, como ya hicimos previamente. La segunda línea nos permite reescribir \verb|ingresos| como un marco de datos con solamente dos columnas (variables): \verb|wage| y \verb|educ|.
+Usamos \verb|haven::read_dta()| para leer bases de datos de Stata, como ya hicimos previamente. En la segunda línea \verb|select()| nos permite seleccionar las variables \verb|wage| y \verb|educ| de la base \verb|ingresos| que acabamos de leer. Asignamos el resultado de \verb|select()| al mismo objeto para sobreescribirlo con solamente las variables que nos interesan.
 \end{Rbox}
 
 %Por el momento nos interesan dos variables: \verb|wage|, que es un vector de ingresos (en dólares menusales) y \verb|educ|, que es un vector con años de escolaridad de cada persona.
