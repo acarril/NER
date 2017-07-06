@@ -63,7 +63,7 @@
 <<setup, include=FALSE>>=
 library(knitr)
 library(highr)
-knitr::opts_chunk$set(cache = FALSE, fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', dev='pdf')
+knitr::opts_chunk$set(cache = TRUE, fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', dev='pdf')
 ## First have a look at the default inline hook function
 knit_hooks$get("inline")
 
