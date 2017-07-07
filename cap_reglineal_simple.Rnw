@@ -230,12 +230,16 @@ beta0
 beta1
 @
 
+\begin{Rbox}
+La función \verb|attach()| es útil para indicar que vamos a usar una base de datos en particular para todas las funciones que siguen. Entonces cuando calculamos el promedio de \verb|x| con \verb|mean(x)|, R sabe que se trata de la variable \verb|x| en el marco \verb|simdatos| (y no de \verb|votos|, por ejemplo). Luego usamos \verb|detach()| para ``desactivar'' el uso de la base que indicamos previamente.
+\end{Rbox}
+
 Vemos que es fácil calcular los estimadores MCO, y para este ejemplo particular obtuvimos que $\hat \beta_0 = \Sexpr{beta0}$ y $\hat \beta_1 = \Sexpr{beta1}$ (redondeando).
-Con esto podemos reescrbir la línea de ajuste definida en \eqref{eq:linea_regresion} usando nuestras estimaciones:
+Con esto podemos completar la línea de ajuste definida en \eqref{eq:linea_regresion} usando nuestras estimaciones:
 \begin{equation*}
 \hat y_i = \Sexpr{beta0} + \Sexpr{beta1}x_i.
 \end{equation*}
-Sin embargo, esto no resulta demasiado práctico para visualizar lo que hemos logrado.
+Esto está bien, pero es demasiado práctico para visualizar lo que hemos logrado.
 Una alternativa mejor es usar estos parámetros para graficar $\hat y_i$ sobre los datos:
 
 <<>>=
@@ -248,14 +252,11 @@ ggplot(simdatos, aes(x,y)) +
     color = "blue", show.legend = FALSE )
 @
 
-\begin{Rbox}
-La función \verb|attach()| es útil para indicar que vamos a usar una base de datos en particular para todas las funciones que siguen. Entonces cuando calculamos el promedio de \verb|x| con \verb|mean(x)|, R sabe que se trata de la variable \verb|x| en el marco \verb|simdatos| (y no de \verb|votos|, por ejemplo). Luego usamos \verb|detach()| para ``desactivar'' el uso de la base que indicamos previamente.
-\end{Rbox}
-
-Hemos visto que el método de MCO encuentra los parámetros del modelo lineal por via de minimizar la suma de errores al cuadrado. Los estimadores MCO ($\hat\beta_0$ y $\hat\beta_1$) que resultan de esta minimización corresponden a las ecuaciones \eqref{eq:MCO_beta0} y \eqref{eq:MCO_beta1}. Con el código anterior calculamos estos estimadores de manera explícita, lo que es útil para entender de manera más profunda qué es lo que estamos haciendo.
-Sin embargo, la mayoría de los programas estadísticos permiten calcular los estimadores MCO de manera mucho más directa, y R no es la excepción:
+Finalmente, si bien resulta útil calcular explícitamente los estimadores para entender mejor qué es lo que estamos haciendo, esto no es demasiado práctico: estamos calculando y guardando promedios, varianzas y covarianzas que no nos interesan.
+En realidad cualquier programa estadístico (decente) tiene algún método para estimar los parámetros de un modelo lineal de manera más compacta, y R no es la excepción:
 
 <<>>=
+# Estimar directamente los parámetros de un modelo lineal
 lm(y ~ x, data = simdatos)
 @
 
@@ -265,14 +266,17 @@ La función \verb|lm()| viene de \eng{linear model}, y permite calcular rápidam
 
 %Una de las ventajas de usar \verb|lm()| es que podemos guardar sus resultados en un objeto, el que luego podemos manipular para extraer otro tipo de información útil del modelo. A continuación veremos cómo extraer, manipular e interpretar esta información, lo que nos dará una comprensión mucho más profunda de lo que estamos haciendo.
 
-Ahora que hemos calculado los parámetros del modelo, ¿podemos darles una interpretación? Es decir, dado que usamos datos de años de escolaridad y salarios, ¿podemos decir algo sobre la relación entre estas variables?
-Saber interpretar correctamente los parámetros de un modelo de regresión es un arte, y comenzamos a explorarlo a continuación.
+Hemos calculado los parámetros del modelo, y sabemos lo que éstos quieren decir en términos matemáticos (minimizan el la suma de los errores cuadráticos) y geométricos (son el intercepto y la pendiente de la línea de ``mejor'' ajuste).
+¿Pero pueden decirnos algo de los datos que usamos para calcularlos?
+¿Qué significa, en términos de la relación entre educación e ingreso, que $\hat \beta_0 = \Sexpr{beta0}$ y $\hat \beta_1 = \Sexpr{beta1}$?
+Saber interpretar correctamente los parámetros de una regresión es un arte, y comenzamos a explorarlo a continuación.
+
 
 \section{Interpretando los parámetros estimados}
 
 Una vez obtenidos los parámetros del modelo, nos interesa poder interpretarlos de manera útil. ¿Qué es lo que quiere decir que hayamos obtenido ciertos valores de $\hat\beta_0$ y $\hat\beta_1$, más allá de ser el intercepto y la pendiente de una ecuación?
 Para explorar este tema dejaremos de usar datos simulados y pasaremos a datos reales.
-En particular, usaremos \verb|wage2|, que es una de las bases usadas en \textcite{wooldridge_introductory_2016} y contiene información de años de educación e ingresos para 935 personas.\footnote{Esta base es un subconjunto de los datos del estudio de \textcite{blackburn_unobserved_1992}.}
+En particular usaremos \verb|wage2|, que es una de las bases usadas en \textcite{wooldridge_introductory_2016} y contiene información de años de educación e ingresos para 935 personas.\footnote{Esta base es un subconjunto de los datos del estudio de \textcite{blackburn_unobserved_1992}.}
 
 <<>>=
 ingresos <- read_dta("http://fmwww.bc.edu/ec-p/data/wooldridge/wage2.dta")
@@ -280,7 +284,7 @@ ingresos <- select(ingresos, wage, educ)
 @
 
 \begin{Rbox}
-Usamos \verb|haven::read_dta()| para leer bases de datos de Stata, como ya hicimos previamente. En la segunda línea \verb|select()| nos permite seleccionar las variables \verb|wage| y \verb|educ| de la base \verb|ingresos| que acabamos de leer. Asignamos el resultado de \verb|select()| al mismo objeto para sobreescribirlo con solamente las variables que nos interesan.
+Usamos \verb|haven::read_dta()| para leer bases de datos de Stata, como ya hicimos previamente. En la segunda línea, \verb|select()| nos permite seleccionar las variables \verb|wage| y \verb|educ| de la base \verb|ingresos| que acabamos de leer. Asignamos el resultado de \verb|select()| al mismo objeto para sobreescribirlo con solamente las variables que nos interesan.
 \end{Rbox}
 
 %Por el momento nos interesan dos variables: \verb|wage|, que es un vector de ingresos (en dólares menusales) y \verb|educ|, que es un vector con años de escolaridad de cada persona.
@@ -302,30 +306,133 @@ Usamos \verb|haven::read_dta()| para leer bases de datos de Stata, como ya hicim
 
 %Es evidente que estos datos (reales) no presentan una relación lineal tan evidente. Más adelante nos haremos cargo de este problema.
 
-Podemos escribir la línea de regresión definida en \eqref{eq:linea_regresion} usando los nombres de las variables que nos interesan: salario mensual en dólares (\verb|wage|) y años de educación (\verb|educ|). Luego estimamos los coeficientes del modelo con \verb|lm()|, esta vez definiendo una fórmula donde \verb|wage| es la variable dependiente y \verb|educ| es la variable independiente.
+Podemos escribir la línea de regresión definida en \eqref{eq:linea_regresion} usando los nombres de las variables que nos interesan: salario mensual en dólares (\verb|wage|) y años de educación (\verb|educ|). Luego estimamos los coeficientes del modelo con \verb|lm()|, esta vez definiendo una fórmula donde \verb|wage| es la variable dependiente y \verb|educ| es la variable independiente:
 \begin{align*}
 \hat y &= \hat\beta_0 + \hat\beta_1 x \\
-\widehat\text{wage} &= \hat\beta_0 + \hat\beta_1 \text{educ}.
+\Longrightarrow \widehat{wage} &= \hat\beta_0 + \hat\beta_1 {educ}.
 \end{align*}
 
-<<echo=1>>=
+<<'ingresos_lm', fig.cap="Modelo de regresión lineal relacionando años de educación (\\texttt{educ}) y salario (\\texttt{wage})", echo=1:2>>=
 lm(wage ~ educ, data = ingresos)
+ggplot(ingresos, aes(educ, wage)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
 modelo <- lm(wage ~ educ, data = ingresos)
 @
+\begin{Rbox}
+\verb|geom_smooth| es una función geom que podemos usar en conjunto con \verb|ggplot()| para graficar medias condicionales. Al usar la opción \verb|method = "lm"| indicamos que queremos graficar un modelo lineal entre las variables de los ejes. El uso de \verb|se = FALSE| es para desactivar los intervalos de confianza, tema del que hablaremos más adelante.
+\end{Rbox}
 
 El intercepto del modelo lineal ($\beta_0$) es el valor predicho de $y$ cuando $x=0$. En términos de nuestro ejemplo, si una persona tiene 0 años de educación el modelo predice un ingreso mensual promedio de \Sexpr{coefficients(modelo)[1]} dólares.
-Es importante notar que en algunos contextos no tiene demasiado sentido pensar en $x=0$ (¿cuántas personas con 0 años de educación existirán?). En esas situaciones $\hat\beta_0$ no tiene mucho valor en sí mismo. Es labor del investigador discriminar los casos dónde esto ocurra.
+Es importante notar que en algunos contextos no tiene demasiado sentido pensar en $x=0$ (¿cuántas personas con 0 años de educación existirán? ¿cuántas hay en los datos?). En esas situaciones $\hat\beta_0$ no tiene mucho valor en sí mismo, y es labor del investigador discriminar los casos dónde esto ocurra.
+Exploraremos este punto con mayor profundidad en el siguiente ejemplo.
 
 Por otro lado, el coeficiente estimado para la pendiente ($\hat\beta_1$) nos dice la cantidad en la que cambia $\hat y$ cuando $x$ aumenta en una unidad. En otras palabras,
+\begin{equation}
+\Delta \hat y = \hat \beta_1 \cdot \Delta x,
+\end{equation}
+donde el operador $\Delta$ (``delta'') significa simplemente ``el cambio en ...''.
 
-\begin{equation*}
-\Delta \hat y = \Delta \hat y / \Delta x.
-\end{equation*}
-Por ejemplo, en la estimación anterior hemos obtenido que $\hat\beta_1 = \Sexpr{coefficients(modelo)[2]}$.
+Notar que el aumento de $x$ puede ir asociado tanto a un aumento como a una disminución de $\hat y$.
+Si $\hat\beta_1 > 0$ entonces un aumento de una unidad de $x$ está asociado a un aumento de $\hat\beta_1$ en $\hat y$; si $\hat\beta_1 < 0$ entonces un aumento de una unidad de $x$ está asociado a una disminución de $-\hat\beta_1$ en $\hat y$.
+
+Por ejemplo, en la estimación graficada en la \autoref{fig:ingresos_lm} hemos obtenido que $\hat\beta_1 = \Sexpr{coefficients(modelo)[2]}$.
 Esto puede interpretarse como que un aumento de un año de educación ($x$ aumenta en una unidad) está asociado a un aumento promedio de (casi) \Sexpr{round(coefficients(modelo)[2])} dólares en el salario.
-Podemos asegurar que un aumento de $x$ produce un aumento en $\hat y$ porque el signo del coeficiente estimado es positivo; si el coeficiente estimado hubiese sido negativo, entonces diríamos que un año adicional de educación \emph{reduce} el salario promedio (¿tendría sentido esto?).
+Podemos asegurar que un aumento de $x$ se relaciona con un aumento en $\hat y$ porque el signo del coeficiente estimado es positivo; si el coeficiente estimado hubiese sido negativo, entonces diríamos que un año adicional de educación \emph{reduce} el salario promedio (¿tendría sentido esto?).
 
 Notar que hemos sido muy cuidadosos en no darle interpretación causal a la variable independiente. En otras palabras, evitamos decir que un año adicional de educación \emph{provoca} un aumento promedio de \Sexpr{round(coefficients(modelo)[2])} dólares en el ingreso. La pregunta de causalidad es importante, y un tema muy estudiado en econometría. Sin embargo, sólo podremos hablar de causalidad más adelante, cuando hayamos estudiado las propiedades estadísticas de los estimadores de MCO e impongamos supuestos más fuertes sobre la población.
+
+\subsection{La unidad de medida}
+
+Habrás notado que la unidad de medida de las variables es clave a la hora de interpretar los coeficientes estimados. En el ejemplo anterior $x$ son años de educación, y por lo tanto $\hat\beta_1 = \Sexpr{coefficients(modelo)[2]}$ implica que un año adicional de educación está asociado a un aumento de \Sexpr{coefficients(modelo)[2]} dólares en el salario mensual promedio, porque la unidad de $y$ son dólares mensuales.
+
+Veamos ahora cómo cambian los parámetros estimados cuando cambia la unidad de medida de las variables.
+En concreto, usaremos los datos \verb|mtcars|, que contiene 32 observaciones de modelos de auto.
+Nos concentramos en una variable que indica su rendimiento en millas por galón (\verb|mpg|) y otra con su peso en miles de libras (\verb|wt|).
+
+<<>>=
+# Calcular estadística descriptiva para las variables mpg y wt
+summary(select(mtcars, mpg, wt))
+# Estimar el modelo lineal 
+lm(mpg ~ wt, data = mtcars)
+@
+
+<<echo=FALSE>>=
+modelo <- lm(mpg ~ wt, data = mtcars)
+@
+
+
+\begin{Rbox}
+\verb|summary()| es una de las funciones más útiles de R base, ya que permite producir un resumen con información útil de distintos objetos: bases de datos, modelos, etc. En este caso la usamos para producir estadística descriptiva de las variables elegidas con \verb|select()|, para evitar usar la función sobre todas las variables de \verb|mtcars|.
+\end{Rbox}
+
+Al estimar este modelo obtenemos que $\hat\beta_1 = \Sexpr{coefficients(modelo)[2]}$. Esto significa que un aumento de una unidad en \verb|wt| está asociado a una disminución promedio de $\Sexpr{abs(coefficients(modelo)[2])}$ en \verb|mpg|.
+
+OK, ¿y?
+
+Como no sé mucho de autos ni del sistema métrico imperial, no tengo idea si esto es mucho o poco.
+A pesar que entiendo cómo interpretar el coeficiente en términos algebraicos, la unidad de medida de las variables hace que esta información no sea tan útil (para mi).
+
+Afortunadamente es muy fácil transformar las variables y luego volver a estimar el modelo con ellas. Crearemos las variables \verb|rendimiento_kml| con el rendimiento en kilómetros por litro y \verb|peso_kg| con el peso en kilógramos de cada auto:
+
+<<>>=
+# Crear marco 'autos' con las variables que nos interesan
+autos <- as_tibble(select(rownames_to_column(mtcars, var = "modelo"), 
+                          modelo, mpg, wt))
+# Crear dos variables nuevas de rendimiento y peso
+autos <- mutate(autos,
+                rendimiento_kml =  mpg * 0.425144,
+                peso_kg = wt * 453.592)
+# Estimar el modelo con estas nuevas variables
+lm(rendimiento_kml ~ peso_kg, data = autos)
+@
+<<echo=FALSE>>=
+modelo <- lm(rendimiento_kml ~ peso_kg, data = autos)
+@
+
+Esta transformación todavía presenta un pequeño problema. Como la unidad de medida de \verb|peso_kg| son kilos, $\hat\beta_1 = \Sexpr{round(coefficients(modelo)[2],3)}$ nos dice que por cada kilo adicional el modelo predice una reducción de \Sexpr{abs(round(coefficients(modelo)[2],3))} en el rendimiento promedio.
+Claramente pensar en un kilo adicional en algo tan pesado como un auto no tiene mucho sentido, por lo que estimaremos el modelo con una variable que indique el peso en unidades de 100 kilos:
+<<>>=
+# Agregar variable con peso en unidades de 100kg
+autos <- autos %>% mutate(peso_100kg = peso_kg / 100)
+# Estimar modelo con esta nueva variable independiente
+lm(rendimiento_kml ~ peso_100kg, data = autos)
+@
+<<echo=FALSE>>=
+modelo <- lm(rendimiento_kml ~ peso_100kg, data = autos)
+@
+
+\begin{Rbox}
+Este bloque introduce el uso del \kw{operador de pipa}, \verb|%>%|.
+Creado por Milton Bache en su paquete \paq{magrittr}, el operador de pipa sirve para pasar un objeto como primer argumento de una función.
+Entonces en lugar de escribir \verb|f(x,y)| podemos escribir de manera equivalente \verb|x %>% f(y)|.
+Esto permite ``desanidar'' funciones, ya que el operador es recursivo: operaciones como $f(g(x))$ pueden expresarse como \verb|x %>% g %>% f|, lo que las hace más legibles.
+\end{Rbox}
+
+Finalmente podemos interpretar el modelo con unidades adecuadas.
+El coeficiente asociado a la variable independiente se puede interpretar como que el modelo predice una reducción promedio de $\Sexpr{abs(coefficients(modelo)[2])}$ km/l por cada 100 kilos adicionales que pese un auto.
+Esto definitivamente parece razonable, y los coeficientes entregan información útil directamente.
+Es importante notar que este valor de $\hat\beta_1$ usando \verb|peso_100kg| es igual al calculado usando \verb|peso_kg|, pero multiplicado por 100. Al realizar una transformación lineal sobre la variable, transformamos de manera inversa el coeficiente asociado.
+
+Por otro lado, el parámetro del intercepto indica que el modelo predice un rendimiento promedio de $\Sexpr{coefficients(modelo)[1]}$ para un auto de 0 kilos.
+Este corresponde a un claro caso donde el intercepto no tiene sentido en sí mismo, ya que es imposible un auto de 0 kilos.
+
+Recordemos que la línea de regresión de este modelo es
+\begin{equation*}
+\hat y_i = \Sexpr{coefficients(modelo)[1]} \Sexpr{coefficients(modelo)[2]} \cdot x_i.
+\end{equation*}
+Podemos usar la ecuación de la línea de regresión para calcular el valor predicho $\hat y_i$ dado un nivel de $x_i$. Por ejemplo, nuestra estimación predice que un auto de 1600 kilos tendrá un rendimiento promedio de $\Sexpr{coefficients(modelo)[1]} \Sexpr{coefficients(modelo)[2]} \cdot 16 = \Sexpr{coefficients(modelo)[1] + coefficients(modelo)[2] * 16}$ km/l.
+Esto se ajusta bastante a los datos reales, como puede apreciarse en la \autoref{fig:autos_lm}.
+%Como siempre, es conveniente dibujar esta línea $\hat y_i$ sobre los datos. El gráfico se muestra en la \autoref{fig:autos_lm}.
+
+<<'autos_lm', fig.cap="Modelo de regresión lineal relacionando el peso de un auto (en unidades de 100 kilos) y su rendimiento (en kilómetros por litro)">>=
+# Graficar la línea de regresión sobre los datos
+autos %>% ggplot(aes(peso_100kg, rendimiento_kml)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+@
+
+
 
 %\subsubsection{Errores estándar de los coeficientes}
 
