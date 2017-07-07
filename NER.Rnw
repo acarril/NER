@@ -6,6 +6,8 @@
 \usepackage{geometry}
 \usepackage{parskip}
 \usepackage{tcolorbox}
+\usepackage{tocloft}
+  \setlength{\cftsubsecindent}{5em}
 \usepackage{mathtools}
   \newtagform{brackets}{[}{]}
   \usetagform{brackets}
@@ -77,10 +79,8 @@ knit_hooks$set(inline = inline_hook)
 
 
 \title{Notas de Econometría en R}
-\author{Alvaro Carril\thanks{Estas notas son un intento de condensar lo justo y necesario para poder seguir un curso de econometría con R.
-Luego de recopilar material de muchas clases y ayudantías de econometría, en general pensadas para ser aplicadas en Stata, decidí que podía intentar hacer estas clases en R y usar esta guía como material de apoyo.
-Mi prioridad fue ser breve y conciso, por lo que estas notas no son un buen comienzo para aprender R (o econometría); son un complemento.
-Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acarril@fen.uchile.cl}.}}
+%\thanks{Estas notas son un intento de condensar lo justo y necesario para poder seguir un curso de econometría con R.Luego de recopilar material de muchas clases y ayudantías de econometría, en general pensadas para ser aplicadas en Stata, decidí que podía intentar hacer estas clases en R y usar esta guía como material de apoyo.Mi prioridad fue ser breve y conciso, por lo que estas notas no son un buen comienzo para aprender R (o econometría); son un complemento.Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acarril@fen.uchile.cl}.}
+\author{Alvaro Carril}
 \date{Borrador, \today \\
   \includegraphics[width=\textwidth]{figs/scatterplot3d_portada}
 }
