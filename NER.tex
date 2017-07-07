@@ -91,7 +91,7 @@
 \newcommand{\se}{\operatorname{se}}
 
 % Eliminar numeración en títulos menores que secciones
-\setcounter{secnumdepth}{2}
+\setcounter{secnumdepth}{1}
 
 % Color box para R
 % new tcolorbox environment
@@ -118,6 +118,9 @@
 Luego de recopilar material de muchas clases y ayudantías de econometría, en general pensadas para ser aplicadas en Stata, decidí que podía intentar hacer estas clases en R y usar esta guía como material de apoyo.
 Mi prioridad fue ser breve y conciso, por lo que estas notas no son un buen comienzo para aprender R (o econometría); son un complemento.
 Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acarril@fen.uchile.cl}.}}
+\date{Borrador, \today \\
+  \includegraphics[width=\textwidth]{figs/scatterplot3d_portada}
+}
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 
@@ -127,10 +130,121 @@ Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acar
 \clearpage
 
 % Introducción, prefacio:
-%<<cap_intro, child='cap_intro.Rnw'>>=
-%@
 
-% Introducción, prefacio:
+
+
+\chapter{Introducción}
+
+En las últimas décadas la economía se ha ido apropiando de los computadores para realizar trabajo empírico y, sin embargo, el enfoque de los libros de econometría sigue siendo eminentemente teórico ---no \emph{aplicado}.
+
+A mi parecer, existen actualmente dos maneras de abordar la enseñanza de econometría. La primera es la clásica, o \emph{matemática}: derivando los modelos desde como ejercicios de álgebra lineal, y en general priorizando aspectos técnicos por sobre los conceptuales o aplicados. Vemos esto en libros que discuten en extensión los supuestos detrás de las formas funcionales o supuestos de distribución, pero que dedican pocas palabras a técnicas aplicadas como métodos de regresión discontinua.
+
+Por otro lado hay quienes, de la mano con el crecimiento de la economía aplicada, abogan por una enseñanza aplicada de econometría, con énfasis en técnicas de 
+
+\section{R}
+
+\subsection{Qué es R}
+
+R es un ambiente de software y un lenguaje de programación interpretado para hacer análisis estadístico y crear gráficos. Es una implementación de S, un lenguaje de programación matemático orientado a objetos más antiguo. Es software libre y de código abierto, constantemente desarrollado por estadísticos y colaboradores de otras disciplinas.
+
+R es mucho más flexible que la mayoría de los paquetes estadísticos normalmente usados por economistas. Es un lenguaje de programación completamente desarrollado, no sólo un programa con tests y métodos pre-programados.
+
+
+\subsection{Obtener R}
+
+La instalación base de R puede obtenerse de \url{https://www.r-project.org/}. Una vez instalado puedes usar RGui para usarlo. Sin embargo, usualmente yo tomo dos pasos adicionales para obtener más flexibilidad. El primero es instalar RStudio, un IDE para R que incluye una consola, editor con resaltado de sintaxis, historial de comandos y varias otras vainas que lo hacen más útil que RGui, especialmente si eres principiante. Puedes descargar RStudio de \url{https://www.rstudio.com/}, y también es gratis.
+
+Finalmente, a mi me gusta poder interactuar con R desde la línea de comandos, igual que puedo hacer con Python o Julia. Para poder hacer esto en Windows tenemos que ejecutar R:
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstr{"C:\textbackslash{}Program Files\textbackslash{}R\textbackslash{}R-3.4.0\textbackslash{}bin\textbackslash{}x64\textbackslash{}R"}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+Obviamente, tienes que reemplazar este directorio por el que corresponde a tu instalación. 
+
+\includegraphics[width=\linewidth]{sss/r-win-command-prompt}
+
+\subsection{Usar R interactivamente y a través de scripts}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{getwd}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## [1] "/Users/alvaro/Dropbox (Personal)/Proyectos/NER"
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+
+\subsection{Trabajando con datos}
+
+\subsubsection{Objetos y asignaciones}
+
+R es un lenguaje interpretado, lo que significa que ejecuta nuestras instrucciones directamente, sin compilar un programa previo. Podemos usar R interactivamente a través de la consola:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlnum{1}\hlopt{+}\hlnum{2}
+\end{alltt}
+\begin{verbatim}
+## [1] 3
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+La mayoría de las operaciones y funciones en R no guardan el resultado de su ejecución. Por ejemplo, el resultado anterior (\verb|3|) es calculado pero no puede ser reutilizado sin volverse a calcular. Para lograr esto tenemos que asignar el resultado de la operación a un objeto:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{x} \hlkwb{<-} \hlnum{1}\hlopt{+}\hlnum{2}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\subsection{R base vs. tidyverse}
+
+Una de las críticas más comunes que se hace a R es que hay muchas (¿demasiadas?) maneras de lograr un mismo resultado. Por ejemplo, R base tiene un sistema propio para crear gráficos, pero también existe \paq{ggplot2} para lograr el mismo objetivo.
+Esta multiplicidad de métodos puede hacer que R sea más difícil de aprender que lo necesario.
+
+R es un lenguaje antiguo, y muchas de sus funcionalidades básicas ---lo que llamamos \kw{R base}--- operan bajo paradigmas anticuados. Uno de los más grandes aportes a la programación en R del útltimo tiempo fue realizado por Hadley Wickham, autor del \paq{tidyverse}. Este es un conjunto de paquetes que modernizan cómo usamos R para manipular datos, y están diseñados para trabajar bien entre ellos.
+
+En un artículo para R-bloggers\footnote{\url{https://www.r-bloggers.com/teach-the-tidyverse-to-beginners/}}, David Robinson resume los dos principales ``curriculums'' de aprendizaje de R:
+\begin{itemize}
+\item \textbf{R base primero}: enseñar elementos de sintaxis como \verb|$| y \verb|[[]]|, loops, condicionales, tipos de datos y funciones base como \verb|tapply()|. Este enfoque no se concentra en un sólo marco de datos.
+\item \textbf{tidyverse primero}: comenzar usando \paq{dplyr} para manipular marcos de datos y \paq{ggplot2} para crear gráficos. Luego introducir rápidamente el uso de \paq{tidyr} y \paq{purrr}. Usar el operador \verb|%>%| casi inmediatamente, pero dejar el uso de \verb|$| y \verb|[[]]| para más adelante. Este enfoque se concentra en un sólo marco de datos.
+\end{itemize}
+
+Mi opinión (y la de muchos otros) es que aprender a usar las herramientas del \paq{tidyverse} es más fácil y más productivo. La filosofía detrás del \paq{tidyverse} es similar a la de Python: "Debería haber una ---y preferiblemente sólo una--- forma obvia de lograr algo''. Esta filosofía es buena al aprender un lenguaje de programación, ya que entrega consistencia y evita confusiones.
+Es por esto que en este documento prefiero usar herramientas del \paq{tidyverse} cada vez que sea posible.
+
+Por ejemplo, en R base existen al menos tres formas de crear una variable nueva a partir de otra existente.
+Por otro lado, con el \paq{tidyverse} hay una sóla forma de lograr esto, que además (a mi) me parece más legible:
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Agregar una variable con R base}
+\hlstd{mtcars}\hlopt{$}\hlstd{libras} \hlkwb{<-} \hlstd{mt}\hlopt{$}\hlstd{wt} \hlopt{*} \hlnum{1000}
+\hlstd{mtcars[[}\hlstr{"libras"}\hlstd{]]} \hlkwb{<-} \hlstd{mtcars[[}\hlstr{"wt"}\hlstd{]]} \hlopt{/} \hlnum{1000}
+\hlstd{mtcars[,} \hlstr{"libras"}\hlstd{]} \hlkwb{<-} \hlstd{mtcars[,} \hlstr{"wt"}\hlstd{]} \hlopt{/} \hlnum{1000}
+
+\hlcom{# Agregar una variable con el tidyverse}
+\hlstd{mtcars} \hlkwb{<-} \hlstd{mtcars} \hlopt{%>%} \hlkwd{mutate}\hlstd{(}\hlkwc{libras} \hlstd{= wt} \hlopt{/} \hlnum{1000}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+Sin embargo, también hay elementos de R base que son importantes de aprender; de hecho, muchas cosas en R no son posibles sin ellos. Iremos introduciendo estos elementos a medida que nos sean útil para el tema en cuestión.
+
+% Regresión lineal bivariada:
 
 
 
@@ -140,21 +254,24 @@ Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acar
 
 El modelo de regresión lineal es el caballo de batalla de la econometría aplicada.
 Muchas de las preguntas que abordaremos comienzan con dos variables, digamos $x$ e $y$. Nos interesará entonces ``explicar $y$ en términos de $x$''.
-Por ejemplo, $y$ podría ser la tasa de crímenes de varios barrios e $x$ el número de parques construidos en esos barrios.
+Por ejemplo, $y$ podría ser la tasa de crímenes de varios barrios y $x$ el número de parques construidos en esos barrios.
 O $y$ podría ser el porcentaje de los votos obtenidos por un partido y $x$ su gasto en la campaña electoral, etc.
 
-La \autoref{fig:votos_plot} muestra datos para 173 campañas entre dos candidatos en EE.UU, enfocándose en el ``candidato A'' (un nombre del que Kafka sin duda estaría orgulloso).
-El eje $x$ corresponde al porcentaje gastado por el candidato A (\verb|shareA|), mientras que el eje $y$ indica el porcentaje de los votos obtenidos por dicho candidato (\verb|voteA|).
-El código para crear el gráfico se muestra a continuación:
+Tomemos este último ejemplo y construyamos un caso concreto.
+La \autoref{fig:votos_plot} muestra datos de 173 campañas entre los dos candidatos finalistas en elecciones de congreso estadounidenses.
+Nos enfocamos en las variables de gasto y votos obtenidos por el ``candidato A'' (un nombre del que Kafka sin duda estaría orgulloso).
+El eje $x$ corresponde al porcentaje gastado por este candidato (\verb|shareA|), mientras que el eje $y$ indica el porcentaje de los votos que obtuvo (\verb|voteA|).
+El código para leer los datos y crear el gráfico se muestra a continuación:
+
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{library}\hlstd{(foreign)}
-\hlkwd{library}\hlstd{(ggplot2)}
-\hlstd{votos} \hlkwb{<-} \hlkwd{read.dta}\hlstd{(}\hlstr{"http://fmwww.bc.edu/ec-p/data/wooldridge/vote1.dta"}\hlstd{)}
+\hlkwd{library}\hlstd{(tidyverse)}
+\hlkwd{library}\hlstd{(haven)}
+\hlstd{votos} \hlkwb{<-} \hlkwd{read_dta}\hlstd{(}\hlstr{"http://fmwww.bc.edu/ec-p/data/wooldridge/vote1.dta"}\hlstd{)}
 \hlkwd{ggplot}\hlstd{(votos,} \hlkwd{aes}\hlstd{(shareA, voteA))} \hlopt{+} \hlkwd{geom_point}\hlstd{()}
 \end{alltt}
-\end{kframe}\begin{figure}
+\end{kframe}\begin{figure}[htb]
 
 {\centering \includegraphics[width=4in,height=3in]{figs/votos_plot-1} 
 
@@ -165,89 +282,108 @@ El código para crear el gráfico se muestra a continuación:
 
 
 \end{knitrout}
+
 \begin{Rbox}
-El comando \verb|library()| permite cargar paquetes de R, los que contienen más funciones y datos. \paq{foreign} es un paquete que nos permite usar la función \verb|read.dta()| para leer una base de datos de Stata, y \paq{ggplot2} nos permite usar la funciones \verb|ggplot()| y \verb|geom_point()| para crear un gráfico de puntos.
+\verb|library()| permite cargar paquetes de R, los que contienen más funciones y datos. \paq{haven} es un paquete que nos permite usar la función \verb|read_dta()| para leer una base de datos de Stata (con extensión \verb|dta|), y \paq{tidyverse} carga \paq{ggplot2}, un paquete que nos permite usar las funciones \verb|ggplot()| y \verb|geom_point()| para crear el gráfico de puntos.
 \end{Rbox}
 
-Al intentar modelar la relación entre $x$ e $y$ surgen una serie de preguntas. Quizás la más inmediata es: ``¿Cuál es la relación funcional entre ambas variables?''
+Al intentar modelar la relación entre $x$ e $y$ surgen una serie de preguntas. Quizás la más inmediata es: ``¿cuál es la relación funcional entre ambas variables?''
 Nuestro primer supuesto será que las variables se relacionan de manera lineal, es decir,
 \begin{equation}
 y = ax + b.
 \label{eq:ec_lin}
 \end{equation}
-Notemos que esta ecuación es idéntica a la clásica función lineal de colegio, y su interpretación geométrica es la misma: $a$ es un término que representa la pendiente de la recta y $b$ es el intercepto.
+
+La ecuación \eqref{eq:ec_lin} corresponde a la clásica función lineal de colegio, y su interpretación geométrica es la misma: $a$ es un término que representa la pendiente de una recta, y $b$ es su intercepto.
 Este supuesto de relación lineal parece cumplirse bastante bien para nuestro ejemplo de la \autoref{fig:votos_plot}: no sabemos qué valores deberían tomar $a$ y $b$, pero definitivamente pareciera existir alguna combinación de valores de $a$ y $b$ tal que una línea se ajuste ``bien'' a los datos.
 
-Sin embargo, hasta ahora nuestro modelo expresado en \eqref{eq:ec_lin} asume que existe una relación lineal \emph{perfecta} entre $x$ e $y$, lo que es altamente restrictivo. 
+Sin embargo, el modelo expresado en \eqref{eq:ec_lin} asume que existe una relación lineal \emph{perfecta} entre $x$ e $y$, lo que es altamente restrictivo. 
 En términos de la \autoref{fig:votos_plot}, es como suponer que podríamos trazar una recta que pasara por \emph{todos} los puntos, lo que evidentemente no se puede.
-Entonces surge naturalmente la pregunta de si es posible permitir que otros factores ---distintos de $x$--- afecten en cierta medida a $y$, de forma que nuestro modelo tenga un margen de error.
+Entonces surge naturalmente la necesidad de permitir que otros factores ---distintos de $x$--- afecten en cierta medida a $y$, de forma que nuestro modelo tenga un margen de error.
 Esto se logra agregando un \kw{término de error}, denotado por $\mu$, al modelo lineal.
 
-Adicionalmente, por un simple tema de convención llamaremos $\beta_0$ al parámetro del intercepto y $\beta_1$ al parámetro de la pendiente.
+Adicionalmente, por un simple tema de convención llamaremos $\beta_0$ al parámetro del intercepto y $\beta_1$ al parámetro de la pendiente desde ahora en adelante.
 Entonces podemos reescribir nuestro modelo, que ahora es
 \begin{equation}
 y = \beta_0 + \beta_1x + \mu.
 \label{eq:modelo_lineal_simple_poblacional}
 \end{equation}
 Esta ecuación define el \kw{modelo de regresión lineal simple}. Entendamos bien qué quiere decir cada palabra de este título:
+
 \begin{itemize}
 \item \textbf{modelo}, porque es un intento de simplificar la realidad para enfocarnos en algunos aspectos que nos interesan
 \item \textbf{de}, una preposición en la gramática del español
 \item \textbf{regresión} es el término usado originalmente por \textcite{galton_regression_1886}, aunque conceptualmente no guarda mucha relación con lo que hacemos ahora\footnote{\textcite{stigler_history_1986} cuenta una historia más detallada al respecto.} (pero el nombre es \eng{cool})
-\item \textbf{lineal}, porque estamos asumiendo que los aspectos de la realidad que nos interesan ---las variables $x$ e $y$--- se relacionan de manera lineal
+\item \textbf{lineal}, porque estamos asumiendo que los aspectos de la realidad que nos interesan ---las variables $x$ e $y$--- se relacionan de manera lineal en parámetros
 \item \textbf{simple}, porque estamos restringiendo el análisis a solamente dos variables (por el momento).
 \end{itemize}
 
 Muchos libros tienen nombres distintos para $x$ e $y$. Yo uso la convención (bastante establecida) de referirme a $y$ como la \kw{variable dependiente} del modelo, y a $x$ como la \kw{variable independiente} del modelo. Estas son las variables que ya tenemos, y que intentaremos relacionar.
 Ya mencionamos que $\mu$ es el llamado \kw{término de error}, que captura factores que afectan a $y$ que no hemos incluido en el modelo. Ojo que $\mu$ no es igual a $u$, y se pronuncia <<mu>>. Esto es sólo para enredar, claro.
 
-En conjunto nos referiremos a $\beta_0$ y $\beta_1$ como los \kw{parámetros} del modelo. Estos son simples números, pero como no los tenemos, intentaremos \emph{estimarlos}.
-Encontrar una forma razonable de estimar estos parámetros será el objetivo de este capítulo (y más allá!), y eso es lo que veremos a continuación.
+En conjunto nos referiremos a $\beta_0$ y $\beta_1$ como los \kw{parámetros} (o coeficientes) del modelo.
+Estos son simples números, pero como no los tenemos, intentaremos \emph{estimarlos}.
+Encontrar una forma razonable de estimar estos parámetros será el objetivo de este capítulo (¡y más allá!).
+Emprendemos esta tarea a continuación.
 
 \section{Estimando los parámetros del modelo}
 
-Nuestro objetivo principal es estimar los parámetros $\beta_0$ y $\beta_1$ del modelo lineal simple explicitado en \eqref{eq:modelo_lineal_simple_poblacional}. Para lograrlo es necesario suponer que contamos con una muestra de la población completa. Llamamos ${(x_i, y_i): i = 1, \ldots, n}$ a una muestra aleatoria de tamaño $n$ de la población, es decir, $x_i$ e $y_i$ son vectores con $n$ observaciones. Entonces reescribimos el modelo en términos de esta muestra:
+Nuestro objetivo ahora es estimar los parámetros $\beta_0$ y $\beta_1$ del modelo de regresión simple explicitado en \eqref{eq:modelo_lineal_simple_poblacional}. En términos geométricos, queremos encontrar una forma de estimar el intercepto y la pendiente de una recta para que esta se ajuste ``bien'' a los datos.
+
+El modelo expresado en \eqref{eq:modelo_lineal_simple_poblacional} es nuestro supuesto de cómo se relacionan variables \emph{poblacionales}.
+Sin embargo, nosotros (con alta probabilidad) no tendremos acceso a datos de la población completa, si no que a una \emph{muestra}.
+Entonces tenemos que adaptar nuestra ecuación para que represente un \kw{modelo muestral}.
+Logramos esto simplemente suponiendo que contamos con una muestra aleatoria de la población completa. Llamamos ${(x_i, y_i): i = 1, \ldots, n}$ a una muestra aleatoria de tamaño $n$ de la población, es decir, $x_i$ e $y_i$ son vectores con $n$ observaciones. Entonces reescribimos el modelo en términos de esta muestra:
 \begin{equation}
 y_i = \beta_0 + \beta_1 x_i + \mu_i,
 \label{eq:modelo_lineal_simple}
 \end{equation}
-para todo $i$, donde $i = 1, \ldots, n$ es un índice que identifica a las observaciones (filas) en los datos. Podríamos tener $n$ personas, familias o empresas.
+para todo $i$, donde $i = 1, \ldots, n$ es un índice que identifica a las observaciones (filas) en los datos.
+Podríamos tener $n$ personas, familias o empresas en nuestra muestra.
 
-Esta ecuación, que sólo se diferencia de \eqref{eq:modelo_lineal_simple_poblacional} por ese pequeño subíndice $i$, es la versión \emph{muestral} del modelo lineal simple.
-Recordemos que hemos supuesto que la variable dependiente $y_i$ es una función lineal de la variable independiente, $x_i$.
-Entonces intentaremos buscar ---o \emph{estimar}--- una combinación de parámetros $\beta_0$ y $\beta_1$ que se ajuste a nuestros datos. Como es posible que los datos no tengan una relación lineal perfecta, el modelo incluye un término de error $\mu_i$. Este término representa todas las variables que afectan a $y_i$ que no son $x_i$.
+La ecuación \eqref{eq:modelo_lineal_simple}, que sólo se diferencia de \eqref{eq:modelo_lineal_simple_poblacional} por ese pequeño subíndice $i$, es la versión \emph{muestral} del modelo lineal simple.
+Como hemos supuesto que tenemos una muestra aleatoria, todavía podemos pensar que la variable dependiente $y_i$ es una función lineal de la variable independiente $x_i$, y que tenemos un término de error $\mu_i$ para capturar el efecto que otros factores tienen sobre $y_i$.
+%Entonces intentaremos buscar ---o \emph{estimar}--- una combinación de parámetros $\beta_0$ y $\beta_1$ que se ajuste a los datos de nuestra muestra.
 
-Por ejemplo, podríamos tener un vector $y_i$ con los salarios de $n$ personas y modelarlo como una función lineal de los años de educación de esas personas, $x_i$. Resulta útil tener una base de datos concreta con estos vectores, por lo que usaremos una pequeña muestra de datos simulados.
+Por ejemplo, podríamos tener un vector $y_i$ con los salarios de $n=30$ personas, y modelarlo como una función lineal de los años de educación de esas personas, $x_i$. Resulta útil tener una base de datos concreta con estos vectores, por lo que usaremos una pequeña muestra de datos simulados.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlcom{# Leer datos CSV de internet}
-\hlstd{simdatos} \hlkwb{<-} \hlkwd{read.csv}\hlstd{(}
+\hlstd{simdatos} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}
   \hlstr{"https://raw.githubusercontent.com/acarril/NER/master/datos/simdatos.csv"}\hlstd{)}
-\hlcom{# Imprimir las primeras filas de los datos}
-\hlkwd{head}\hlstd{(simdatos)}
+\hlcom{# Imprimir las primeras observaciones de los datos}
+\hlstd{simdatos}
 \end{alltt}
 \begin{verbatim}
-##   y         x
-## 1 1  4.199913
-## 2 1  7.510634
-## 3 1  2.125473
-## 4 2  8.988857
-## 5 2 10.243105
-## 6 2 11.296823
+## # A tibble: 30 x 2
+##        y         x
+##    <int>     <dbl>
+##  1     1  4.199913
+##  2     1  7.510634
+##  3     1  2.125473
+##  4     2  8.988857
+##  5     2 10.243105
+##  6     2 11.296823
+##  7     3  7.356365
+##  8     3 10.505349
+##  9     3 10.511601
+## 10     4 12.434589
+## # ... with 20 more rows
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 
 \begin{Rbox}
-\verb|read.csv()| permite leer bases de datos en formato CSV. Lo usamos para leer una base en línea y luego asignamos esos datos al objeto \verb|simdatos| (datos simulados). 
-Usamos \verb|head()| para imprimir el encabezado de los datos, lo que permite hacernos una idea rápida de las variables y sus valores (puedes imprimir la base completa ejecutado \verb|simdatos|).
-Esta base tiene solamente 30 observaciones.
+\verb|read_csv()| permite leer bases de datos en formato CSV. Lo usamos para leer una base en línea y luego asignamos esos datos al objeto \verb|simdatos| (datos simulados).
+Luego escribimos el nombre del objeto (\verb|simdatos|) para imprimirlo. Como es un \eng{tibble} (una base de datos), R imprime solamente las primeras 10 observaciones.
+Esto es útil para hacernos una idea rápida de las variables de la base y los valores que éstas toman.
 \end{Rbox}
 
-En esta base la variable \verb|y| representa ingreso por hora (en miles de pesos) y la variable \verb|x| representa años de educación.
-Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha información y revela patrones que son difíciles de ver en los datos.
+En estos datos la variable \verb|y| contiene salarios por hora (en miles de pesos) y la variable \verb|x| contiene años de educación.
+Cada fila representa una observación (en este caso, una persona) distinta.
+Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha información y revela patrones que son difíciles de ver en los datos. Creamos un gráfico simple con \paq{ggplot2}:
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -256,7 +392,7 @@ Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha inf
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-3-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-8-1} 
 
 }
 
@@ -268,17 +404,17 @@ Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha inf
 \paq{ggplot2} es un paquete muy poderoso para crear gráficos de distintos tipos. Su principal función es \verb|ggplot()|, que permite definir los datos y las variables que usaremos (dentro de \verb|aes()|). Luego usamos \kw{funciones geom} para definir el tipo de gráfico; en este caso \verb|geom_point()| crea un gráfico de puntos.
 \end{Rbox}
 
-Vemos que existe una evidente relación lineal entre $x$ e $y$: a mayor nivel de educación parece haber mayor nivel de ingreso.
-Esto es bueno para nosotros, ya que queremos ajustar los datos a un modelo lineal como el que escribimos en \eqref{eq:modelo_lineal_simple}.
-Cabe preguntarse ahora cuál es la manera óptima de elegir los parámetros que determinan dicha relación lineal, es decir, ¿cómo podemos elegir $\beta_0$ (el intercepto) y $\beta_1$ (la pendiente) para que la predicción se ajuste lo mejor posible a los datos?
+Vemos que existe una evidente relación lineal entre $x_i$ e $y_i$: a mayor nivel de educación parece haber mayor nivel de ingreso.
+Esto es bueno para nosotros, ya que queremos ajustar los datos al modelo lineal que escribimos en \eqref{eq:modelo_lineal_simple}.
+Cabe preguntarse ahora cuál es la manera óptima de elegir los parámetros que determinan dicha relación lineal, es decir, ¿cómo podemos elegir $\beta_0$ (el intercepto) y $\beta_1$ (la pendiente) para que nuestra predicción de $y_i$ sea lo mejor posible?
 
-Podríamos elegir entre una infinita variedad de combinaciones de $\beta_0$ y $\beta_1$ para modelar los datos. Por ejemplo, el código de abajo simula 150 líneas con interceptos y pendientes ``razonables'':
+Es claro que podríamos elegir entre una infinita variedad de combinaciones de $\beta_0$ y $\beta_1$ para modelar los datos. Por ejemplo, el código de abajo simula 150 líneas con interceptos y pendientes ``razonables'', los que se grafican a continuación.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlkwd{set.seed}\hlstd{(}\hlnum{314}\hlstd{)}
-\hlstd{modelos} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}
+\hlstd{modelos} \hlkwb{<-} \hlkwd{tibble}\hlstd{(}
   \hlkwc{beta1} \hlstd{=} \hlkwd{runif}\hlstd{(}\hlnum{150}\hlstd{,} \hlopt{-}\hlnum{3}\hlstd{,} \hlnum{1}\hlstd{),}
   \hlkwc{beta2} \hlstd{=} \hlkwd{runif}\hlstd{(}\hlnum{150}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{)}
 \hlstd{)}
@@ -291,7 +427,7 @@ Podríamos elegir entre una infinita variedad de combinaciones de $\beta_0$ y $\
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-4-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-9-1} 
 
 }
 
@@ -299,7 +435,7 @@ Podríamos elegir entre una infinita variedad de combinaciones de $\beta_0$ y $\
 
 \end{knitrout}
 
-Si bien hay muchas líneas que claramente no se ajustan bien a los datos, varias otras sí lo hacen, y resulta difícil determinar cuál es ``la mejor'' (asumiendo que tal línea existe).
+Si bien hay muchas líneas que claramente no se ajustan bien a los datos, varias otras sí lo hacen, y resulta difícil determinar a simple vista cuál es ``la mejor'' (asumiendo que tal línea existe).
 Es evidente que necesitamos un criterio riguroso para elegir los parámetros $\beta_0$ y $\beta_1$ de manera óptima.
 Esto es lo que veremos a continuación.
 
@@ -308,55 +444,70 @@ Esto es lo que veremos a continuación.
 \label{sec:MCO}
 
 El método de Mínimos Cuadrados Ordinarios (MCO) es una respuesta directa a la pregunta que planteamos recién: ¿qué criterio conviene usar para elegir el modelo lineal que se ajuste ``mejor'' a los datos?
-Geométricamente, el método de MCO equivale a minimizar la distancia vertical entre los puntos y la recta definida por el modelo.
+Intuitivamente, la idea es minimizar el error de ajuste entre la predicción de $y_i$ definida por nuestra elección de $\beta_0$ y $\beta_1$, y los valores reales de $y_i$.
+
+%Geométricamente, el método de MCO equivale a minimizar la distancia vertical entre los puntos y la recta definida por el modelo.
+
+
+
+Ahora formalizaremos esta intuición, y para esto necesitamos introducir un poco de notación nueva.
+Recordemos que estamos trabajando con \eqref{eq:modelo_lineal_simple}, que es la versión muestral del modelo lineal simple (reimpresa a continuación para comodidad del lector):
+\begin{equation*}
+y_i = \beta_0 + \beta_1 x_i + \mu_i.
+\end{equation*}
+Dada una muestra de datos, llamaremos $\hat\beta_0$ y $\hat\beta_1$ a nuestra estimación de los coeficientes.
+Entonces la \kw{línea de regresión por MCO}, denotada por $\hat y_i$, está definida como
+\begin{equation}
+\hat y_i = \hat\beta_0 + \hat\beta_1 x_i.
+\label{eq:linea_regresion}
+\end{equation}
+Algebraicamente, $\hat y_i$ es el vector que resulta de multiplicar el vector $x_i$ por el escalar $\hat\beta_1$ y luego sumarle $\hat\beta_0$.
+Geométricamente, $\hat y_i$ es simplemente una recta que resulta de aplicar una transformación lineal a $x_i$, donde el intercepto y la pendiente dependen de nuestra elección de $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:linea_regresion}.
+Esta recta está dibujada con azul en la \autoref{fig:MCO}.
 
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[htb]
 
 {\centering \includegraphics[width=4in,height=3in]{figs/MCO-1} 
 
 }
 
-\caption[Línea de ajuste (rojo) y residuos (azul) del modelo lineal simple]{Línea de ajuste (rojo) y residuos (azul) del modelo lineal simple}\label{fig:MCO}
+\caption[Línea de regresión $\hat y_i$ en azul y residuo $\hat \mu_i$ en rojo]{Línea de regresión $\hat y_i$ en azul y residuo $\hat \mu_i$ en rojo}\label{fig:MCO}
 \end{figure}
 
 
 \end{knitrout}
 
-Recordemos que estamos trabajando con la versión muestral del modelo lineal simple, es decir,
-\begin{equation*}
-y_i = \beta_0 + \beta_1 x_i + \mu_i.
-\end{equation*}
-Dada una muestra de datos (como \verb|simdatos|), llamamos $\hat\beta_0$ y $\hat\beta_1$ a los candidatos para los coeficientes de la estimación. Entonces la recta $y_i$ que estimamos está definida como
-\begin{equation}
-\hat y_i = \hat\beta_0 + \hat\beta_1 x_i.
-\end{equation}
-
-La diferencia entre $y_i$ (los datos) y $\hat y_i$ (nuestra predicción) corresponde a $\hat\mu_i$, el residuo de nuestra estimación para cada observación $i$: 
+Ahora, si tomamos la diferencia entre $y_i$ (los datos) y $\hat y_i$ (nuestra predicción) obtenemos $\hat\mu_i$, el \kw{residuo} de nuestra estimación:
 \begin{align}
 \hat \mu_i &= y_i - \hat y_i \notag \\
            &= y_i - \hat\beta_0 + \hat\beta_1 x_i.
 \label{eq:residuos}
 \end{align}
-Gráficamente, la distancia entre cada punto (los datos) y la recta (la predicción $\hat y_i$)  corresponde al residuo, $\hat\mu_i$, representada en el gráfico por las líneas rojas. 
-Es decir que para cada observación $i$ tenemos una medida de la magnitud del error que esta elección de $\hat\beta_0$ y $\hat\beta_1$ produce.
-El método de MCO corresponde a elegir $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:residuos} tal que se minimice la suma de los residuos al cuadrado:\footnote{¿Por qué al cuadrado? Porque se asume que es irrelevante si el error es una subestimación o una sobreestimación, de forma que lo único que importa es la magnitud. ¿Por qué no se usa el valor absoluto entonces? Buena pregunta: \url{https://stats.stackexchange.com/q/46019/91358}. Básicamente, porque es algebraicamente más simple manejar valores al cuadrado, y no hace ninguna diferencia en el resultado final.}
+Gráficamente el residuo corresponde a la distancia vertical entre cada punto (los datos $y_i$) y la recta (la predicción $\hat y_i$), dibujado con líneas rojas en la \autoref{fig:MCO}.
+Es decir que para cada observación $i$ tenemos una medida de la magnitud del error que unos valores en particular de $\hat\beta_0$ y $\hat\beta_1$ producen.
 
+¿Cómo elegir elegimos los parámetros entonces?
+El método de MCO consiste en elegir $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:residuos} tal que se minimice la suma de los residuos al cuadrado.\footnote{¿Por qué al cuadrado? Porque se asume que es irrelevante si el error es una subestimación o una sobreestimación, de forma que lo único que importa es la magnitud. ¿Por qué no se usa el valor absoluto entonces? Buena pregunta: \url{https://stats.stackexchange.com/q/46019/91358}. Básicamente, porque es algebraicamente más simple manejar valores al cuadrado, y no hace ninguna diferencia en el resultado final.}
+Geométricamente esto es equivalente a minimizar la suma de las distancias verticales entre todos los puntos y la línea de regresión (las líneas rojas de la \autoref{fig:MCO}).
+Matemáticamente el problema es
 \begin{align}
 \min_{\hat\beta_0,\hat\beta_1} & \sum_{i=1}^n \hat\mu_i^2 \notag \\
 \Leftrightarrow \min_{\hat\beta_0,\hat\beta_1} & \sum_{i=1}^n (y_i - \hat\beta_0 - \hat\beta_1 x_i)^2.
 \label{eq:prob_min_MCO}
 \end{align}
 
-Al resolver este problema de minimización obtendremos los estimadores MCO:\footnote{La derivación paso a paso puede encontrarse, por ejemplo, en \textcite[cap. 2]{wooldridge_introductory_2016}.}
-
+Al resolver esta minimización obtendremos los estimadores MCO.\footnote{La derivación paso a paso puede encontrarse, por ejemplo, en \textcite[cap. 2]{wooldridge_introductory_2016}.}
+Estos corresponden a la elección óptima de $\hat\beta_0$ y $\hat\beta_1$ que hemos estado buscando:
 \begin{align}
 \hat \beta_1 &= \sum_{i=1}^n \frac{\sum_{i=1}^n (x_i - \bar x)(y_i - \bar y)}{\sum_{i=1}^n (x_i - \bar x)^2} \notag \\
- &= \frac{\Cov (x,y)}{\Var(x)} \\
-\hat \beta_0 &= \bar y - \hat\beta_1 \bar x
+ &= \frac{\Cov (x,y)}{\Var(x)} \label{eq:MCO_beta1} \\
+\hat \beta_0 &= \bar y - \hat\beta_1 \bar x, \label{eq:MCO_beta0}
 \end{align}
 donde $\bar x$ e $\bar y$ son los promedios de $x_i$ e $y_i$, $\Var(x)$ es la varianza muestral de $x$ y $\Cov(x,y)$ es la covarianza muestral de $x$ e $y$.
-Todo esto significa que para encontrar los estimadores MCO y obtener la línea de mejor ajuste simplemente tenemos que calcular cuatro cosas: $\bar y$, $\bar x$, $\Cov (x,y)$ y $\Var (x,y)$. ¡Hagámoslo ahora!
+
+¡Hemos logrado nuestro objetivo!
+Lo anterior significa que para encontrar los estimadores MCO y obtener la línea de regresión que mejor se ajuste a los datos solo tenemos que calcular cuatro cosas: $\bar y$, $\bar x$, $\Cov (x,y)$ y $\Var (x,y)$. ¡Hagámoslo ahora!
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -388,9 +539,18 @@ Todo esto significa que para encontrar los estimadores MCO y obtener la línea d
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
-Vemos que es fácil calcular los estimadores MCO y en este caso $\hat \beta_0 = -1.19$ y $\hat \beta_1 = 0.43$.
 
-Ahora podemos usar los parámetros estimados para graficar $\hat y_i$ sobre los datos:
+\begin{Rbox}
+La función \verb|attach()| es útil para indicar que vamos a usar una base de datos en particular para todas las funciones que siguen. Entonces cuando calculamos el promedio de \verb|x| con \verb|mean(x)|, R sabe que se trata de la variable \verb|x| en el marco \verb|simdatos| (y no de \verb|votos|, por ejemplo). Luego usamos \verb|detach()| para ``desactivar'' el uso de la base que indicamos previamente.
+\end{Rbox}
+
+Vemos que es fácil calcular los estimadores MCO, y para este ejemplo particular obtuvimos que $\hat \beta_0 = -1.19$ y $\hat \beta_1 = 0.43$ (redondeando).
+Con esto podemos completar la línea de ajuste definida en \eqref{eq:linea_regresion} usando nuestras estimaciones:
+\begin{equation*}
+\hat y_i = -1.19 + 0.43x_i.
+\end{equation*}
+Esto está bien, pero es demasiado práctico para visualizar lo que hemos logrado.
+Una alternativa mejor es usar estos parámetros para graficar $\hat y_i$ sobre los datos:
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -405,7 +565,7 @@ Ahora podemos usar los parámetros estimados para graficar $\hat y_i$ sobre los 
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-6-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-11-1} 
 
 }
 
@@ -413,11 +573,13 @@ Ahora podemos usar los parámetros estimados para graficar $\hat y_i$ sobre los 
 
 \end{knitrout}
 
-Si bien el método que acabamos de usar para calcular $\hat\beta_0$ y $\hat\beta_1$ es útil para entender de manera más profunda qué es lo que estamos haciendo al estimar un modelo líneal por el método de MCO, no es demasiado breve. Podemos obtener los parámetros directamente usando la función \verb|lm()| de la siguiente forma:
+Finalmente, si bien resulta útil calcular explícitamente los estimadores para entender mejor qué es lo que estamos haciendo, esto no es demasiado práctico: estamos calculando y guardando promedios, varianzas y covarianzas que no nos interesan.
+En realidad cualquier programa estadístico (decente) tiene algún método para estimar los parámetros de un modelo lineal de manera más compacta, y R no es la excepción:
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlcom{# Estimar directamente los parámetros de un modelo lineal}
 \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x,} \hlkwc{data} \hlstd{= simdatos)}
 \end{alltt}
 \begin{verbatim}
@@ -432,82 +594,62 @@ Si bien el método que acabamos de usar para calcular $\hat\beta_0$ y $\hat\beta
 \end{kframe}
 \end{knitrout}
 
-La función \verb|lm()| viene de \eng{linear model}, y permite calcular rápidamente los parámetros de un modelo lineal (¡usamos una línea!). El primer argumento de la función es una fórmula de R, que no es exactamente lo mismo que una fórmula en el sentido usual de la palabra. Por el momento basta entender que a la izquierda de \verb|~| indicamos la variable dependiente, mientras que a la derecha indicamos las variables independientes. Entonces \verb|lm()| toma una fórmula como \verb|y~x| y la traduce automáticamente a algo como \verb|y = beta0 + beta1 * x|.
+\begin{Rbox}
+La función \verb|lm()| viene de \eng{linear model}, y permite calcular rápidamente los parámetros de un modelo lineal. El primer argumento de la función es una fórmula de R, que no es exactamente lo mismo que una fórmula en el sentido usual de la palabra. Por el momento basta entender que a la izquierda de \verb|~| indicamos la variable dependiente, mientras que a la derecha indicamos las variables independientes. Entonces \verb|lm()| toma una fórmula como \verb|y~x| y la traduce automáticamente a algo como \verb|y = beta0 + beta1 * x|.
+\end{Rbox}
 
-Una de las ventajas de usar \verb|lm()| es que podemos guardar sus resultados en un objeto, el que luego podemos manipular para extraer otro tipo de información útil del modelo. A continuación veremos cómo extraer, manipular e interpretar esta información, lo que nos dará una comprensión mucho más profunda de lo que estamos haciendo.
+%Una de las ventajas de usar \verb|lm()| es que podemos guardar sus resultados en un objeto, el que luego podemos manipular para extraer otro tipo de información útil del modelo. A continuación veremos cómo extraer, manipular e interpretar esta información, lo que nos dará una comprensión mucho más profunda de lo que estamos haciendo.
+
+Hemos calculado los parámetros del modelo, y sabemos lo que éstos quieren decir en términos matemáticos (minimizan el la suma de los errores cuadráticos) y geométricos (son el intercepto y la pendiente de la línea de ``mejor'' ajuste).
+¿Pero pueden decirnos algo de los datos que usamos para calcularlos?
+¿Qué significa, en términos de la relación entre educación e ingreso, que $\hat \beta_0 = -1.19$ y $\hat \beta_1 = 0.43$?
+Saber interpretar correctamente los parámetros de una regresión es un arte, y comenzamos a explorarlo a continuación.
 
 
-\section{Interpretando un modelo lineal}
+\section{Interpretando los parámetros estimados}
 
-Usaremos ahora la base \verb|wage2|, que es uno de los datos usados por \textcite{wooldridge_introductory_2016} y contiene información de ingresos (y otras variables) para 935 personas. \footnote{Esta base es un subconjunto de los datos del estudio de \textcite{blackburn_unobserved_1992}.}
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(foreign)}
-\hlcom{#ingresos <- read.dta("http://fmwww.bc.edu/ec-p/data/wooldridge/wage2.dta")}
-\hlstd{ingresos} \hlkwb{<-} \hlkwd{read.dta}\hlstd{(}\hlstr{"datos/wage2.dta"}\hlstd{)}
-\hlstd{ingresos} \hlkwb{<-} \hlkwd{as.data.frame}\hlstd{(ingresos[}\hlkwd{c}\hlstd{(}\hlstr{"wage"}\hlstd{,}\hlstr{"educ"}\hlstd{)])}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-El paquete \paq{foreign} nos permite leer bases de datos en formatos de otros programas. En este caso usamos la función \verb|foreign::read.dta()| para leer una base de datos de Stata.
-Por el momento nos interesan dos variables: \verb|wage|, que es un vector de ingresos (en dólares menusales) y \verb|educ|, que es un vector con años de escolaridad de cada persona. La última línea guarda solamente esas dos variables, como marco de datos, en el objeto \verb|ingresos|.
-
-Al cargar nuevos datos yo siempre recomiendo:
-\begin{enumerate}
-\item Imprimir el encabezado
-\item Imprimir un resumen
-\item Graficarlos
-\end{enumerate}
-
-Escribimos lo siguiente para lograr estas tres cosas:
+Una vez obtenidos los parámetros del modelo, nos interesa poder interpretarlos de manera útil. ¿Qué es lo que quiere decir que hayamos obtenido ciertos valores de $\hat\beta_0$ y $\hat\beta_1$, más allá de ser el intercepto y la pendiente de una ecuación?
+Para explorar este tema dejaremos de usar datos simulados y pasaremos a datos reales.
+En particular usaremos \verb|wage2|, que es una de las bases usadas en \textcite{wooldridge_introductory_2016} y contiene información de años de educación e ingresos para 935 personas.\footnote{Esta base es un subconjunto de los datos del estudio de \textcite{blackburn_unobserved_1992}.}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{head}\hlstd{(ingresos)}
-\end{alltt}
-\begin{verbatim}
-##   wage educ
-## 1  769   12
-## 2  808   18
-## 3  825   14
-## 4  650   12
-## 5  562   11
-## 6 1400   16
-\end{verbatim}
-\begin{alltt}
-\hlkwd{summary}\hlstd{(ingresos)}
-\end{alltt}
-\begin{verbatim}
-##       wage             educ      
-##  Min.   : 115.0   Min.   : 9.00  
-##  1st Qu.: 669.0   1st Qu.:12.00  
-##  Median : 905.0   Median :12.00  
-##  Mean   : 957.9   Mean   :13.47  
-##  3rd Qu.:1160.0   3rd Qu.:16.00  
-##  Max.   :3078.0   Max.   :18.00
-\end{verbatim}
-\begin{alltt}
-\hlkwd{ggplot}\hlstd{(ingresos,} \hlkwd{aes}\hlstd{(educ, wage))} \hlopt{+} \hlkwd{geom_point}\hlstd{()}
+\hlstd{ingresos} \hlkwb{<-} \hlkwd{read_dta}\hlstd{(}\hlstr{"http://fmwww.bc.edu/ec-p/data/wooldridge/wage2.dta"}\hlstd{)}
+\hlstd{ingresos} \hlkwb{<-} \hlkwd{select}\hlstd{(ingresos, wage, educ)}
 \end{alltt}
 \end{kframe}
-
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-9-1} 
-
-}
-
-
-
 \end{knitrout}
 
-Es evidente que estos datos (reales) no presentan una relación lineal tan evidente. Más adelante nos haremos cargo de este problema.
+\begin{Rbox}
+Usamos \verb|haven::read_dta()| para leer bases de datos de Stata, como ya hicimos previamente. En la segunda línea, \verb|select()| nos permite seleccionar las variables \verb|wage| y \verb|educ| de la base \verb|ingresos| que acabamos de leer. Asignamos el resultado de \verb|select()| al mismo objeto para sobreescribirlo con solamente las variables que nos interesan.
+\end{Rbox}
 
-\subsubsection{Coeficientes}
+%Por el momento nos interesan dos variables: \verb|wage|, que es un vector de ingresos (en dólares menusales) y \verb|educ|, que es un vector con años de escolaridad de cada persona.
 
-Volvemos a usar \verb|lm()| como ya lo hemos hecho, esta vez definiendo una fórmula donde \verb|wage| es la variable dependiente y \verb|educ| es la variable independiente:
+%Al cargar nuevos datos yo siempre recomiendo:
+%\begin{enumerate}
+%\item Imprimir el encabezado
+%\item Imprimir un resumen
+%\item Graficarlos
+%\end{enumerate}
+
+%Escribimos lo siguiente para lograr estas tres cosas:
+
+%<<>>=
+%head(ingresos)
+%summary(ingresos)
+%ggplot(ingresos, aes(educ, wage)) + geom_point()
+%@
+
+%Es evidente que estos datos (reales) no presentan una relación lineal tan evidente. Más adelante nos haremos cargo de este problema.
+
+Podemos escribir la línea de regresión definida en \eqref{eq:linea_regresion} usando los nombres de las variables que nos interesan: salario mensual en dólares (\verb|wage|) y años de educación (\verb|educ|). Luego estimamos los coeficientes del modelo con \verb|lm()|, esta vez definiendo una fórmula donde \verb|wage| es la variable dependiente y \verb|educ| es la variable independiente:
+\begin{align*}
+\hat y &= \hat\beta_0 + \hat\beta_1 x \\
+\Longrightarrow \widehat{wage} &= \hat\beta_0 + \hat\beta_1 {educ}.
+\end{align*}
+
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
@@ -522,260 +664,305 @@ Volvemos a usar \verb|lm()| como ya lo hemos hecho, esta vez definiendo una fór
 ## (Intercept)         educ  
 ##      146.95        60.21
 \end{verbatim}
-\end{kframe}
+\begin{alltt}
+\hlkwd{ggplot}\hlstd{(ingresos,} \hlkwd{aes}\hlstd{(educ, wage))} \hlopt{+}
+  \hlkwd{geom_point}\hlstd{()} \hlopt{+}
+  \hlkwd{geom_smooth}\hlstd{(}\hlkwc{method} \hlstd{=} \hlstr{"lm"}\hlstd{,} \hlkwc{se} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+\end{alltt}
+\end{kframe}\begin{figure}[htb]
+
+{\centering \includegraphics[width=4in,height=3in]{figs/ingresos_lm-1} 
+
+}
+
+\caption[Modelo de regresión lineal relacionando años de educación (\texttt{educ}) y salario (\texttt{wage})]{Modelo de regresión lineal relacionando años de educación (\texttt{educ}) y salario (\texttt{wage})}\label{fig:ingresos_lm}
+\end{figure}
+
+
 \end{knitrout}
+\begin{Rbox}
+\verb|geom_smooth| es una función geom que podemos usar en conjunto con \verb|ggplot()| para graficar medias condicionales. Al usar la opción \verb|method = "lm"| indicamos que queremos graficar un modelo lineal entre las variables de los ejes. El uso de \verb|se = FALSE| es para desactivar los intervalos de confianza, tema del que hablaremos más adelante.
+\end{Rbox}
 
+El intercepto del modelo lineal ($\beta_0$) es el valor predicho de $y$ cuando $x=0$. En términos de nuestro ejemplo, si una persona tiene 0 años de educación el modelo predice un ingreso mensual promedio de 146.95 dólares.
+Es importante notar que en algunos contextos no tiene demasiado sentido pensar en $x=0$ (¿cuántas personas con 0 años de educación existirán? ¿cuántas hay en los datos?). En esas situaciones $\hat\beta_0$ no tiene mucho valor en sí mismo, y es labor del investigador discriminar los casos dónde esto ocurra.
+Exploraremos este punto con mayor profundidad en el siguiente ejemplo.
 
-Los coeficientes estimados de un modelo lineal como este pueden interpretarse fácilmente, recordando que nuestra predicción es
-\begin{equation*}
-\hat y = \hat \beta_0 + \hat \beta_1 x.
-\end{equation*}
-Notar que esta ecuación es equivalente a una función lineal genérica, del tipo $y=a+bx$. Tener este simple hecho en cuenta es de gran ayuda para entender su interpretación.
+Por otro lado, el coeficiente estimado para la pendiente ($\hat\beta_1$) nos dice la cantidad en la que cambia $\hat y$ cuando $x$ aumenta en una unidad. En otras palabras,
+\begin{equation}
+\Delta \hat y = \hat \beta_1 \cdot \Delta x,
+\end{equation}
+donde el operador $\Delta$ (``delta'') significa simplemente ``el cambio en ...''.
 
-El intercepto de un modelo lineal nos indica que si las variables independientes son todas iguales a 0, el modelo predice, en promedio, un valor de $\hat \beta_0$ para $\hat y$. En este ejemplo, si una persona tiene 0 años de educación el modelo predice un ingreso mensual promedio de 146.95 dólares.
-Los coeficientes estimados para las variables independientes (solamente $\hat \beta_1$, en este caso) pueden interpretarse como el cambio promedio que un aumento de una unidad de $x$ tiene sobre $y$. Nuestra estimación indica que un año adicional de educación tiene un efecto promedio de aumentar en 60.21 dólares el ingreso de las personas. Si este coeficiente fuera negativo diríamos que un cambio en $x$ está correlacionado a una reducción de $y$.
+Notar que el aumento de $x$ puede ir asociado tanto a un aumento como a una disminución de $\hat y$.
+Si $\hat\beta_1 > 0$ entonces un aumento de una unidad de $x$ está asociado a un aumento de $\hat\beta_1$ en $\hat y$; si $\hat\beta_1 < 0$ entonces un aumento de una unidad de $x$ está asociado a una disminución de $-\hat\beta_1$ en $\hat y$.
 
+Por ejemplo, en la estimación graficada en la \autoref{fig:ingresos_lm} hemos obtenido que $\hat\beta_1 = 60.21$.
+Esto puede interpretarse como que un aumento de un año de educación ($x$ aumenta en una unidad) está asociado a un aumento promedio de (casi) 60 dólares en el salario.
+Podemos asegurar que un aumento de $x$ se relaciona con un aumento en $\hat y$ porque el signo del coeficiente estimado es positivo; si el coeficiente estimado hubiese sido negativo, entonces diríamos que un año adicional de educación \emph{reduce} el salario promedio (¿tendría sentido esto?).
 
-\subsubsection{Errores estándar de los coeficientes}
+Notar que hemos sido muy cuidadosos en no darle interpretación causal a la variable independiente. En otras palabras, evitamos decir que un año adicional de educación \emph{provoca} un aumento promedio de 60 dólares en el ingreso. La pregunta de causalidad es importante, y un tema muy estudiado en econometría. Sin embargo, sólo podremos hablar de causalidad más adelante, cuando hayamos estudiado las propiedades estadísticas de los estimadores de MCO e impongamos supuestos más fuertes sobre la población.
 
-Los parámetros estimados ---los coeficientes de MCO, en este caso--- son estadísticos muestrales que usamos para hacer inferencias de los parámetros poblacionales. Es importante tener en cuenta que son estos parámetros poblacionales los que nos interesan en realidad, pero como no podemos observarlos directamente, debemos inferirlos por medio de una muestra finita.
+\subsection{La unidad de medida}
 
-Es evidente que si tomáramos una muestra distinta a la actual, lo más probable es que estimaríamos parámetros diferentes. Si tomaras datos de otras 935 personas (o cualquier número, en realidad) es muy posible que al aplicar el mismo modelo obtuviéramos valores de $\beta_0$ y $\beta_1$ distintos de 146.95 y 60.21. Además es muy probable que nuevamente ninguno de los dos sea igual al verdadero parámetro poblacional, que es el que nos interesa. Si continuáramos este proceso de tomar diferentes muestras y estimar los mismos parámetros una y otra vez, veríamos que la frecuencia relativa de las estimaciones obtenidas sigue una distribución de probabilidad, y por el Teorema Central del Límite sabemos que es probable que esta distribución sea normal. Entonces es importante para nuestra estimación que cuantifiquemos la cantidad de incertidumbre en esta distribución poblacional desconocida. Ahí es donde entra el concepto de error estándar, que corresponde a nuestra estimación de la desviación estándar de la distribución de estos muestreos. En términos intuitivos, es una medida de la incertidumbre de $\hat\beta$.
+Habrás notado que la unidad de medida de las variables es clave a la hora de interpretar los coeficientes estimados. En el ejemplo anterior $x$ son años de educación, y por lo tanto $\hat\beta_1 = 60.21$ implica que un año adicional de educación está asociado a un aumento de 60.21 dólares en el salario mensual promedio, porque la unidad de $y$ son dólares mensuales.
 
-Encerramos \verb|lm()| dentro de \verb|summary()| para obtener información más detallada de las estimaciones del modelo, incluyendo estimaciones para los errores estándar de los coeficientes:
+Veamos ahora cómo cambian los parámetros estimados cuando cambia la unidad de medida de las variables.
+En concreto, usaremos los datos \verb|mtcars|, que contiene 32 observaciones de modelos de auto.
+Nos concentramos en una variable que indica su rendimiento en millas por galón (\verb|mpg|) y otra con su peso en miles de libras (\verb|wt|).
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{summary}\hlstd{(}\hlkwd{lm}\hlstd{(wage} \hlopt{~} \hlstd{educ,} \hlkwc{data} \hlstd{= ingresos))}
+\hlcom{# Calcular estadística descriptiva para las variables mpg y wt}
+\hlkwd{summary}\hlstd{(}\hlkwd{select}\hlstd{(mtcars, mpg, wt))}
+\end{alltt}
+\begin{verbatim}
+##       mpg              wt       
+##  Min.   :10.40   Min.   :1.513  
+##  1st Qu.:15.43   1st Qu.:2.581  
+##  Median :19.20   Median :3.325  
+##  Mean   :20.09   Mean   :3.217  
+##  3rd Qu.:22.80   3rd Qu.:3.610  
+##  Max.   :33.90   Max.   :5.424
+\end{verbatim}
+\begin{alltt}
+\hlcom{# Estimar el modelo lineal }
+\hlkwd{lm}\hlstd{(mpg} \hlopt{~} \hlstd{wt,} \hlkwc{data} \hlstd{= mtcars)}
 \end{alltt}
 \begin{verbatim}
 ## 
 ## Call:
-## lm(formula = wage ~ educ, data = ingresos)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -877.4 -268.6  -38.4  207.0 2148.3 
+## lm(formula = mpg ~ wt, data = mtcars)
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)   146.95      77.71    1.89    0.059 .  
-## educ           60.21       5.69   10.57   <2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 382 on 933 degrees of freedom
-## Multiple R-squared:  0.107,	Adjusted R-squared:  0.106 
-## F-statistic:  112 on 1 and 933 DF,  p-value: <2e-16
+## (Intercept)           wt  
+##      37.285       -5.344
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 
-En el ejemplo, ...
+
+
+
+\begin{Rbox}
+\verb|summary()| es una de las funciones más útiles de R base, ya que permite producir un resumen con información útil de distintos objetos: bases de datos, modelos, etc. En este caso la usamos para producir estadística descriptiva de las variables elegidas con \verb|select()|, para evitar usar la función sobre todas las variables de \verb|mtcars|.
+\end{Rbox}
+
+Al estimar este modelo obtenemos que $\hat\beta_1 = -5.34$. Esto significa que un aumento de una unidad en \verb|wt| está asociado a una disminución promedio de $5.34$ en \verb|mpg|.
+
+OK, ¿y?
+
+Como no sé mucho de autos ni del sistema métrico imperial, no tengo idea si esto es mucho o poco.
+A pesar que entiendo cómo interpretar el coeficiente en términos algebraicos, la unidad de medida de las variables hace que esta información no sea tan útil (para mi).
+
+Afortunadamente es muy fácil transformar las variables y luego volver a estimar el modelo con ellas. Crearemos las variables \verb|rendimiento_kml| con el rendimiento en kilómetros por litro y \verb|peso_kg| con el peso en kilógramos de cada auto:
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Crear marco 'autos' con las variables que nos interesan}
+\hlstd{autos} \hlkwb{<-} \hlkwd{as_tibble}\hlstd{(}\hlkwd{select}\hlstd{(}\hlkwd{rownames_to_column}\hlstd{(mtcars,} \hlkwc{var} \hlstd{=} \hlstr{"modelo"}\hlstd{),}
+                          \hlstd{modelo, mpg, wt))}
+\hlcom{# Crear dos variables nuevas de rendimiento y peso}
+\hlstd{autos} \hlkwb{<-} \hlkwd{mutate}\hlstd{(autos,}
+                \hlkwc{rendimiento_kml} \hlstd{=  mpg} \hlopt{*} \hlnum{0.425144}\hlstd{,}
+                \hlkwc{peso_kg} \hlstd{= wt} \hlopt{*} \hlnum{453.592}\hlstd{)}
+\hlcom{# Estimar el modelo con estas nuevas variables}
+\hlkwd{lm}\hlstd{(rendimiento_kml} \hlopt{~} \hlstd{peso_kg,} \hlkwc{data} \hlstd{= autos)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = rendimiento_kml ~ peso_kg, data = autos)
+## 
+## Coefficients:
+## (Intercept)      peso_kg  
+##   15.851548    -0.005009
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+Esta transformación todavía presenta un pequeño problema. Como la unidad de medida de \verb|peso_kg| son kilos, $\hat\beta_1 = -0.005$ nos dice que por cada kilo adicional el modelo predice una reducción de 0.005 en el rendimiento promedio.
+Claramente pensar en un kilo adicional en algo tan pesado como un auto no tiene mucho sentido, por lo que estimaremos el modelo con una variable que indique el peso en unidades de 100 kilos:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Agregar variable con peso en unidades de 100kg}
+\hlstd{autos} \hlkwb{<-} \hlstd{autos} \hlopt{%>%} \hlkwd{mutate}\hlstd{(}\hlkwc{peso_100kg} \hlstd{= peso_kg} \hlopt{/} \hlnum{100}\hlstd{)}
+\hlcom{# Estimar modelo con esta nueva variable independiente}
+\hlkwd{lm}\hlstd{(rendimiento_kml} \hlopt{~} \hlstd{peso_100kg,} \hlkwc{data} \hlstd{= autos)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = rendimiento_kml ~ peso_100kg, data = autos)
+## 
+## Coefficients:
+## (Intercept)   peso_100kg  
+##     15.8515      -0.5009
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+\begin{Rbox}
+Este bloque introduce el uso del \kw{operador de pipa}, \verb|%>%|.
+Creado por Milton Bache en su paquete \paq{magrittr}, el operador de pipa sirve para pasar un objeto como primer argumento de una función.
+Entonces en lugar de escribir \verb|f(x,y)| podemos escribir de manera equivalente \verb|x %>% f(y)|.
+Esto permite ``desanidar'' funciones, ya que el operador es recursivo: operaciones como $f(g(x))$ pueden expresarse como \verb|x %>% g %>% f|, lo que las hace más legibles.
+\end{Rbox}
+
+Finalmente podemos interpretar el modelo con unidades adecuadas.
+El coeficiente asociado a la variable independiente se puede interpretar como que el modelo predice una reducción promedio de $0.5$ km/l por cada 100 kilos adicionales que pese un auto.
+Esto definitivamente parece razonable, y los coeficientes entregan información útil directamente.
+Es importante notar que este valor de $\hat\beta_1$ usando \verb|peso_100kg| es igual al calculado usando \verb|peso_kg|, pero multiplicado por 100. Al realizar una transformación lineal sobre la variable, transformamos de manera inversa el coeficiente asociado.
+
+Por otro lado, el parámetro del intercepto indica que el modelo predice un rendimiento promedio de $15.85$ para un auto de 0 kilos.
+Este corresponde a un claro caso donde el intercepto no tiene sentido en sí mismo, ya que es imposible un auto de 0 kilos.
+
+Recordemos que la línea de regresión de este modelo es
+\begin{equation*}
+\hat y_i = 15.85 -0.5 \cdot x_i.
+\end{equation*}
+Podemos usar la ecuación de la línea de regresión para calcular el valor predicho $\hat y_i$ dado un nivel de $x_i$. Por ejemplo, nuestra estimación predice que un auto de 1600 kilos tendrá un rendimiento promedio de $15.85 -0.5 \cdot 16 = 7.84$ km/l.
+Esto se ajusta bastante a los datos reales, como puede apreciarse en la \autoref{fig:autos_lm}.
+%Como siempre, es conveniente dibujar esta línea $\hat y_i$ sobre los datos. El gráfico se muestra en la \autoref{fig:autos_lm}.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Graficar la línea de regresión sobre los datos}
+\hlstd{autos} \hlopt{%>%} \hlkwd{ggplot}\hlstd{(}\hlkwd{aes}\hlstd{(peso_100kg, rendimiento_kml))} \hlopt{+}
+  \hlkwd{geom_point}\hlstd{()} \hlopt{+}
+  \hlkwd{geom_smooth}\hlstd{(}\hlkwc{method} \hlstd{=} \hlstr{"lm"}\hlstd{,} \hlkwc{se} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+\end{alltt}
+\end{kframe}\begin{figure}[htb]
+
+{\centering \includegraphics[width=4in,height=3in]{figs/autos_lm-1} 
+
+}
+
+\caption[Modelo de regresión lineal relacionando el peso de un auto (en unidades de 100 kilos) y su rendimiento (en kilómetros por litro)]{Modelo de regresión lineal relacionando el peso de un auto (en unidades de 100 kilos) y su rendimiento (en kilómetros por litro)}\label{fig:autos_lm}
+\end{figure}
+
+
+\end{knitrout}
+
+
+
+%\subsubsection{Errores estándar de los coeficientes}
+
+%Los parámetros estimados ---los coeficientes de MCO, en este caso--- son estadísticos muestrales que usamos para hacer inferencias de los parámetros poblacionales. Es importante tener en cuenta que son estos parámetros poblacionales los que nos interesan en realidad, pero como no podemos observarlos directamente, debemos inferirlos por medio de una muestra finita.
+
+%Es evidente que si tomáramos una muestra distinta a la actual, lo más probable es que estimaríamos parámetros diferentes. Si tomaras datos de otras 935 personas (o cualquier número, en realidad) es muy posible que al aplicar el mismo modelo obtuviéramos valores de $\beta_0$ y $\beta_1$ distintos de coefficients(modelo)[1] y coefficients(modelo)[2]. Además es muy probable que nuevamente ninguno de los dos sea igual al verdadero parámetro poblacional, que es el que nos interesa. Si continuáramos este proceso de tomar diferentes muestras y estimar los mismos parámetros una y otra vez, veríamos que la frecuencia relativa de las estimaciones obtenidas sigue una distribución de probabilidad, y por el Teorema Central del Límite sabemos que es probable que esta distribución sea normal. Entonces es importante para nuestra estimación que cuantifiquemos la cantidad de incertidumbre en esta distribución poblacional desconocida. Ahí es donde entra el concepto de error estándar, que corresponde a nuestra estimación de la desviación estándar de la distribución de estos muestreos. En términos intuitivos, es una medida de la incertidumbre de $\hat\beta$.
+
+%Encerramos \verb|lm()| dentro de \verb|summary()| para obtener información más detallada de las estimaciones del modelo, incluyendo estimaciones para los errores estándar de los coeficientes:
+
+%<<>>=
+%summary(lm(wage ~ educ, data = ingresos))
+%@
 
 %todo: explicar mejor todos los summary de ols
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{ggplot}\hlstd{(ingresos,} \hlkwd{aes}\hlstd{(educ, wage))} \hlopt{+}
-  \hlkwd{geom_point}\hlstd{()} \hlopt{+}
-  \hlkwd{geom_smooth}\hlstd{(}\hlkwc{method} \hlstd{=} \hlstr{"lm"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-13-1} 
-
-}
+%<<>>=
+%ggplot(ingresos, aes(educ, wage)) + 
+%  geom_point() + 
+%  geom_smooth(method = "lm")
+%@
 
 
+\section{Valor esperado de los estimadores}
 
-\end{knitrout}
+Hasta ahora hemos aprendido a calcular e interpretar los parámetros de un modelo lineal simple. Sin embargo, recordemos que nuestra estimación de $\hat\beta_0$ y $\hat\beta_1$ proviene de una muestra aleatoria de la población.
+En esta sección analizaremos las propiedades estadísticas de $\hat\beta_0$ y $\hat\beta_1$, lo que nos dará herramientas para estimar qué tanto se acercan nuestras estimaciones a los verdaderos parámetros poblacionales.
 
+Primero nos detendremos a entender el problema en sí: ¿en qué se diferencian los parámetros estimados ($\hat\beta_0$ y $\hat\beta_1$) de los verdaderos parámetros poblacionales ($\beta_0$ y $\beta_1$)?
 
-\subsection{Extraer estadísticos de una regresión}
+Cuando planteamos el modelo de regresión lineal simple (ecuación \eqref{eq:modelo_lineal_simple_poblacional}), supusimos que las variables $x$ e $y$ se relacionaban por medio de una función lineal, y que 
 
-Para guardar el modelo asignamos \verb|lm()| a un objeto:
+Si bien en estricto rigor suponemos que el ``tamaño'' de la población es infinito, fijamos $N=1.000.000$ para efectos de nuestra población simulada.
+Luego definimos un error \verb|u| con media 0 (es uno de nuestros supuestos) y desviación estándar \verb|sigma| $=5$. Finalmente generamos \verb|y| como una función lineal de \verb|x|, con intercepto 2 y pendiente 10, e incluyendo nuestro error \verb|u|$\sim \mathcal{N}(0, 5)$.\footnote{No es necesario asumir que $\mu \sim \mathcal{N}$, ya que bastaría con que $\E(\mu)=0$. Es un error común pensar que MCO requiere errores con distribución normal.}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{modelo} \hlkwb{<-} \hlkwd{lm}\hlstd{(wage} \hlopt{~} \hlstd{educ,} \hlkwc{data} \hlstd{= ingresos)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+\hlcom{# Parámetros iniciales}
+\hlkwd{set.seed}\hlstd{(}\hlnum{03072017}\hlstd{)}
+\hlstd{N} \hlkwb{<-} \hlnum{1000000}
+\hlstd{sigma} \hlkwb{<-} \hlnum{5}
 
-El objeto \verb|modelo| no solo incluye los coeficientes estimados, si no que una serie de otros elementos que son muy útiles ---veremos ahora por qué. En estricto rigor \verb|modelo| es lo que R llama una lista, y contiene una serie de otros objetos. Podemos imprimir los nombres de estos objetos escribiendo
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{names}\hlstd{(modelo)}
-\end{alltt}
-\begin{verbatim}
-##  [1] "coefficients"  "residuals"     "effects"       "rank"         
-##  [5] "fitted.values" "assign"        "qr"            "df.residual"  
-##  [9] "xlevels"       "call"          "terms"         "model"
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-Para acceder a los objetos guardados usamos la notación de \verb|$|, como es usual en R. Por ejemplo, para imprimir los coeficientes del modelo escribimos
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{modelo}\hlopt{$}\hlstd{coefficients}
-\end{alltt}
-\begin{verbatim}
-## (Intercept)        educ 
-##         147          60
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-También existen funciones para acceder directamente a los objetos. Por ejemplo,
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{coefficients}\hlstd{(modelo)}
-\end{alltt}
-\begin{verbatim}
-## (Intercept)        educ 
-##         147          60
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-En cualquier caso, el resultado es un vector cuyos elementos tienen nombres: el intercepto ($\beta_0$) es \texttt{(Intercept)} y el nombre del primer coeficiente ($\beta_1$) es el nombre de la variable $x$, es decir, \texttt{educ}. Usando esto podemos acceder a elementos específicos del vector usando sus nombres o sus índices, como se mencionó en [ref]:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{coef}\hlstd{(modelo)[}\hlnum{1}\hlstd{]}
-\end{alltt}
-\begin{verbatim}
-## (Intercept) 
-##         147
-\end{verbatim}
-\begin{alltt}
-\hlkwd{coef}\hlstd{(modelo)[}\hlstr{"educ"}\hlstd{]}
-\end{alltt}
-\begin{verbatim}
-## educ 
-##   60
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-\subsection{Predicciones y residuos}
-
-La predicción de un modelo, a veces llamada valores ajustados, es simplemente el vector $\hat y_i$. Teniendo los valores ajustados podemos calcular también los residuos del modelo, $\mu_i$:
-\begin{align}
-\hat y_i &= \hat \beta_0 + \hat\beta_1 x_i \label{eq:prediccion} \\
-\hat \mu_i &= y_i - \hat y_i \label{eq:residuos}
-\end{align}
-Podemos calcular fácilmente ambos vectores con los elementos que tenemos:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{ingresos}\hlopt{$}\hlstd{prediccion} \hlkwb{<-} \hlkwd{coef}\hlstd{(modelo)[}\hlnum{1}\hlstd{]} \hlopt{+} \hlkwd{coef}\hlstd{(modelo)[}\hlnum{2}\hlstd{]} \hlopt{*} \hlstd{ingresos}\hlopt{$}\hlstd{educ}
-\hlstd{ingresos}\hlopt{$}\hlstd{residuos} \hlkwb{<-} \hlstd{ingresos}\hlopt{$}\hlstd{wage} \hlopt{-} \hlstd{ingresos}\hlopt{$}\hlstd{prediccion}
+\hlcom{# Variables poblacionales}
+\hlstd{x} \hlkwb{<-} \hlkwd{runif}\hlstd{(N)}
+\hlstd{u} \hlkwb{<-} \hlkwd{rnorm}\hlstd{(N,} \hlnum{0}\hlstd{, sigma)}
+\hlstd{y} \hlkwb{<-} \hlnum{2} \hlopt{+} \hlnum{10}\hlopt{*}\hlstd{x} \hlopt{+} \hlstd{u}
+\hlstd{poblacion} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(y,x)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
 
-Alternativamente, podemos calcular los valores predichos y los residuos del modelo usando funciones específicas para ello:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{modelo.sim} \hlkwb{<-} \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x,} \hlkwc{data} \hlstd{= simdatos)}
-\hlstd{simdatos}\hlopt{$}\hlstd{prediccion} \hlkwb{<-} \hlkwd{fitted}\hlstd{(modelo.sim)}
-\hlstd{simdatos}\hlopt{$}\hlstd{residuos} \hlkwb{<-} \hlkwd{resid}\hlstd{(modelo.sim)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-Podemos graficar nuestra predicción sobre los datos para inspeccionar visualmente cómo se ve. Para esto volvemos a usar \paq{ggplot2}:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{ggplot}\hlstd{(ingresos,} \hlkwd{aes}\hlstd{(educ, wage))} \hlopt{+}
-  \hlkwd{geom_point}\hlstd{()} \hlopt{+}
-  \hlkwd{geom_line}\hlstd{(}\hlkwd{aes}\hlstd{(}\hlkwc{y} \hlstd{= prediccion),} \hlkwc{color} \hlstd{=} \hlstr{"blue"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-21-1} 
-
-}
-
-
-
-\end{knitrout}
-
-También resulta interesante analizar los residuos, que son ``la otra cara de la moneda''. Si bien los valores predichos nos muestran el patrón que el modelo ha sido capaz de capturar, los residuos nos mostrarán lo que el modelo ha omitido. Recordar que los residuos son simplemente la diferencia entre el valor predicho y el real, como se indica en \eqref{eq:residuos}. Graficamos los residuos escribiendo
+Al haber creado nosotros mismos los datos poblacionales, estamos seguros de los verdaderos valores de los parámetros: $\beta_0=2$ y $\beta_1=10$. La única desviación que se dará en nuestra simulación es debido a que la población no es infinita (aunque se le acerca bastante).
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{ggplot}\hlstd{(ingresos,} \hlkwd{aes}\hlstd{(educ, residuos))} \hlopt{+}
-  \hlkwd{geom_hline}\hlstd{(}\hlkwc{yintercept} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{color} \hlstd{=} \hlstr{"gray"}\hlstd{)} \hlopt{+}
-  \hlkwd{geom_point}\hlstd{()}
-\end{alltt}
-\end{kframe}
-
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-22-1} 
-
-}
-
-
-
-\end{knitrout}
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{ggplot}\hlstd{(simdatos,} \hlkwd{aes}\hlstd{(x, residuos))} \hlopt{+}
-  \hlkwd{geom_hline}\hlstd{(}\hlkwc{yintercept} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{color} \hlstd{=} \hlstr{"gray"}\hlstd{)} \hlopt{+}
-  \hlkwd{geom_point}\hlstd{()}
-\end{alltt}
-\end{kframe}
-
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-23-1} 
-
-}
-
-
-
-\end{knitrout}
-
-Además de estos elementos directamente accesibles guardados en \verb|modelo|, existen una serie de funciones que podemos aplicar al objeto para realizar otros cálculos o resumir información útil. Por ejemplo, es muy común usar \verb|summary()| para obtener un resumen de información importante del modelo estimado:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{summary}\hlstd{(modelo)}
+\hlcom{# Estimar parámetros poblacionales}
+\hlkwd{lm}\hlstd{(y}\hlopt{~}\hlstd{x,} \hlkwc{data} \hlstd{= poblacion)}
 \end{alltt}
 \begin{verbatim}
 ## 
 ## Call:
-## lm(formula = wage ~ educ, data = ingresos)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -877.4 -268.6  -38.4  207.0 2148.3 
+## lm(formula = y ~ x, data = poblacion)
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)   146.95      77.71    1.89    0.059 .  
-## educ           60.21       5.69   10.57   <2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 382 on 933 degrees of freedom
-## Multiple R-squared:  0.107,	Adjusted R-squared:  0.106 
-## F-statistic:  112 on 1 and 933 DF,  p-value: <2e-16
+## (Intercept)            x  
+##       1.985       10.020
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 
-\section{Valor esperado de los estimadores}
+Verificamos que en nuestra población simulada los parámetros son ...
+A continuación extraemos una muestra aleatoria de 100 observaciones ($n=100$) de la población. Esto es lo que nosotros suponemos que hacemos cuando tenemos, por ejemplo, una base de datos con puntajes SIMCE para de 100 estudiantes.
+Luego estimamos los coeficientes $\hat\beta_0$ y $\hat\beta_1$ para esta muestra en particular.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Extraer una muestra aleatoria de la población y estimar sus parámetros}
+\hlstd{muestra} \hlkwb{<-} \hlstd{poblacion[}\hlkwd{sample}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{N,} \hlnum{100}\hlstd{),]}
+\hlkwd{lm}\hlstd{(y}\hlopt{~}\hlstd{x,} \hlkwc{data} \hlstd{= muestra)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = y ~ x, data = muestra)
+## 
+## Coefficients:
+## (Intercept)            x  
+##       3.101        8.085
+\end{verbatim}
+\begin{alltt}
+\hlkwd{coefficients}\hlstd{(modelo_muestral)}
+\end{alltt}
+\begin{verbatim}
+## (Intercept)           x 
+##    3.101083    8.084905
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Observamos que los coeficientes estimados en esta muestra particular son bastante distintos de los reales: $\hat\beta_0 = 3.1$ y $\hat\beta_1 = 8.08$.
+Este fenómeno no es exclusivo a los estimadores, y en realidad ocurre para cualquier tipo de estadística que es calculada para la muestra de una población.
+
+Por ejemplo, supón una población (un poco ridícula) de 4 personas, y observamos sus pesos en kilogramos:
+\begin{equation*}
+P = \{74, 62, 65, 71\}.
+\end{equation*}
+Si tomamos muestras de 2 personas repetidas veces, obtendremos distintas estimaciones del promedio poblacional. Algunos promedios muestrales serán iguales al promedio poblacional, mientras que otros no. Lo importante es que al tomar varias muestras y guardar registro de los promedios muestrales,
+
+ninguna muestra de menos de 2 observaciones nos entregará este promedio. Al extraer repetidas muestras obtendremos una distribución muestral: algunos promedios de nuestra muestra se repetirán más que otros.
+\hrulefill
 
 Recordemos el hecho que los estimadores MCO ($\hat\beta_0$ y $\hat\beta_1$, o en general $\hat\beta$) tienen una distribución de probabilidad.
 Esto ocurre porque si tomáramos distintas muestras de tamaño $n$, obtendríamos distintos valores para $\hat\beta$.
@@ -1077,7 +1264,7 @@ Podemos generar fácilmente un conjunto de datos que presenten heterocedasticida
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-25-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-23-1} 
 
 }
 
@@ -1153,6 +1340,190 @@ Dado que $\sd(\hat\beta_1) = \sigma / \sqrt{SST_x}$, el estimador natural para e
 \end{equation}
 A este término se le conoce como el \kw{error estándar} de $\hat\beta_1$.
 El error estándar de un estimador nos dá una idea de cuán dispersa es nuestra estimación. Debido a esto, el error estándar juega un rol importante en econometría, y lo usaremos para construir tests estadísticos e intervalos de confianza para distintos métodos que veremos más adelante.
+
+
+\hrulefill
+
+\subsection{Extraer estadísticos de una regresión}
+
+Para guardar el modelo asignamos \verb|lm()| a un objeto:
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{modelo} \hlkwb{<-} \hlkwd{lm}\hlstd{(wage} \hlopt{~} \hlstd{educ,} \hlkwc{data} \hlstd{= ingresos)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+El objeto \verb|modelo| no solo incluye los coeficientes estimados, si no que una serie de otros elementos que son muy útiles ---veremos ahora por qué. En estricto rigor \verb|modelo| es lo que R llama una lista, y contiene una serie de otros objetos. Podemos imprimir los nombres de estos objetos escribiendo
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{names}\hlstd{(modelo)}
+\end{alltt}
+\begin{verbatim}
+##  [1] "coefficients"  "residuals"     "effects"       "rank"         
+##  [5] "fitted.values" "assign"        "qr"            "df.residual"  
+##  [9] "xlevels"       "call"          "terms"         "model"
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Para acceder a los objetos guardados usamos la notación de \verb|$|, como es usual en R. Por ejemplo, para imprimir los coeficientes del modelo escribimos
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{modelo}\hlopt{$}\hlstd{coefficients}
+\end{alltt}
+\begin{verbatim}
+## (Intercept)        educ 
+##   146.95244    60.21428
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+También existen funciones para acceder directamente a los objetos. Por ejemplo,
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{coefficients}\hlstd{(modelo)}
+\end{alltt}
+\begin{verbatim}
+## (Intercept)        educ 
+##   146.95244    60.21428
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+En cualquier caso, el resultado es un vector cuyos elementos tienen nombres: el intercepto ($\beta_0$) es \texttt{(Intercept)} y el nombre del primer coeficiente ($\beta_1$) es el nombre de la variable $x$, es decir, \texttt{educ}. Usando esto podemos acceder a elementos específicos del vector usando sus nombres o sus índices, como se mencionó en [ref]:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{coef}\hlstd{(modelo)[}\hlnum{1}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+## (Intercept) 
+##    146.9524
+\end{verbatim}
+\begin{alltt}
+\hlkwd{coef}\hlstd{(modelo)[}\hlstr{"educ"}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+##     educ 
+## 60.21428
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\subsection{Predicciones y residuos}
+
+La predicción de un modelo, a veces llamada valores ajustados, es simplemente el vector $\hat y_i$. Teniendo los valores ajustados podemos calcular también los residuos del modelo, $\mu_i$:
+\begin{align}
+\hat y_i &= \hat \beta_0 + \hat\beta_1 x_i \label{eq:prediccion} \\
+\hat \mu_i &= y_i - \hat y_i \label{eq:residuos2}
+\end{align}
+Podemos calcular fácilmente ambos vectores con los elementos que tenemos:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{ingresos}\hlopt{$}\hlstd{prediccion} \hlkwb{<-} \hlkwd{coef}\hlstd{(modelo)[}\hlnum{1}\hlstd{]} \hlopt{+} \hlkwd{coef}\hlstd{(modelo)[}\hlnum{2}\hlstd{]} \hlopt{*} \hlstd{ingresos}\hlopt{$}\hlstd{educ}
+\hlstd{ingresos}\hlopt{$}\hlstd{residuos} \hlkwb{<-} \hlstd{ingresos}\hlopt{$}\hlstd{wage} \hlopt{-} \hlstd{ingresos}\hlopt{$}\hlstd{prediccion}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+Alternativamente, podemos calcular los valores predichos y los residuos del modelo usando funciones específicas para ello:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{modelo.sim} \hlkwb{<-} \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x,} \hlkwc{data} \hlstd{= simdatos)}
+\hlstd{simdatos}\hlopt{$}\hlstd{prediccion} \hlkwb{<-} \hlkwd{fitted}\hlstd{(modelo.sim)}
+\hlstd{simdatos}\hlopt{$}\hlstd{residuos} \hlkwb{<-} \hlkwd{resid}\hlstd{(modelo.sim)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+Podemos graficar nuestra predicción sobre los datos para inspeccionar visualmente cómo se ve. Para esto volvemos a usar \paq{ggplot2}:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{ggplot}\hlstd{(ingresos,} \hlkwd{aes}\hlstd{(educ, wage))} \hlopt{+}
+  \hlkwd{geom_point}\hlstd{()} \hlopt{+}
+  \hlkwd{geom_line}\hlstd{(}\hlkwd{aes}\hlstd{(}\hlkwc{y} \hlstd{= prediccion),} \hlkwc{color} \hlstd{=} \hlstr{"blue"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-31-1} 
+
+}
+
+
+
+\end{knitrout}
+
+También resulta interesante analizar los residuos, que son ``la otra cara de la moneda''. Si bien los valores predichos nos muestran el patrón que el modelo ha sido capaz de capturar, los residuos nos mostrarán lo que el modelo ha omitido. Recordar que los residuos son simplemente la diferencia entre el valor predicho y el real, como se indica en \eqref{eq:residuos}. Graficamos los residuos escribiendo
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{ggplot}\hlstd{(ingresos,} \hlkwd{aes}\hlstd{(educ, residuos))} \hlopt{+}
+  \hlkwd{geom_hline}\hlstd{(}\hlkwc{yintercept} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{color} \hlstd{=} \hlstr{"gray"}\hlstd{)} \hlopt{+}
+  \hlkwd{geom_point}\hlstd{()}
+\end{alltt}
+\end{kframe}
+
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-32-1} 
+
+}
+
+
+
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{ggplot}\hlstd{(simdatos,} \hlkwd{aes}\hlstd{(x, residuos))} \hlopt{+}
+  \hlkwd{geom_hline}\hlstd{(}\hlkwc{yintercept} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{color} \hlstd{=} \hlstr{"gray"}\hlstd{)} \hlopt{+}
+  \hlkwd{geom_point}\hlstd{()}
+\end{alltt}
+\end{kframe}
+
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-33-1} 
+
+}
+
+
+
+\end{knitrout}
+
+Además de estos elementos directamente accesibles guardados en \verb|modelo|, existen una serie de funciones que podemos aplicar al objeto para realizar otros cálculos o resumir información útil. Por ejemplo, es muy común usar \verb|summary()| para obtener un resumen de información importante del modelo estimado:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{summary}\hlstd{(modelo)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = wage ~ educ, data = ingresos)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -877.38 -268.63  -38.38  207.05 2148.26 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  146.952     77.715   1.891   0.0589 .  
+## educ          60.214      5.695  10.573   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 382.3 on 933 degrees of freedom
+## Multiple R-squared:  0.107,	Adjusted R-squared:  0.106 
+## F-statistic: 111.8 on 1 and 933 DF,  p-value: < 2.2e-16
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 %% Introducción, prefacio:
 %<<cap_OLD, child='cap_OLD.Rnw'>>=
