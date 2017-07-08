@@ -873,10 +873,185 @@ Esto se ajusta bastante a los datos reales, como puede apreciarse en la \autoref
 %@
 
 
+\section{Propiedades de los estimadores MCO}
+
+Hasta ahora hemos aprendido a calcular e interpretar los parámetros de un modelo lineal simple. Sin embargo, recordemos que nuestra estimación de $\hat\beta_0$ y $\hat\beta_1$ proviene de una muestra aleatoria de la población.
+Ahora veremos a $\hat\beta_0$ y $\hat\beta_1$ como estimadores de los verdaderos parámetros poblacionales, $\beta_0$ y $\beta_1$.
+Esto nos permitirá estudiar las propiedades de la distribución de $\hat\beta_0$ y $\hat\beta_1$ bajo distintas muestras aleatorias.
+
+Es importante recordar que los estimadores MCO ($\hat\beta_0$ y $\hat\beta_1$, o en general $\hat\beta$) tienen una distribución de probabilidad.
+Intuitivamente, la razón por la que esto ocurre es porque nuestra estimación de $\hat\beta_0$ y $\hat\beta_1$ viene de una muestra aleatoria en particular de la población.
+Si tomáramos distintas muestras, obtendríamos distintos valores para $\hat\beta$.
+Entonces nuestra estimación de $\hat\beta$ es solo una realización de infinidad de posibilidades, como se muestra en la \autoref{fig:parametros_distribucion}.
+
+\begin{figure}[htb]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+    no markers, domain=0:8, samples=100,
+    axis lines*=left, xlabel=, ylabel=$f(\hat\beta)$,
+    every axis y label/.style={at=(current axis.above origin),anchor=south},
+    every axis x label/.style={at=(current axis.right of origin),anchor=west},
+    height=4cm, width=6cm,
+    xtick={3},
+    xticklabels={$\hat\beta$},
+    ytick=\empty,
+    enlargelimits=false, clip=false, axis on top,
+    grid = major
+    ]
+    \addplot [very thick, black] {gauss(4,1)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{La realización de $\hat\beta$ que nosotros observamos proviene de una función de probabilidad}
+  \label{fig:parametros_distribucion}
+\end{figure}%
+
+\subsection{Valor esperado}
+
+Teniendo en cuenta que los los estimadores tienen una función de densidad de probabilidad, parece natural querer que nuestros estimadores estén centrados en torno al verdadero parámetro $\beta$, es decir,
+\begin{equation}
+\E(\hat \beta) = \beta.
+\end{equation}
+A un estimador que cumple con esta propiedad se le llama \kw{ estimador insesgado}.
+La \autoref{fig:estimadores_sesgo} muestra la distribución de un estimador insesgado en azul, mientras que la distribución de un estimador sesgado está graficada en rojo.
+Notar que ambos tienen igual varianza, pero sólo el primero está centrado en torno al verdadero valor de $\beta$, y por lo tanto es insesgado.
+
+\begin{figure}[htb]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+    no markers, domain=0:10, samples=100,
+    axis lines*=left, xlabel=, ylabel=$f(\hat\beta)$,
+    every axis y label/.style={at=(current axis.above origin),anchor=south},
+    every axis x label/.style={at=(current axis.right of origin),anchor=west},
+    height=4cm, width=6cm,
+    xtick={4},
+    xticklabels={$\beta$},
+    ytick=\empty,
+    enlargelimits=false, clip=false, axis on top,
+    grid = major
+    ]
+    \addplot [very thick,cyan!50!black] {gauss(4,1)};
+    \addplot [very thick,magenta!50!black] {gauss(6,1)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Estimador insesgado (azul) vs. estimador sesgado (rojo)}
+  \label{fig:estimadores_sesgo}
+\end{figure}%
+
+Para asegurar que los estimadores MCO que hemos obtenido son insesgados deben cumplirse cuatro supuestos.
+Hemos enunciado estos supuestos a medida que construimos los estimadores, pero a continuación los enunciaremos de forma más explícita.
+
+\paragraph{RLS.1: Lineal en parámetros} Esto corresponde al supuesto fundamental del modelo, donde asumimos que las variables poblacionales se relacionan siguiendo la siguiente forma funcional:
+\begin{equation}
+y = \beta_0 + \beta_1 x + \mu. \tag{\ref{eq:modelo_lineal_simple_poblacional}, revisitada}
+\end{equation}
+Nuestro objetivo es estimar $\beta_0$ y (en especial) $\beta_1$ suponiendo que los datos se relacionan de forma lineal en parámetros y que $x$, $y$ y $\mu$ son variables aleatorias.
+
+\paragraph{RLS.2: Muestreo aleatorio} Suponemos que tenemos una muestra aleatoria de tamaño $n$ de la población total, de forma que en términos muestrales el modelo lineal es
+\begin{equation}
+y_i = \beta_0 + \beta_1 x_i + \mu_i, \quad i = 1,\ldots,n. \tag{\ref{eq:modelo_lineal_simple}, revisitada}
+\end{equation}
+Sí, es lo mismo que arriba, pero con el subíndice. En términos de notación la diferencia es sutil, pero es importante entender lo que significa.
+
+\paragraph{RLS.3: Variación en las variables independientes}
+Necesitamos que la (o las) variables independientes del modelo tengan algo de variación.
+Este supuesto es fácil, pero necesario matemáticamente.
+Por ejemplo, para poder estimar
+\begin{equation*}
+wage_i = \beta_0 + \beta_1 educ_i + \mu_i,
+\end{equation*}
+es necesario tener una muestra donde la gente tenga distintos niveles de educación. Si todos tienen exactamente los mismos años de escolaridad entonces es imposible determinar la relación entre años de escolaridad y salario.
+
+\paragraph{RLS.4: Media condicional cero}
+El error $u$ debe tener un valor esperado igual a cero, condicional a los valores de las variables independientes. En una muestra aleatoria esto significa que
+\begin{equation}
+E(\mu_i | x_i) = 0 \quad \forall\; i = 1,\ldots, n.
+\end{equation}
+
+Este es probablemente el supuesto más importante a la hora de determinar si una regresión lineal simple entregará parámetros insesgados.
+
+%todo: completar! Berry (1993)
+
+\hrulefill
+
+Usando los supuestos RLS.1 a RLS.4 se puede demostrar que los estimadores MCO son insesgados, es decir, que
+\begin{equation}
+\E(\hat\beta_0) = \beta_0 \text{ y } \E(\hat\beta_1) = \beta_1.
+\end{equation}
+
+En general, si cualquiera de los supuestos no se cumple entonces perderemos la propiedad de insesgamiento. RLS.1 requiere que $y$ y $x$ estén relacionados linealmente, lo que ciertamente puede no cumplirse. Hay que recordar, sin embargo, que la relación es solamente lineal en \emph{parámetros}, no en variables, por lo que ciertamente podemos transformar $x$ e $y$ para capturar relaciones no lineales más interesantes.
+RLS.2 asume que nuestros datos corresponden a una muestra aleatoria de la población, lo que claramente no siempre se cumple en datos de corte transversal. Por ejemplo, es posible que solamente tengamos datos de micro y pequeñas empresas, o que solamente observemos jefas de hogar de los quintiles más pobres.
+
+RLS.3 es extremadamente básico y con mucha seguridad se cumplirá en cualquier tipo de datos. Sin embargo, RSL.4 ciertamente representa un problema potencial. Si no se cumple que la media condicional del error es 0, esto es equivalente a decir que existe alguna correlación entre $x$ y $\mu$.
+Una razón por la que esto puede ocurrir es porque dejamos de incluir una variable relevante en nuestro modelo, de forma que esta afecta a $x$ por medio de $\mu$.
+
+\begin{figure}[htb]
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+    no markers, domain=0:10, samples=100,
+    axis lines*=left, xlabel=, ylabel=$f(\hat\beta)$,
+    every axis y label/.style={at=(current axis.above origin),anchor=south},
+    every axis x label/.style={at=(current axis.right of origin),anchor=west},
+    height=4cm, width=6cm,
+    xtick={4},
+    xticklabels={$\beta$},
+    ytick=\empty,
+    enlargelimits=false, clip=false, axis on top,
+    grid = major
+    ]
+    \addplot [very thick,cyan!50!black] {gauss(4,1)};
+    \addplot [very thick,magenta!50!black] {gauss(6,1)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Estimador insesgado (azul) vs. estimador sesgado (rojo)}
+%  \label{fig:estimadores_sesgo}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+    no markers, domain=0:10, samples=100,
+    axis lines*=left, xlabel=, ylabel=$f(\hat\beta)$,
+    every axis y label/.style={at=(current axis.above origin),anchor=south},
+    every axis x label/.style={at=(current axis.right of origin),anchor=west},
+    height=4cm, width=6cm,
+    xtick={5},
+    xticklabels={$\beta$},
+    ytick=\empty,
+    enlargelimits=false, clip=false, axis on top,
+    grid = major
+    ]
+    \addplot [very thick,cyan!50!black] {gauss(5,0.5)};
+    \addplot [very thick,magenta!50!black] {gauss(5,1.2)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Estimadores insesgados con distinta varianza}
+  \label{fig:estimadores_varianza}
+\end{subfigure}
+\caption{Heterocedasticidad}
+\label{fig:estimadores_OLS_propiedades}
+\end{figure}
+
+Además de requerir que el estimador se centre en torno al verdadero valor del parámetro, también queremos saber qué tan lejos podemos esperar que $\hat\beta$ se aleje de $\beta$ en promedio. Esto nos permitirá elegir el estimador más eficiente, es decir, de entre todos los estimadores insesgados elegir aquél que tenga la menor varianza.
+La \autoref{fig:estimadores_varianza} muestra la distribución de dos estimadores insesgados. Sin embargo, el estimador representado por la curva roja tiene relativamente mayor varianza que el representado por la azul.
+
+Nuestro objetivo es obtener ambas propiedades para nuestros estimadores MCO.
+Sin embargo, estas propiedades sólo existirán en la medida que se cumplan algunos supuestos. En esta sección veremos cuáles son estos supuestos y qué propiedades entregan.
+
+Es importante tener en cuenta que las propiedades estadísticas no tienen nada que ver con una muestra en particular, si no que es una propiedad que los estimadores cumplirán cuando se realice un muestreo aleatorio repetidamente.
+
+
+
+\hrulefill
+
 \section{Valor esperado de los estimadores}
 
 Hasta ahora hemos aprendido a calcular e interpretar los parámetros de un modelo lineal simple. Sin embargo, recordemos que nuestra estimación de $\hat\beta_0$ y $\hat\beta_1$ proviene de una muestra aleatoria de la población.
-En esta sección analizaremos las propiedades estadísticas de $\hat\beta_0$ y $\hat\beta_1$, lo que nos dará herramientas para estimar qué tanto se acercan nuestras estimaciones a los verdaderos parámetros poblacionales.
+En esta sección analizaremos las propiedades estadísticas de $\hat\beta_0$ y $\hat\beta_1$, lo que nos dará herramientas para analizar qué tanto se acercan nuestras estimaciones a los verdaderos parámetros poblacionales.
 
 Primero nos detendremos a entender el problema en sí: ¿en qué se diferencian los parámetros estimados ($\hat\beta_0$ y $\hat\beta_1$) de los verdaderos parámetros poblacionales ($\beta_0$ y $\beta_1$)?
 
@@ -962,136 +1137,10 @@ P = \{74, 62, 65, 71\}.
 Si tomamos muestras de 2 personas repetidas veces, obtendremos distintas estimaciones del promedio poblacional. Algunos promedios muestrales serán iguales al promedio poblacional, mientras que otros no. Lo importante es que al tomar varias muestras y guardar registro de los promedios muestrales,
 
 ninguna muestra de menos de 2 observaciones nos entregará este promedio. Al extraer repetidas muestras obtendremos una distribución muestral: algunos promedios de nuestra muestra se repetirán más que otros.
+
 \hrulefill
 
-Recordemos el hecho que los estimadores MCO ($\hat\beta_0$ y $\hat\beta_1$, o en general $\hat\beta$) tienen una distribución de probabilidad.
-Esto ocurre porque si tomáramos distintas muestras de tamaño $n$, obtendríamos distintos valores para $\hat\beta$.
-Entonces nuestra estimación de $\hat\beta$ es solo una realización de infinidad de posibilidades, como se muestra en la \autoref{fig:parametros_distribucion}.
 
-\begin{figure}[htb]
-  \centering
-  \begin{tikzpicture}
-    \begin{axis}[
-    no markers, domain=0:8, samples=100,
-    axis lines*=left, xlabel=$x$, ylabel=$y$,
-    every axis y label/.style={at=(current axis.above origin),anchor=south},
-    every axis x label/.style={at=(current axis.right of origin),anchor=west},
-    height=4cm, width=6cm,
-    xtick={3},
-    xticklabels={$\hat\beta$},
-    ytick=\empty,
-    enlargelimits=false, clip=false, axis on top,
-    grid = major
-    ]
-    \addplot [very thick, black] {gauss(4,1)};
-    \end{axis}
-  \end{tikzpicture}
-  \caption{Los parámetros estimados provienen de una distribución muestral}
-  \label{fig:parametros_distribucion}
-\end{figure}%
-
-Parece natural querer que nuestros estimadores estén centrados en torno al verdadero parámetro $\beta$, es decir,
-\begin{equation}
-\E(\hat \beta) = \beta.
-\end{equation}
-Un estimador que cumple con esta propiedad se llama insesgado.
-La \autoref{fig:estimadores_sesgo} muestra la distribución de un estimador insesgado en azul, mientras que la distribución de un estimador sesgado está graficada en rojo.
-Notar que aunque ambos tienen igual varianza, el primero está centrado en torno al verdadero valor de $\beta$, y por lo tanto es insesgado.
-
-
-\begin{figure}[htb]
-\centering
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \begin{tikzpicture}
-    \begin{axis}[
-    no markers, domain=0:10, samples=100,
-    axis lines*=left, xlabel=$x$, ylabel=$y$,
-    every axis y label/.style={at=(current axis.above origin),anchor=south},
-    every axis x label/.style={at=(current axis.right of origin),anchor=west},
-    height=4cm, width=6cm,
-    xtick={4},
-    xticklabels={$\beta$},
-    ytick=\empty,
-    enlargelimits=false, clip=false, axis on top,
-    grid = major
-    ]
-    \addplot [very thick,cyan!50!black] {gauss(4,1)};
-    \addplot [very thick,magenta!50!black] {gauss(6,1)};
-    \end{axis}
-  \end{tikzpicture}
-  \caption{Estimador insesgado (azul) vs. estimador sesgado (rojo)}
-  \label{fig:estimadores_sesgo}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \begin{tikzpicture}
-    \begin{axis}[
-    no markers, domain=0:10, samples=100,
-    axis lines*=left, xlabel=$x$, ylabel=$y$,
-    every axis y label/.style={at=(current axis.above origin),anchor=south},
-    every axis x label/.style={at=(current axis.right of origin),anchor=west},
-    height=4cm, width=6cm,
-    xtick={5},
-    xticklabels={$\beta$},
-    ytick=\empty,
-    enlargelimits=false, clip=false, axis on top,
-    grid = major
-    ]
-    \addplot [very thick,cyan!50!black] {gauss(5,0.5)};
-    \addplot [very thick,magenta!50!black] {gauss(5,1.2)};
-    \end{axis}
-  \end{tikzpicture}
-  \caption{Estimadores insesgados con distinta varianza}
-  \label{fig:estimadores_varianza}
-\end{subfigure}
-\caption{Heterocedasticidad}
-\label{fig:estimadores_OLS_propiedades}
-\end{figure}
-
-Además de requerir que el estimador se centre en torno al verdadero valor del parámetro, también queremos saber qué tan lejos podemos esperar que $\hat\beta$ se aleje de $\beta$ en promedio. Esto nos permitirá elegir el estimador más eficiente, es decir, de entre todos los estimadores insesgados elegir aquél que tenga la menor varianza.
-La \autoref{fig:estimadores_varianza} muestra la distribución de dos estimadores insesgados. Sin embargo, el estimador representado por la curva roja tiene relativamente mayor varianza que el representado por la azul.
-
-Nuestro objetivo es obtener ambas propiedades para nuestros estimadores MCO.
-Sin embargo, estas propiedades sólo existirán en la medida que se cumplan algunos supuestos. En esta sección veremos cuáles son estos supuestos y qué propiedades entregan.
-
-Es importante tener en cuenta que las propiedades estadísticas no tienen nada que ver con una muestra en particular, si no que es una propiedad que los estimadores cumplirán cuando se realice un muestreo aleatorio repetidamente.
-
-
-\paragraph{RLS.1: Lineal en parámetros} Esto corresponde al supuesto fundamental del modelo lineal, donde asumimos que la población sigue una función lineal:
-\begin{equation}
-y = \beta_0 + \beta_1 x + \mu.
-\end{equation}
-Nuestro objetivo es estimar $\beta_0$ y (en especial) $\beta_1$ suponiendo que los datos se relacionan de forma lineal en parámetros y que $x$, $y$ y $\mu$ son variables aleatorias.
-
-\paragraph{RLS.2: Muestreo aleatorio} Suponemos que tenemos una muestra aleatoria de tamaño $n$ de la población total, de forma que en términos muestrales el modelo lineal es
-\begin{equation}
-y_i = \beta_0 + \beta_1 x_i + \mu_i, \quad i = 1,\ldots,n.
-\end{equation}
-Sí, es lo mismo que arriba, pero con el subíndice.
-
-\paragraph{RLS.3: Variación en las variables independientes}
-Necesitamos que la (o las) variables independientes del modelo tengan algo de variación.
-Este supuesto es fácil, pero necesario matemáticamente.
-Por ejemplo, para estimar el modelo de Mincer es necesario tener una muestra donde la gente tenga distintos niveles de educación. Si todos tienen exactamente los mismos años de escolaridad entonces es imposible determinar la relación entre años de escolaridad e ingresos.
-
-\paragraph{RLS.4: Media condicional cero}
-El error $u$ debe tener un valor esperado igual a cero, condicional a los valores de las variables independientes. En una muestra aleatoria esto significa que
-
-\begin{equation}
-E(\mu_i | x_i) = 0 \quad \forall\; i = 1,\ldots, n
-\end{equation}
-
-Usando los supuestos RLS.1 a RLS.4 se puede demostrar que los estimadores MCO son insesgados, es decir,
-\begin{equation}
-\E(\hat\beta_0) = \beta_0 \text{ y } \E(\hat\beta_1) = \beta_1.
-\end{equation}
-
-En general, si cualquiera de los supuestos no se cumple entonces perderemos la propiedad de insesgamiento. RLS.1 requiere que $y$ y $x$ estén relacionados linealmente, lo que ciertamente puede no cumplirse. Hay que recordar, sin embargo, que la relación es solamente lineal en \emph{parámetros}, no en variables, por lo que ciertamente podemos transformar $x$ e $y$ para capturar relaciones no lineales más interesantes.
-RLS.2 asume que nuestros datos corresponden a una muestra aleatoria de la población, lo que claramente no siempre se cumple en datos de corte transversal. Por ejemplo, es posible que solamente tengamos datos de micro y pequeñas empresas, o que solamente observemos jefas de hogar de los quintiles más pobres.
-
-RLS.3 es extremadamente básico y con mucha seguridad se cumplirá en cualquier tipo de datos. Sin embargo, RSL.4 ciertamente representa un problema potencial. Si no se cumple que la media condicional del error es 0, esto es equivalente a decir que existe alguna correlación entre $x$ y $\mu$.
-Una razón por la que esto puede ocurrir es porque dejamos de incluir una variable relevante en nuestro modelo, de forma que esta afecta a $x$ por medio de $\mu$.
 
 \section{Varianza de los estimadores}
 
