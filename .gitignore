@@ -1,15 +1,13 @@
-
+# Folders:
 figs/*
 refs/*
+cache/*
+
+# Extensions:
 *.gz
-NER.run.xml
-NER.pdf
 *.log
 *.bbl
-NER-concordance.tex
-NER-blx.bib
 *.toc
-NER.tex
 *.tex
 *.pdf
 *.aux
@@ -19,6 +17,6 @@ NER.tex
 *.xml
 *-blx.bib
 *.gnuplot
-cache/*
-*.tex
-NER.tex
+
+# Files:
+NER-blx.bib
