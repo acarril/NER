@@ -62,6 +62,9 @@
   \newtagform{brackets}{[}{]}
   \usetagform{brackets}
 \usepackage{subcaption}
+\usepackage{tikz}
+  \usetikzlibrary{arrows}
+  \usetikzlibrary{positioning}
 \usepackage{pgfplots}
   \pgfplotsset{compat=1.12}
   \makeatletter
@@ -417,7 +420,7 @@ Es claro que podríamos elegir entre una infinita variedad de combinaciones de $
 \hlstd{modelos} \hlkwb{<-} \hlkwd{tibble}\hlstd{(}
   \hlkwc{beta1} \hlstd{=} \hlkwd{runif}\hlstd{(}\hlnum{150}\hlstd{,} \hlopt{-}\hlnum{3}\hlstd{,} \hlnum{1}\hlstd{),}
   \hlkwc{beta2} \hlstd{=} \hlkwd{runif}\hlstd{(}\hlnum{150}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{)}
-\hlstd{)}
+  \hlstd{)}
 \hlkwd{ggplot}\hlstd{(simdatos,} \hlkwd{aes}\hlstd{(x, y))} \hlopt{+}
   \hlkwd{geom_point}\hlstd{()} \hlopt{+}
   \hlkwd{geom_abline}\hlstd{(}
@@ -872,6 +875,103 @@ Esto se ajusta bastante a los datos reales, como puede apreciarse en la \autoref
 %  geom_smooth(method = "lm")
 %@
 
+\section{Distribución muestral de los estimadores}
+
+Es importante tener en cuenta que los estimadores MCO son eso: estimadores de un parámetro poblacional real.
+Podemos pensar en MCO como una máquina en donde entra una muestra y salen estimadores, tal como se representa en la \autoref{fig:MCOcaja}.
+Las estimaciones que realicemos dependen de la muestra que usemos, de forma que distintas muestran producirán distintas estimaciones de los parámetros.
+
+%<<>>=
+%library(hdm)
+%AJR <- as_tibble(AJR)
+%lm(GDP ~ logMort, data = AJR)
+%ggplot(AJR, aes(logMort, GDP)) + geom_point() + geom_smooth(method = "lm")
+%@
+
+% Sacado de http://www.mattblackwell.org/
+%\includegraphics[width=\textwidth]{figs/ols_blackbox}
+
+\begin{figure}[htb]
+\centering
+\begin{tikzpicture}[thick]
+
+\path [every node/.style={inner sep=0.2cm, outer sep=0.2cm}]
+  node (muestra1) at (0, 1.6cm) {Muestra 1: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  node[align=right] (muestra2) at (0, 0.8cm) {Muestra 2: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  node (muestradots) at (0,0) {$\vdots$}
+  node (muestrak-1) at (0, -0.8cm) {Muestra $k-1$: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  node (muestrak) at (0, -1.6cm) {Muestra $k$: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  [xshift=6cm]
+  node[draw, minimum width=3cm, minimum height=3cm] (MCO) at (0,0) {MCO}
+  [xshift=4cm]
+  node (est1) at (0, 1.6cm) {$(\hat\beta_0, \hat\beta_1)_{1}$}
+  node (est2) at (0, 0.8cm) {$(\hat\beta_0, \hat\beta_1)_{2}$}
+  node (estdots) at (0,0) {$\vdots$}
+  node (estk-1) at (0, -1.6cm) {$(\hat\beta_0, \hat\beta_1)_{k-1}$}
+  node (estk) at (0, -0.8cm) {$(\hat\beta_0, \hat\beta_1)_{k}$};
+
+\begin{scope}[->,>=latex]
+	% Entrada arriba
+	\draw[->] (muestra1.east) to [out=0,in=140] ([yshift=1cm]MCO.west) ;
+	\draw[->] (muestra2.east) to [out=0,in=140] ([yshift=.4cm]MCO.west) ;
+	% Entrada abajo
+	\draw[->] (muestrak-1.east) to [out=0,in=-140] ([yshift=-.4cm]MCO.west) ;
+	\draw[->] (muestrak.east) to [out=0,in=-140] ([yshift=-1cm]MCO.west) ;
+	% Salida arriba
+	\draw[->] ([yshift=1cm]MCO.east) to [out=10,in=180] (est1.west) ;
+	\draw[->] ([yshift=.4cm]MCO.east) to [out=10,in=180] (est2.west) ;
+	% Salida abajo
+	\draw[->] ([yshift=-1cm]MCO.east) to [out=-10,in=-180] (estk-1.west) ;
+	\draw[->] ([yshift=-.4cm]MCO.east) to [out=-10,in=-180] (estk.west) ;
+\end{scope}
+
+\end{tikzpicture}
+\caption{MCO es como una caja donde entran muestras y salen parámetros estimados}
+\label{fig:MCOcaja}
+\end{figure}
+
+Si bien distintas muestras nos llevaran a estimar distintos parámetros, ...
+
+% Simulacion de http://www.unc.edu/~carsey/teaching/ICPSR-2011/Sim%20Slides%20Handout.pdf
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Parámetros de la simulación}
+\hlkwd{set.seed}\hlstd{(}\hlnum{1102}\hlstd{)} \hlcom{# fijar la semilla para resultados replicables}
+\hlstd{muestras} \hlkwb{<-} \hlnum{500} \hlcom{# número de simulaciones }
+\hlstd{beta0} \hlkwb{<-} \hlkwd{numeric}\hlstd{(muestras)} \hlcom{# vector vacío para guardar los interceptos estimados}
+\hlstd{beta1} \hlkwb{<-} \hlkwd{numeric}\hlstd{(muestras)} \hlcom{# vector vacío para guardar las pendientes estimadas}
+
+\hlcom{# Parámetros de la población y de la muestra}
+\hlstd{a} \hlkwb{<-} \hlnum{.2} \hlcom{# verdadero valor del intercepto}
+\hlstd{b} \hlkwb{<-} \hlnum{.5} \hlcom{# verdadero valor de la pendiente}
+
+\hlstd{n} \hlkwb{<-} \hlnum{1000} \hlcom{# tamaño muestral}
+\hlstd{x} \hlkwb{<-} \hlkwd{runif}\hlstd{(n,} \hlopt{-}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{)} \hlcom{# crear una muestra aleatoria de n observaciones para x}
+
+\hlcom{# Comenzar simulaciones (loop)}
+\hlkwa{for}\hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlstd{muestras) \{}
+  \hlstd{y} \hlkwb{<-} \hlstd{a} \hlopt{+} \hlstd{b}\hlopt{*}\hlstd{x} \hlopt{+} \hlkwd{rnorm}\hlstd{(n,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{)} \hlcom{# Verdadera función generadora de datos pob.}
+  \hlstd{estimacion} \hlkwb{<-} \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x)} \hlcom{# estimar parámetros por MCO}
+  \hlstd{beta0[i]} \hlkwb{<-} \hlstd{estimacion}\hlopt{$}\hlstd{coef[}\hlnum{1}\hlstd{]} \hlcom{# guardar el intercepto estimado de esta iteración}
+  \hlstd{beta1[i]} \hlkwb{<-} \hlstd{estimacion}\hlopt{$}\hlstd{coef[}\hlnum{2}\hlstd{]} \hlcom{# guardar la pendiente estimada de esta iteración}
+\hlstd{\}}
+
+\hlcom{# Graficar densidad de pendientes estimadas}
+\hlkwd{ggplot}\hlstd{(}\hlkwd{tibble}\hlstd{(beta1),} \hlkwd{aes}\hlstd{(beta1))} \hlopt{+}
+  \hlkwd{geom_vline}\hlstd{(}\hlkwc{xintercept} \hlstd{= b,} \hlkwc{color} \hlstd{=} \hlstr{"gray"}\hlstd{)} \hlopt{+}
+  \hlkwd{geom_density}\hlstd{()}
+\end{alltt}
+\end{kframe}
+
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-20-1} 
+
+}
+
+
+
+\end{knitrout}
+
 
 \section{Propiedades de los estimadores MCO}
 
@@ -892,7 +992,7 @@ Entonces nuestra estimación de $\hat\beta$ es solo una realización de infinida
     axis lines*=left, xlabel=, ylabel=$f(\hat\beta)$,
     every axis y label/.style={at=(current axis.above origin),anchor=south},
     every axis x label/.style={at=(current axis.right of origin),anchor=west},
-    height=4cm, width=6cm,
+    height=2.4in, width=3.2in,
     xtick={3},
     xticklabels={$\hat\beta$},
     ytick=\empty,
@@ -924,7 +1024,7 @@ Notar que ambos tienen igual varianza, pero sólo el primero está centrado en t
     axis lines*=left, xlabel=, ylabel=$f(\hat\beta)$,
     every axis y label/.style={at=(current axis.above origin),anchor=south},
     every axis x label/.style={at=(current axis.right of origin),anchor=west},
-    height=4cm, width=6cm,
+    height=2.4in, width=3.2in,
     xtick={4},
     xticklabels={$\beta$},
     ytick=\empty,
@@ -969,9 +1069,15 @@ El error $u$ debe tener un valor esperado igual a cero, condicional a los valore
 E(\mu_i | x_i) = 0 \quad \forall\; i = 1,\ldots, n.
 \end{equation}
 
+Hemos supuesto que la esperanza del error es cero, es decir, que $\E(\mu)=0$.
+Mencionamos que no perdemos nada al hacer esto, ya que siempre podemos acomodar el intercepto de manera de asegurarnos que $\E(\mu)=0$.
+
+Si ocurre que $\mu$ y $x$ son independientes entonces $\E(\mu | x) = E(x) = 0$.
+Sin embargo, si existe una correlación entre $\mu$ y $x$ esto implicará que $\E(\mu | x) \neq 0$.
+
 Este es probablemente el supuesto más importante a la hora de determinar si una regresión lineal simple entregará parámetros insesgados.
 
-%todo: completar! Berry (1993)
+%todo: completar! Berry (1993) https://www.quora.com/In-linear-regression-why-we-use-the-assumption-of-zero-conditional-mean-rather-than-independency-between-x-and-error-term-along-with-E-u-0
 
 \hrulefill
 
@@ -996,7 +1102,7 @@ Una razón por la que esto puede ocurrir es porque dejamos de incluir una variab
     axis lines*=left, xlabel=, ylabel=$f(\hat\beta)$,
     every axis y label/.style={at=(current axis.above origin),anchor=south},
     every axis x label/.style={at=(current axis.right of origin),anchor=west},
-    height=4cm, width=6cm,
+    height=2.4in, width=3.2in,
     xtick={4},
     xticklabels={$\beta$},
     ytick=\empty,
@@ -1018,7 +1124,7 @@ Una razón por la que esto puede ocurrir es porque dejamos de incluir una variab
     axis lines*=left, xlabel=, ylabel=$f(\hat\beta)$,
     every axis y label/.style={at=(current axis.above origin),anchor=south},
     every axis x label/.style={at=(current axis.right of origin),anchor=west},
-    height=4cm, width=6cm,
+    height=2.4in, width=3.2in,
     xtick={5},
     xticklabels={$\beta$},
     ytick=\empty,
@@ -1197,7 +1303,7 @@ declare function={
     zmin=0, zmax=1,
     xmin=0, xmax=3,
     samples=200,
-   samples y=0,
+    samples y=0,
     view={40}{30},
     axis lines=middle,
     enlarge y limits=false,
@@ -1313,7 +1419,7 @@ Podemos generar fácilmente un conjunto de datos que presenten heterocedasticida
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-23-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-24-1} 
 
 }
 
@@ -1501,7 +1607,7 @@ Podemos graficar nuestra predicción sobre los datos para inspeccionar visualmen
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-31-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-32-1} 
 
 }
 
@@ -1520,7 +1626,7 @@ También resulta interesante analizar los residuos, que son ``la otra cara de la
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-32-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-33-1} 
 
 }
 
@@ -1537,7 +1643,7 @@ También resulta interesante analizar los residuos, que son ``la otra cara de la
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-33-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-34-1} 
 
 }
 

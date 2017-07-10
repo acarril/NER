@@ -12,6 +12,9 @@
   \newtagform{brackets}{[}{]}
   \usetagform{brackets}
 \usepackage{subcaption}
+\usepackage{tikz}
+  \usetikzlibrary{arrows}
+  \usetikzlibrary{positioning}
 \usepackage{pgfplots}
   \pgfplotsset{compat=1.12}
   \makeatletter
