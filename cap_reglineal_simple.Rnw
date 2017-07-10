@@ -475,19 +475,19 @@ Las estimaciones que realicemos dependen de la muestra que usemos, de forma que 
 \begin{tikzpicture}[thick]
 
 \path [every node/.style={inner sep=0.2cm, outer sep=0.2cm}]
-  node (muestra1) at (0, 1.6cm) {Muestra 1: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
-  node[align=right] (muestra2) at (0, 0.8cm) {Muestra 2: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
-  node (muestradots) at (0,0) {$\vdots$}
-  node (muestrak-1) at (0, -0.8cm) {Muestra $k-1$: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
-  node (muestrak) at (0, -1.6cm) {Muestra $k$: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
-  [xshift=6cm]
-  node[draw, minimum width=3cm, minimum height=3cm] (MCO) at (0,0) {MCO}
-  [xshift=4cm]
-  node (est1) at (0, 1.6cm) {$(\hat\beta_0, \hat\beta_1)_{1}$}
-  node (est2) at (0, 0.8cm) {$(\hat\beta_0, \hat\beta_1)_{2}$}
-  node (estdots) at (0,0) {$\vdots$}
-  node (estk-1) at (0, -1.6cm) {$(\hat\beta_0, \hat\beta_1)_{k-1}$}
-  node (estk) at (0, -0.8cm) {$(\hat\beta_0, \hat\beta_1)_{k}$};
+  node[anchor=east] (muestra1) at (0, 1.6cm) {Muestra 1: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  node[anchor=east] (muestra2) at (0, 0.8cm) {Muestra 2: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  node (muestradots) at (-4,0) {$\vdots$}
+  node[anchor=east] (muestrak-1) at (0, -0.8cm) {Muestra $k-1$: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  node[anchor=east] (muestrak) at (0, -1.6cm) {Muestra $k$: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  [xshift=3cm]
+  node[draw, minimum width=3cm, minimum height=3cm, anchor=center] (MCO) at (0,0) {MCO}
+  [xshift=3cm]
+  node[anchor=west] (est1) at (0, 1.6cm) {$(\hat\beta_0, \hat\beta_1)_{1}$}
+  node[anchor=west] (est2) at (0, 0.8cm) {$(\hat\beta_0, \hat\beta_1)_{2}$}
+  node[anchor=west] (estdots) at (1.15,0) {$\vdots$}
+  node[anchor=west] (estk-1) at (0, -1.6cm) {$(\hat\beta_0, \hat\beta_1)_{k-1}$}
+  node[anchor=west] (estk) at (0, -0.8cm) {$(\hat\beta_0, \hat\beta_1)_{k}$};
 
 \begin{scope}[->,>=latex]
 	% Entrada arriba
@@ -497,11 +497,11 @@ Las estimaciones que realicemos dependen de la muestra que usemos, de forma que 
 	\draw[->] (muestrak-1.east) to [out=0,in=-140] ([yshift=-.4cm]MCO.west) ;
 	\draw[->] (muestrak.east) to [out=0,in=-140] ([yshift=-1cm]MCO.west) ;
 	% Salida arriba
-	\draw[->] ([yshift=1cm]MCO.east) to [out=10,in=180] (est1.west) ;
-	\draw[->] ([yshift=.4cm]MCO.east) to [out=10,in=180] (est2.west) ;
+	\draw[->] ([yshift=1cm]MCO.east) to [out=40,in=180] (est1.west) ;
+	\draw[->] ([yshift=.4cm]MCO.east) to [out=40,in=180] (est2.west) ;
 	% Salida abajo
-	\draw[->] ([yshift=-1cm]MCO.east) to [out=-10,in=-180] (estk-1.west) ;
-	\draw[->] ([yshift=-.4cm]MCO.east) to [out=-10,in=-180] (estk.west) ;
+	\draw[->] ([yshift=-1cm]MCO.east) to [out=-40,in=-180] (estk-1.west) ;
+	\draw[->] ([yshift=-.4cm]MCO.east) to [out=-40,in=-180] (estk.west) ;
 \end{scope}
 
 \end{tikzpicture}
@@ -530,8 +530,8 @@ x <- runif(n, -1, 1) # crear una muestra aleatoria de n observaciones para x
 for(i in 1:muestras) {
   y <- a + b*x + rnorm(n, 0, 1) # Verdadera función generadora de datos pob.
   estimacion <- lm(y ~ x) # estimar parámetros por MCO
-  beta0[i] <- estimacion$coef[1] # guardar el intercepto estimado de esta iteración
-  beta1[i] <- estimacion$coef[2] # guardar la pendiente estimada de esta iteración
+  beta0[i] <- estimacion$coef[1] # guardar intercepto estimado de esta iteración
+  beta1[i] <- estimacion$coef[2] # guardar pendiente estimada de esta iteración
 }
 
 # Graficar densidad de pendientes estimadas
