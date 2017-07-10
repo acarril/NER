@@ -17,6 +17,9 @@ cache/*
 *.xml
 *-blx.bib
 *.gnuplot
+*.gz(busy)
+*.out
 
 # Files:
 NER-blx.bib
+
