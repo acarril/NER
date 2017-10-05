@@ -487,34 +487,33 @@ Las estimaciones que realicemos dependen de la muestra que usemos, de forma que 
 \label{fig:MCOcaja}
 \end{figure}
 
-Si bien distintas muestras nos llevaran a estimar distintos parámetros, ...
+No es necesario creer en mi palabra. A continuación simulamos 500 muestreos aleatorios de 1000 observaciones cada uno.
 
 % Simulacion de http://www.unc.edu/~carsey/teaching/ICPSR-2011/Sim%20Slides%20Handout.pdf
 <<>>=
-# Parámetros de la simulación
 set.seed(1102) # fijar la semilla para resultados replicables
-muestras <- 500 # número de simulaciones 
-beta0 <- numeric(muestras) # vector vacío para guardar los interceptos estimados
-beta1 <- numeric(muestras) # vector vacío para guardar las pendientes estimadas
 
-# Parámetros de la población y de la muestra
+# Parámetros poblacionales ("verdaderos")
 a <- .2 # verdadero valor del intercepto
 b <- .5 # verdadero valor de la pendiente
 
+# Parámetros de la simulación
+sims <- 500 # número de simulaciones 
 n <- 1000 # tamaño muestral
-x <- runif(n, -1, 1) # crear una muestra aleatoria de n observaciones para x
 
-# Comenzar simulaciones (loop)
-for(i in 1:muestras) {
-  y <- a + b*x + rnorm(n, 0, 1) # Verdadera función generadora de datos pob.
+# Comenzar simulación
+beta1 <- numeric(length = sims) # vector vacío para guardar pendientes estimadas
+for(i in 1:sims) { # loop de 500 simulaciones
+  x <- rnorm(n, mean=2, sd=1) # variable independiente
+  u <- rnorm(n, mean=0, sd=1) # término de error
+  y <- a + b*x + u # variable dependiente
   estimacion <- lm(y ~ x) # estimar parámetros por MCO
-  beta0[i] <- estimacion$coef[1] # guardar intercepto estimado de esta iteración
-  beta1[i] <- estimacion$coef[2] # guardar pendiente estimada de esta iteración
+  beta1[i] <- coef(estimacion)[2] # guardar pendiente (2do coef) estimada
 }
 
-# Graficar densidad de pendientes estimadas
+# Graficar densidad de 500 pendientes estimadas
 ggplot(tibble(beta1), aes(beta1)) +
-  geom_vline(xintercept = b, color = "gray") +
+  geom_vline(xintercept = b, color = "forestgreen") +
   geom_density()
 @
 
