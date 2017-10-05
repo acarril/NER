@@ -18,6 +18,7 @@ cache/*
 *.gnuplot
 *.gz(busy)
 *.out
+*.DS_Store
 
 # Files:
 NER-blx.bib
