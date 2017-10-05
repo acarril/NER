@@ -17,7 +17,7 @@ Tomemos este último ejemplo y construyamos un caso concreto.
 La \autoref{fig:votos_plot} muestra datos de 173 campañas entre los dos candidatos finalistas en elecciones de congreso estadounidenses.
 Nos enfocamos en las variables de gasto y votos obtenidos por el ``candidato A'' (un nombre del que Kafka sin duda estaría orgulloso).
 El eje $x$ corresponde al porcentaje gastado por este candidato (\verb|shareA|), mientras que el eje $y$ indica el porcentaje de los votos que obtuvo (\verb|voteA|).
-El código para leer los datos y crear el gráfico se muestra a continuación:
+El código para cargar los datos y crear el gráfico se muestra a continuación:
 
 <<'votos_plot', message=FALSE, fig.cap="Relación entre porcentaje de gasto (\\texttt{shareA}) y porcentaje de votos obtenidos (\\texttt{voteA})">>=
 library(tidyverse)
@@ -27,7 +27,7 @@ ggplot(votos, aes(shareA, voteA)) + geom_point()
 @
 
 \begin{Rbox}
-\verb|library()| permite cargar paquetes de R, los que contienen más funciones y datos. \paq{haven} es un paquete que nos permite usar la función \verb|read_dta()| para leer una base de datos de Stata (con extensión \verb|dta|), y \paq{tidyverse} carga \paq{ggplot2}, un paquete que nos permite usar las funciones \verb|ggplot()| y \verb|geom_point()| para crear el gráfico de puntos.
+\verb|library()| permite cargar paquetes de R, los que contienen más funciones y datos. \paq{haven} es un paquete que nos permite usar la función \verb|read_dta()| para leer una base de datos de Stata (con extensión \verb|*.dta|), y \paq{tidyverse} carga \paq{ggplot2}, un paquete que nos permite usar las funciones \verb|ggplot()| y \verb|geom_point()| para crear el gráfico de puntos.
 \end{Rbox}
 
 Al intentar modelar la relación entre $x$ e $y$ surgen una serie de preguntas. Quizás la más inmediata es: ``¿cuál es la relación funcional entre ambas variables?''
@@ -41,11 +41,11 @@ La ecuación \eqref{eq:ec_lin} corresponde a la clásica función lineal de cole
 Este supuesto de relación lineal parece cumplirse bastante bien para nuestro ejemplo de la \autoref{fig:votos_plot}: no sabemos qué valores deberían tomar $a$ y $b$, pero definitivamente pareciera existir alguna combinación de valores de $a$ y $b$ tal que una línea se ajuste ``bien'' a los datos.
 
 Sin embargo, el modelo expresado en \eqref{eq:ec_lin} asume que existe una relación lineal \emph{perfecta} entre $x$ e $y$, lo que es altamente restrictivo. 
-En términos de la \autoref{fig:votos_plot}, es como suponer que podríamos trazar una recta que pasara por \emph{todos} los puntos, lo que evidentemente no se puede.
+En términos de la \autoref{fig:votos_plot}, es como suponer que podríamos trazar una recta que pasara por \emph{todos} los puntos, lo que evidentemente es imposible.
 Entonces surge naturalmente la necesidad de permitir que otros factores ---distintos de $x$--- afecten en cierta medida a $y$, de forma que nuestro modelo tenga un margen de error.
 Esto se logra agregando un \kw{término de error}, denotado por $\mu$, al modelo lineal.
 
-Adicionalmente, por un simple tema de convención llamaremos $\beta_0$ al parámetro del intercepto y $\beta_1$ al parámetro de la pendiente desde ahora en adelante.
+Adicionalmente, por un simple tema de convención desde ahora en adelante llamaremos $\beta_0$ al parámetro del intercepto y $\beta_1$ al parámetro de la pendiente.
 Entonces podemos reescribir nuestro modelo, que ahora es
 \begin{equation}
 y = \beta_0 + \beta_1x + \mu.
@@ -145,11 +145,10 @@ Esto es lo que veremos a continuación.
 \label{sec:MCO}
 
 El método de Mínimos Cuadrados Ordinarios (MCO) es una respuesta directa a la pregunta que planteamos recién: ¿qué criterio conviene usar para elegir el modelo lineal que se ajuste ``mejor'' a los datos?
-Intuitivamente, la idea es minimizar el error de ajuste entre la predicción de $y_i$ definida por nuestra elección de $\beta_0$ y $\beta_1$, y los valores reales de $y_i$.
+Intuitivamente, la idea es minimizar el error de ajuste entre los datos reales contenidos en $y_i$ y los datos predichos por nuestra elección de $\beta_0$ y $\beta_1$, que denotaremos con $\hat y_i$.
+%Intuitivamente, la idea es minimizar el error de ajuste entre la predicción de $y_i$ definida por nuestra elección de $\beta_0$ y $\beta_1$, y los valores reales de $y_i$.
 
 %Geométricamente, el método de MCO equivale a minimizar la distancia vertical entre los puntos y la recta definida por el modelo.
-
-
 
 Ahora formalizaremos esta intuición, y para esto necesitamos introducir un poco de notación nueva.
 Recordemos que estamos trabajando con \eqref{eq:modelo_lineal_simple}, que es la versión muestral del modelo lineal simple (reimpresa a continuación para comodidad del lector):
@@ -157,14 +156,13 @@ Recordemos que estamos trabajando con \eqref{eq:modelo_lineal_simple}, que es la
 y_i = \beta_0 + \beta_1 x_i + \mu_i.
 \end{equation*}
 Dada una muestra de datos, llamaremos $\hat\beta_0$ y $\hat\beta_1$ a nuestra estimación de los coeficientes.
-Entonces la \kw{línea de regresión por MCO}, denotada por $\hat y_i$, está definida como
+Entonces la \kw{línea de regresión}, denotada por $\hat y_i$, está definida como
 \begin{equation}
-\hat y_i = \hat\beta_0 + \hat\beta_1 x_i.
+\hat y_i = \hat{\beta}_0 + \hat\beta_1 x_i.
 \label{eq:linea_regresion}
 \end{equation}
 Algebraicamente, $\hat y_i$ es el vector que resulta de multiplicar el vector $x_i$ por el escalar $\hat\beta_1$ y luego sumarle $\hat\beta_0$.
-Geométricamente, $\hat y_i$ es simplemente una recta que resulta de aplicar una transformación lineal a $x_i$, donde el intercepto y la pendiente dependen de nuestra elección de $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:linea_regresion}.
-Esta recta está dibujada con azul en la \autoref{fig:MCO}.
+Geométricamente, $\hat y_i$ es simplemente una recta que resulta de aplicar una transformación lineal a $x_i$, donde el intercepto y la pendiente dependen de los valores que hayamos elegido para $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:linea_regresion}. La \autoref{fig:MCO} muestra una línea de regresión en azul.
 
 <<'MCO', fig.cap="Línea de regresión $\\hat y_i$ en azul y residuo $\\hat \\mu_i$ en rojo", echo=FALSE, message=FALSE>>=
 dist1 <- simdatos %>% 
@@ -183,14 +181,14 @@ ggplot(dist1, aes(x, y)) +
 Ahora, si tomamos la diferencia entre $y_i$ (los datos) y $\hat y_i$ (nuestra predicción) obtenemos $\hat\mu_i$, el \kw{residuo} de nuestra estimación:
 \begin{align}
 \hat \mu_i &= y_i - \hat y_i \notag \\
-           &= y_i - \hat\beta_0 + \hat\beta_1 x_i.
+\hat \mu_i &= y_i - \hat\beta_0 + \hat\beta_1 x_i.
 \label{eq:residuos}
 \end{align}
 Gráficamente el residuo corresponde a la distancia vertical entre cada punto (los datos $y_i$) y la recta (la predicción $\hat y_i$), dibujado con líneas rojas en la \autoref{fig:MCO}.
-Es decir que para cada observación $i$ tenemos una medida de la magnitud del error que unos valores en particular de $\hat\beta_0$ y $\hat\beta_1$ producen.
+Es decir que para cada observación $i$ tenemos una medida de la magnitud del error que una elección particular de $\hat\beta_0$ y $\hat\beta_1$ producen.
 
-¿Cómo elegir elegimos los parámetros entonces?
-El método de MCO consiste en elegir $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:residuos} tal que se minimice la suma de los residuos al cuadrado.\footnote{¿Por qué al cuadrado? Porque se asume que es irrelevante si el error es una subestimación o una sobreestimación, de forma que lo único que importa es la magnitud. ¿Por qué no se usa el valor absoluto entonces? Buena pregunta: \url{https://stats.stackexchange.com/q/46019/91358}. Básicamente, porque es algebraicamente más simple manejar valores al cuadrado, y no hace ninguna diferencia en el resultado final.}
+Armados con esta notación podemos volver a la pregunta central: ¿Cómo elegimos de manera óptima los parámetros?
+El método de MCO consiste en elegir $\hat\beta_0$ y $\hat\beta_1$ en \eqref{eq:residuos} tal que se minimice la suma de los residuos al cuadrado.\footnote{¿Por qué al cuadrado? Porque se asume que es irrelevante si el error es una subestimación o una sobreestimación, de forma que lo único que importa es la magnitud. ¿Por qué no se usa el valor absoluto entonces? Buena pregunta: \url{https://stats.stackexchange.com/q/46019/91358}. Básicamente, porque es algebraicamente más simple manejar valores cuadráticos, y no hace ninguna diferencia en el resultado final.}
 Geométricamente esto es equivalente a minimizar la suma de las distancias verticales entre todos los puntos y la línea de regresión (las líneas rojas de la \autoref{fig:MCO}).
 Matemáticamente el problema es
 \begin{align}
@@ -235,11 +233,11 @@ La función \verb|attach()| es útil para indicar que vamos a usar una base de d
 \end{Rbox}
 
 Vemos que es fácil calcular los estimadores MCO, y para este ejemplo particular obtuvimos que $\hat \beta_0 = \Sexpr{beta0}$ y $\hat \beta_1 = \Sexpr{beta1}$ (redondeando).
-Con esto podemos completar la línea de ajuste definida en \eqref{eq:linea_regresion} usando nuestras estimaciones:
+Con esto podemos completar la línea de regresión definida en \eqref{eq:linea_regresion}, usando nuestras estimaciones:
 \begin{equation*}
 \hat y_i = \Sexpr{beta0} + \Sexpr{beta1}x_i.
 \end{equation*}
-Esto está bien, pero es demasiado práctico para visualizar lo que hemos logrado.
+Esto está bien, pero no es demasiado práctico para visualizar lo que hemos logrado.
 Una alternativa mejor es usar estos parámetros para graficar $\hat y_i$ sobre los datos:
 
 <<>>=
@@ -287,29 +285,10 @@ ingresos <- select(ingresos, wage, educ)
 Usamos \verb|haven::read_dta()| para leer bases de datos de Stata, como ya hicimos previamente. En la segunda línea, \verb|select()| nos permite seleccionar las variables \verb|wage| y \verb|educ| de la base \verb|ingresos| que acabamos de leer. Asignamos el resultado de \verb|select()| al mismo objeto para sobreescribirlo con solamente las variables que nos interesan.
 \end{Rbox}
 
-%Por el momento nos interesan dos variables: \verb|wage|, que es un vector de ingresos (en dólares menusales) y \verb|educ|, que es un vector con años de escolaridad de cada persona.
-
-%Al cargar nuevos datos yo siempre recomiendo:
-%\begin{enumerate}
-%\item Imprimir el encabezado
-%\item Imprimir un resumen
-%\item Graficarlos
-%\end{enumerate}
-
-%Escribimos lo siguiente para lograr estas tres cosas:
-
-%<<>>=
-%head(ingresos)
-%summary(ingresos)
-%ggplot(ingresos, aes(educ, wage)) + geom_point()
-%@
-
-%Es evidente que estos datos (reales) no presentan una relación lineal tan evidente. Más adelante nos haremos cargo de este problema.
-
-Podemos escribir la línea de regresión definida en \eqref{eq:linea_regresion} usando los nombres de las variables que nos interesan: salario mensual en dólares (\verb|wage|) y años de educación (\verb|educ|). Luego estimamos los coeficientes del modelo con \verb|lm()|, esta vez definiendo una fórmula donde \verb|wage| es la variable dependiente y \verb|educ| es la variable independiente:
+Sólo por conveniencia, podemos escribir la línea de regresión definida en \eqref{eq:linea_regresion} usando los nombres de las variables que nos interesan: salario mensual en dólares (\verb|wage|) y años de educación (\verb|educ|). Luego estimamos los coeficientes del modelo con \verb|lm()|, esta vez definiendo una fórmula donde \verb|wage| es la variable dependiente y \verb|educ| es la variable independiente:
 \begin{align*}
 \hat y &= \hat\beta_0 + \hat\beta_1 x \\
-\Longrightarrow \widehat{wage} &= \hat\beta_0 + \hat\beta_1 {educ}.
+\Longleftrightarrow \widehat{wage} &= \hat\beta_0 + \hat\beta_1 {educ}.
 \end{align*}
 
 <<'ingresos_lm', fig.cap="Modelo de regresión lineal relacionando años de educación (\\texttt{educ}) y salario (\\texttt{wage})", echo=1:2>>=
@@ -320,27 +299,26 @@ ggplot(ingresos, aes(educ, wage)) +
 modelo <- lm(wage ~ educ, data = ingresos)
 @
 \begin{Rbox}
-\verb|geom_smooth| es una función geom que podemos usar en conjunto con \verb|ggplot()| para graficar medias condicionales. Al usar la opción \verb|method = "lm"| indicamos que queremos graficar un modelo lineal entre las variables de los ejes. El uso de \verb|se = FALSE| es para desactivar los intervalos de confianza, tema del que hablaremos más adelante.
+\verb|geom_smooth| es una función geom que podemos usar en conjunto con \verb|ggplot()| para graficar medias condicionales. Al usar la opción \verb|method = "lm"| indicamos que queremos graficar un modelo lineal entre las variables de los ejes. El uso de \verb|se=FALSE| es para desactivar los intervalos de confianza, tema del que hablaremos más adelante.
 \end{Rbox}
 
 El intercepto del modelo lineal ($\beta_0$) es el valor predicho de $y$ cuando $x=0$. En términos de nuestro ejemplo, si una persona tiene 0 años de educación el modelo predice un ingreso mensual promedio de \Sexpr{coefficients(modelo)[1]} dólares.
 Es importante notar que en algunos contextos no tiene demasiado sentido pensar en $x=0$ (¿cuántas personas con 0 años de educación existirán? ¿cuántas hay en los datos?). En esas situaciones $\hat\beta_0$ no tiene mucho valor en sí mismo, y es labor del investigador discriminar los casos dónde esto ocurra.
-Exploraremos este punto con mayor profundidad en el siguiente ejemplo.
+Exploraremos este punto con mayor profundidad en otro ejemplo más adelante.
 
-Por otro lado, el coeficiente estimado para la pendiente ($\hat\beta_1$) nos dice la cantidad en la que cambia $\hat y$ cuando $x$ aumenta en una unidad. En otras palabras,
+El coeficiente estimado para la pendiente ($\hat\beta_1$) nos dice la cantidad en la que cambia $\hat y$ cuando $x$ aumenta en una unidad. En otras palabras,
 \begin{equation}
 \Delta \hat y = \hat \beta_1 \cdot \Delta x,
 \end{equation}
 donde el operador $\Delta$ (``delta'') significa simplemente ``el cambio en ...''.
 
-Notar que el aumento de $x$ puede ir asociado tanto a un aumento como a una disminución de $\hat y$.
+El aumento de $x$ puede ir asociado tanto a un aumento como a una disminución de $\hat y$.
 Si $\hat\beta_1 > 0$ entonces un aumento de una unidad de $x$ está asociado a un aumento de $\hat\beta_1$ en $\hat y$; si $\hat\beta_1 < 0$ entonces un aumento de una unidad de $x$ está asociado a una disminución de $-\hat\beta_1$ en $\hat y$.
-
 Por ejemplo, en la estimación graficada en la \autoref{fig:ingresos_lm} hemos obtenido que $\hat\beta_1 = \Sexpr{coefficients(modelo)[2]}$.
 Esto puede interpretarse como que un aumento de un año de educación ($x$ aumenta en una unidad) está asociado a un aumento promedio de (casi) \Sexpr{round(coefficients(modelo)[2])} dólares en el salario.
 Podemos asegurar que un aumento de $x$ se relaciona con un aumento en $\hat y$ porque el signo del coeficiente estimado es positivo; si el coeficiente estimado hubiese sido negativo, entonces diríamos que un año adicional de educación \emph{reduce} el salario promedio (¿tendría sentido esto?).
 
-Notar que hemos sido muy cuidadosos en no darle interpretación causal a la variable independiente. En otras palabras, evitamos decir que un año adicional de educación \emph{provoca} un aumento promedio de \Sexpr{round(coefficients(modelo)[2])} dólares en el ingreso. La pregunta de causalidad es importante, y un tema muy estudiado en econometría. Sin embargo, sólo podremos hablar de causalidad más adelante, cuando hayamos estudiado las propiedades estadísticas de los estimadores de MCO e impongamos supuestos más fuertes sobre la población.
+Hemos sido cuidadosos en no atribuirle una interpretación causal a la variable independiente. En otras palabras, evitamos decir que un año adicional de educación \emph{provoca} un aumento promedio de \Sexpr{round(coefficients(modelo)[2])} dólares en el ingreso. La pregunta de causalidad es importante, y un tema muy estudiado en econometría. Sin embargo, sólo podremos hablar de causalidad más adelante, cuando hayamos estudiado las propiedades estadísticas de los estimadores de MCO e impongamos supuestos más fuertes sobre la población.
 
 \subsection{La unidad de medida}
 
@@ -351,7 +329,7 @@ En concreto, usaremos los datos \verb|mtcars|, que contiene 32 observaciones de 
 Nos concentramos en una variable que indica su rendimiento en millas por galón (\verb|mpg|) y otra con su peso en miles de libras (\verb|wt|).
 
 <<>>=
-# Calcular estadística descriptiva para las variables mpg y wt
+# Calcular estadística descriptiva para las variables 'mpg' y 'wt'
 summary(select(mtcars, mpg, wt))
 # Estimar el modelo lineal 
 lm(mpg ~ wt, data = mtcars)
@@ -409,7 +387,7 @@ Entonces en lugar de escribir \verb|f(x,y)| podemos escribir de manera equivalen
 Esto permite ``desanidar'' funciones, ya que el operador es recursivo: operaciones como $f(g(x))$ pueden expresarse como \verb|x %>% g %>% f|, lo que las hace más legibles.
 \end{Rbox}
 
-Finalmente podemos interpretar el modelo con unidades adecuadas.
+Ahora podemos interpretar el modelo más fácilmente, teniendo unidades adecuadas.
 El coeficiente asociado a la variable independiente se puede interpretar como que el modelo predice una reducción promedio de $\Sexpr{abs(coefficients(modelo)[2])}$ km/l por cada 100 kilos adicionales que pese un auto.
 Esto definitivamente parece razonable, y los coeficientes entregan información útil directamente.
 Es importante notar que este valor de $\hat\beta_1$ usando \verb|peso_100kg| es igual al calculado usando \verb|peso_kg|, pero multiplicado por 100. Al realizar una transformación lineal sobre la variable, transformamos de manera inversa el coeficiente asociado.
