@@ -4,42 +4,36 @@ set_parent('NER.Rnw')
 
 \chapter{Introducción}
 
-En las últimas décadas la economía se ha ido apropiando de los computadores para realizar trabajo empírico y, sin embargo, el enfoque de los libros de econometría sigue siendo eminentemente teórico ---no \emph{aplicado}.
+En las últimas décadas la economía ha ido adoptando a los computadores para realizar econometría aplicada.
+Sin embargo, la manera en que se enseña econometría sigue siendo eminentemente teórica.
+La gran mayoría de los textos de econometría deriva los modelos como ejercicios de álgebra lineal, y más tarde (o nunca) intentan conectar esto con el trabajo aplicado, usando ejemplos específicos y pequeños extractos de código (si es que hay algo de código).
+Este libro intenta dar la vuelta a este paradigma, apoyándose en R.
 
-A mi parecer, existen actualmente dos maneras de abordar la enseñanza de econometría. La primera es la clásica, o \emph{matemática}: derivando los modelos desde como ejercicios de álgebra lineal, y en general priorizando aspectos técnicos por sobre los conceptuales o aplicados. Vemos esto en libros que discuten en extensión los supuestos detrás de las formas funcionales o supuestos de distribución, pero que dedican pocas palabras a técnicas aplicadas como métodos de regresión discontinua.
+%A mi parecer, existen actualmente dos maneras de abordar la enseñanza de econometría. La primera es la clásica, o \emph{matemática}: derivando los modelos desde como ejercicios de álgebra lineal, y en general priorizando aspectos técnicos por sobre los conceptuales o aplicados. Vemos esto en libros que discuten en extensión los supuestos detrás de las formas funcionales o supuestos de distribución, pero que dedican pocas palabras a técnicas aplicadas como métodos de regresión discontinua.
 
-Por otro lado hay quienes, de la mano con el crecimiento de la economía aplicada, abogan por una enseñanza aplicada de econometría, con énfasis en técnicas de 
+%Por otro lado hay quienes, de la mano con el crecimiento de la economía aplicada, abogan por una enseñanza aplicada de econometría, con énfasis en técnicas de 
 
-\section{R}
+\section{¿Qué es R?}
 
-\subsection{Qué es R}
-
-R es un ambiente de software y un lenguaje de programación interpretado para hacer análisis estadístico y crear gráficos. Es una implementación de S, un lenguaje de programación matemático orientado a objetos más antiguo. Es software libre y de código abierto, constantemente desarrollado por estadísticos y colaboradores de otras disciplinas.
+R es un ambiente de software y un lenguaje de programación interpretado para manipular datos, hacer análisis estadístico y visualizar datos. Es una implementación de S, un lenguaje de programación matemático orientado a objetos más antiguo. Es software libre y de código abierto, constantemente desarrollado y ampliado por colaboradores de múltiples disciplinas.
 
 R es mucho más flexible que la mayoría de los paquetes estadísticos normalmente usados por economistas. Es un lenguaje de programación completamente desarrollado, no sólo un programa con tests y métodos pre-programados.
 
+\section{Obtener R}
 
-\subsection{Obtener R}
+La instalación base de R puede obtenerse directamente de \url{https://cloud.r-project.org/}. Una vez instalado puedes usar RGui para interactuar con R. Sin embargo, esta opción no es demasiado sexy:
 
-La instalación base de R puede obtenerse de \url{https://www.r-project.org/}. Una vez instalado puedes usar RGui para usarlo. Sin embargo, usualmente yo tomo dos pasos adicionales para obtener más flexibilidad. El primero es instalar RStudio, un IDE para R que incluye una consola, editor con resaltado de sintaxis, historial de comandos y varias otras vainas que lo hacen más útil que RGui, especialmente si eres principiante. Puedes descargar RStudio de \url{https://www.rstudio.com/}, y también es gratis.
+\begin{center}
+\vspace{\baselineskip}
+\includegraphics[width=.66\linewidth]{sss/rgui-win-42}
+\vspace{\baselineskip}
+\end{center}
 
-Finalmente, a mi me gusta poder interactuar con R desde la línea de comandos, igual que puedo hacer con Python o Julia. Para poder hacer esto en Windows tenemos que ejecutar R:
+Mi recomendación es usar RStudio, un IDE (\eng{integrated development environment}) que nos ayudará a trabajar mucho más cómodamente con R. RStudio incluye una consola, un editor de código con resaltado de sintaxis, explorador de objetos y una larga lista de cosas que puede que no entiendas aún, pero que seguro harán tu vida más fácil. Con toda seguridad se \emph{ve} mejor que RGui. Puedes descargar RStudio de \url{https://www.rstudio.com/}, y también es gratis (asegúrate de haber instalado R antes de instalar RStudio).
 
-<<eval=FALSE>>=
-"C:\Program Files\R\R-3.4.0\bin\x64\R"
-@
-
-Obviamente, tienes que reemplazar este directorio por el que corresponde a tu instalación. 
-
-\includegraphics[width=\linewidth]{sss/r-win-command-prompt}
+\includegraphics[width=\linewidth]{sss/rstudio-mac}
 
 \subsection{Usar R interactivamente y a través de scripts}
-
-<<>>=
-getwd()
-@
-
-
 
 \subsection{Trabajando con datos}
 
@@ -55,7 +49,7 @@ La mayoría de las operaciones y funciones en R no guardan el resultado de su ej
 x <- 1+2
 @
 
-\subsection{R base vs. tidyverse}
+\section{R base vs. tidyverse}
 
 Una de las críticas más comunes que se hace a R es que hay muchas (¿demasiadas?) maneras de lograr un mismo resultado. Por ejemplo, R base tiene un sistema propio para crear gráficos, pero también existe \paq{ggplot2} para lograr el mismo objetivo.
 Esta multiplicidad de métodos puede hacer que R sea más difícil de aprender que lo necesario.
