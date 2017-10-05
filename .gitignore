@@ -9,7 +9,6 @@ cache/*
 *.bbl
 *.toc
 *.tex
-*.pdf
 *.aux
 *.idx
 *.ilg
