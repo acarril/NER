@@ -1,4 +1,4 @@
-\documentclass{report}\usepackage[]{graphicx}\usepackage[]{color}
+\documentclass[12pt]{report}\usepackage[]{graphicx}\usepackage[]{color}
 %% maxwidth is the original width if it is less than linewidth
 %% otherwise use linewidth (to make sure the graphics do not exceed the margin)
 \makeatletter
@@ -53,6 +53,12 @@
 \usepackage{polyglossia}
   \setmainlanguage{spanish}
 \usepackage{fontspec}
+\usepackage{amsmath,amsthm}
+%\usepackage{unicode-math}
+  \setmainfont{Libertinus Serif}
+  \setsansfont{Libertinus Sans}
+  \setmathfont[AutoFakeBold]{Libertinus Math}
+  \setmonofont[Scale=.9]{Ubuntu Mono}
 \usepackage{geometry}
 \usepackage{parskip}
 \usepackage{tcolorbox}
@@ -64,7 +70,6 @@
 \usepackage{subcaption}
 \usepackage{tikz}
   \usetikzlibrary{arrows}
-  \usetikzlibrary{positioning}
 \usepackage{pgfplots}
   \pgfplotsset{compat=1.12}
   \makeatletter
@@ -138,53 +143,36 @@
 
 \chapter{Introducción}
 
-En las últimas décadas la economía se ha ido apropiando de los computadores para realizar trabajo empírico y, sin embargo, el enfoque de los libros de econometría sigue siendo eminentemente teórico ---no \emph{aplicado}.
+En las últimas décadas la economía ha ido adoptando a los computadores para realizar econometría aplicada.
+Sin embargo, la manera en que se enseña econometría sigue siendo eminentemente teórica.
+La gran mayoría de los textos de econometría deriva los modelos como ejercicios de álgebra lineal, y más tarde (o nunca) intentan conectar esto con el trabajo aplicado, usando ejemplos específicos y pequeños extractos de código (si es que hay algo de código).
+Este libro intenta dar la vuelta a este paradigma, apoyándose en R.
 
-A mi parecer, existen actualmente dos maneras de abordar la enseñanza de econometría. La primera es la clásica, o \emph{matemática}: derivando los modelos desde como ejercicios de álgebra lineal, y en general priorizando aspectos técnicos por sobre los conceptuales o aplicados. Vemos esto en libros que discuten en extensión los supuestos detrás de las formas funcionales o supuestos de distribución, pero que dedican pocas palabras a técnicas aplicadas como métodos de regresión discontinua.
+%A mi parecer, existen actualmente dos maneras de abordar la enseñanza de econometría. La primera es la clásica, o \emph{matemática}: derivando los modelos desde como ejercicios de álgebra lineal, y en general priorizando aspectos técnicos por sobre los conceptuales o aplicados. Vemos esto en libros que discuten en extensión los supuestos detrás de las formas funcionales o supuestos de distribución, pero que dedican pocas palabras a técnicas aplicadas como métodos de regresión discontinua.
 
-Por otro lado hay quienes, de la mano con el crecimiento de la economía aplicada, abogan por una enseñanza aplicada de econometría, con énfasis en técnicas de 
+%Por otro lado hay quienes, de la mano con el crecimiento de la economía aplicada, abogan por una enseñanza aplicada de econometría, con énfasis en técnicas de 
 
-\section{R}
+\section{¿Qué es R?}
 
-\subsection{Qué es R}
-
-R es un ambiente de software y un lenguaje de programación interpretado para hacer análisis estadístico y crear gráficos. Es una implementación de S, un lenguaje de programación matemático orientado a objetos más antiguo. Es software libre y de código abierto, constantemente desarrollado por estadísticos y colaboradores de otras disciplinas.
+R es un ambiente de software y un lenguaje de programación interpretado para manipular datos, hacer análisis estadístico y visualizar datos. Es una implementación de S, un lenguaje de programación matemático orientado a objetos más antiguo. Es software libre y de código abierto, constantemente desarrollado y ampliado por colaboradores de múltiples disciplinas.
 
 R es mucho más flexible que la mayoría de los paquetes estadísticos normalmente usados por economistas. Es un lenguaje de programación completamente desarrollado, no sólo un programa con tests y métodos pre-programados.
 
+\section{Obtener R}
 
-\subsection{Obtener R}
+La instalación base de R puede obtenerse directamente de \url{https://cloud.r-project.org/}. Una vez instalado puedes usar RGui para interactuar con R. Sin embargo, esta opción no es demasiado sexy:
 
-La instalación base de R puede obtenerse de \url{https://www.r-project.org/}. Una vez instalado puedes usar RGui para usarlo. Sin embargo, usualmente yo tomo dos pasos adicionales para obtener más flexibilidad. El primero es instalar RStudio, un IDE para R que incluye una consola, editor con resaltado de sintaxis, historial de comandos y varias otras vainas que lo hacen más útil que RGui, especialmente si eres principiante. Puedes descargar RStudio de \url{https://www.rstudio.com/}, y también es gratis.
+\begin{center}
+\vspace{\baselineskip}
+\includegraphics[width=.66\linewidth]{sss/rgui-win-42}
+\vspace{\baselineskip}
+\end{center}
 
-Finalmente, a mi me gusta poder interactuar con R desde la línea de comandos, igual que puedo hacer con Python o Julia. Para poder hacer esto en Windows tenemos que ejecutar R:
+Mi recomendación es usar RStudio, un IDE (\eng{integrated development environment}) que nos ayudará a trabajar mucho más cómodamente con R. RStudio incluye una consola, un editor de código con resaltado de sintaxis, explorador de objetos y una larga lista de cosas que puede que no entiendas aún, pero que seguro harán tu vida más fácil. Con toda seguridad se \emph{ve} mejor que RGui. Puedes descargar RStudio de \url{https://www.rstudio.com/}, y también es gratis (asegúrate de haber instalado R antes de instalar RStudio).
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstr{"C:\textbackslash{}Program Files\textbackslash{}R\textbackslash{}R-3.4.0\textbackslash{}bin\textbackslash{}x64\textbackslash{}R"}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-Obviamente, tienes que reemplazar este directorio por el que corresponde a tu instalación. 
-
-\includegraphics[width=\linewidth]{sss/r-win-command-prompt}
+\includegraphics[width=\linewidth]{sss/rstudio-mac}
 
 \subsection{Usar R interactivamente y a través de scripts}
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{getwd}\hlstd{()}
-\end{alltt}
-\begin{verbatim}
-## [1] "/Users/alvaro/Dropbox (Personal)/Proyectos/NER"
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-
 
 \subsection{Trabajando con datos}
 
@@ -211,7 +199,7 @@ La mayoría de las operaciones y funciones en R no guardan el resultado de su ej
 \end{kframe}
 \end{knitrout}
 
-\subsection{R base vs. tidyverse}
+\section{R base vs. tidyverse}
 
 Una de las críticas más comunes que se hace a R es que hay muchas (¿demasiadas?) maneras de lograr un mismo resultado. Por ejemplo, R base tiene un sistema propio para crear gráficos, pero también existe \paq{ggplot2} para lograr el mismo objetivo.
 Esta multiplicidad de métodos puede hacer que R sea más difícil de aprender que lo necesario.
@@ -395,7 +383,7 @@ Siempre es recomendable graficar los datos, ya que un gráfico entrega mucha inf
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-8-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-6-1} 
 
 }
 
@@ -430,7 +418,7 @@ Es claro que podríamos elegir entre una infinita variedad de combinaciones de $
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-9-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-7-1} 
 
 }
 
@@ -568,7 +556,7 @@ Una alternativa mejor es usar estos parámetros para graficar $\hat y_i$ sobre l
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-11-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-9-1} 
 
 }
 
@@ -896,19 +884,19 @@ Las estimaciones que realicemos dependen de la muestra que usemos, de forma que 
 \begin{tikzpicture}[thick]
 
 \path [every node/.style={inner sep=0.2cm, outer sep=0.2cm}]
-  node (muestra1) at (0, 1.6cm) {Muestra 1: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
-  node[align=right] (muestra2) at (0, 0.8cm) {Muestra 2: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
-  node (muestradots) at (0,0) {$\vdots$}
-  node (muestrak-1) at (0, -0.8cm) {Muestra $k-1$: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
-  node (muestrak) at (0, -1.6cm) {Muestra $k$: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
-  [xshift=6cm]
-  node[draw, minimum width=3cm, minimum height=3cm] (MCO) at (0,0) {MCO}
-  [xshift=4cm]
-  node (est1) at (0, 1.6cm) {$(\hat\beta_0, \hat\beta_1)_{1}$}
-  node (est2) at (0, 0.8cm) {$(\hat\beta_0, \hat\beta_1)_{2}$}
-  node (estdots) at (0,0) {$\vdots$}
-  node (estk-1) at (0, -1.6cm) {$(\hat\beta_0, \hat\beta_1)_{k-1}$}
-  node (estk) at (0, -0.8cm) {$(\hat\beta_0, \hat\beta_1)_{k}$};
+  node[anchor=east] (muestra1) at (0, 1.6cm) {Muestra 1: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  node[anchor=east] (muestra2) at (0, 0.8cm) {Muestra 2: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  node (muestradots) at (-4,0) {$\vdots$}
+  node[anchor=east] (muestrak-1) at (0, -0.8cm) {Muestra $k-1$: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  node[anchor=east] (muestrak) at (0, -1.6cm) {Muestra $k$: $\{ (y_1,x_1),\ldots,(y_n,x_n) \}$}
+  [xshift=3cm]
+  node[draw, minimum width=3cm, minimum height=3cm, anchor=center] (MCO) at (0,0) {MCO}
+  [xshift=3cm]
+  node[anchor=west] (est1) at (0, 1.6cm) {$(\hat\beta_0, \hat\beta_1)_{1}$}
+  node[anchor=west] (est2) at (0, 0.8cm) {$(\hat\beta_0, \hat\beta_1)_{2}$}
+  node[anchor=west] (estdots) at (1.15,0) {$\vdots$}
+  node[anchor=west] (estk-1) at (0, -1.6cm) {$(\hat\beta_0, \hat\beta_1)_{k-1}$}
+  node[anchor=west] (estk) at (0, -0.8cm) {$(\hat\beta_0, \hat\beta_1)_{k}$};
 
 \begin{scope}[->,>=latex]
 	% Entrada arriba
@@ -918,11 +906,11 @@ Las estimaciones que realicemos dependen de la muestra que usemos, de forma que 
 	\draw[->] (muestrak-1.east) to [out=0,in=-140] ([yshift=-.4cm]MCO.west) ;
 	\draw[->] (muestrak.east) to [out=0,in=-140] ([yshift=-1cm]MCO.west) ;
 	% Salida arriba
-	\draw[->] ([yshift=1cm]MCO.east) to [out=10,in=180] (est1.west) ;
-	\draw[->] ([yshift=.4cm]MCO.east) to [out=10,in=180] (est2.west) ;
+	\draw[->] ([yshift=1cm]MCO.east) to [out=40,in=180] (est1.west) ;
+	\draw[->] ([yshift=.4cm]MCO.east) to [out=40,in=180] (est2.west) ;
 	% Salida abajo
-	\draw[->] ([yshift=-1cm]MCO.east) to [out=-10,in=-180] (estk-1.west) ;
-	\draw[->] ([yshift=-.4cm]MCO.east) to [out=-10,in=-180] (estk.west) ;
+	\draw[->] ([yshift=-1cm]MCO.east) to [out=-40,in=-180] (estk-1.west) ;
+	\draw[->] ([yshift=-.4cm]MCO.east) to [out=-40,in=-180] (estk.west) ;
 \end{scope}
 
 \end{tikzpicture}
@@ -953,8 +941,8 @@ Si bien distintas muestras nos llevaran a estimar distintos parámetros, ...
 \hlkwa{for}\hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlstd{muestras) \{}
   \hlstd{y} \hlkwb{<-} \hlstd{a} \hlopt{+} \hlstd{b}\hlopt{*}\hlstd{x} \hlopt{+} \hlkwd{rnorm}\hlstd{(n,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{)} \hlcom{# Verdadera función generadora de datos pob.}
   \hlstd{estimacion} \hlkwb{<-} \hlkwd{lm}\hlstd{(y} \hlopt{~} \hlstd{x)} \hlcom{# estimar parámetros por MCO}
-  \hlstd{beta0[i]} \hlkwb{<-} \hlstd{estimacion}\hlopt{$}\hlstd{coef[}\hlnum{1}\hlstd{]} \hlcom{# guardar el intercepto estimado de esta iteración}
-  \hlstd{beta1[i]} \hlkwb{<-} \hlstd{estimacion}\hlopt{$}\hlstd{coef[}\hlnum{2}\hlstd{]} \hlcom{# guardar la pendiente estimada de esta iteración}
+  \hlstd{beta0[i]} \hlkwb{<-} \hlstd{estimacion}\hlopt{$}\hlstd{coef[}\hlnum{1}\hlstd{]} \hlcom{# guardar intercepto estimado de esta iteración}
+  \hlstd{beta1[i]} \hlkwb{<-} \hlstd{estimacion}\hlopt{$}\hlstd{coef[}\hlnum{2}\hlstd{]} \hlcom{# guardar pendiente estimada de esta iteración}
 \hlstd{\}}
 
 \hlcom{# Graficar densidad de pendientes estimadas}
@@ -964,7 +952,7 @@ Si bien distintas muestras nos llevaran a estimar distintos parámetros, ...
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-20-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-18-1} 
 
 }
 
@@ -1419,7 +1407,7 @@ Podemos generar fácilmente un conjunto de datos que presenten heterocedasticida
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-24-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-22-1} 
 
 }
 
@@ -1607,7 +1595,7 @@ Podemos graficar nuestra predicción sobre los datos para inspeccionar visualmen
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-32-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-30-1} 
 
 }
 
@@ -1626,7 +1614,7 @@ También resulta interesante analizar los residuos, que son ``la otra cara de la
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-33-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-31-1} 
 
 }
 
@@ -1643,7 +1631,7 @@ También resulta interesante analizar los residuos, que son ``la otra cara de la
 \end{alltt}
 \end{kframe}
 
-{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-34-1} 
+{\centering \includegraphics[width=4in,height=3in]{figs/unnamed-chunk-32-1} 
 
 }
 

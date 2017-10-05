@@ -1,8 +1,14 @@
-\documentclass{report}
+\documentclass[12pt]{report}
 
 \usepackage{polyglossia}
   \setmainlanguage{spanish}
 \usepackage{fontspec}
+  \setmonofont[Scale=.9]{Ubuntu Mono}
+\usepackage[libertine, mono=false]{libertine}
+\usepackage[libertine]{newtxmath}
+\usepackage{microtype}
+\usepackage{amsmath}
+
 \usepackage{geometry}
 \usepackage{parskip}
 \usepackage{tcolorbox}
@@ -67,7 +73,7 @@
 <<setup, include=FALSE>>=
 library(knitr)
 library(highr)
-knitr::opts_chunk$set(cache = TRUE, fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', fig.pos = "htb", dev='pdf')
+knitr::opts_chunk$set(cache = FALSE, fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', fig.pos = "htb", dev='pdf')
 ## First have a look at the default inline hook function
 knit_hooks$get("inline")
 
