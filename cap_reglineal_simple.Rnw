@@ -464,8 +464,8 @@ Las estimaciones que realicemos dependen de la muestra que usemos, de forma que 
   node[anchor=west] (est1) at (0, 1.6cm) {$(\hat\beta_0, \hat\beta_1)_{1}$}
   node[anchor=west] (est2) at (0, 0.8cm) {$(\hat\beta_0, \hat\beta_1)_{2}$}
   node[anchor=west] (estdots) at (1.15,0) {$\vdots$}
-  node[anchor=west] (estk-1) at (0, -1.6cm) {$(\hat\beta_0, \hat\beta_1)_{k-1}$}
-  node[anchor=west] (estk) at (0, -0.8cm) {$(\hat\beta_0, \hat\beta_1)_{k}$};
+  node[anchor=west] (estk-1) at (0, -0.8cm) {$(\hat\beta_0, \hat\beta_1)_{k-1}$}
+  node[anchor=west] (estk) at (0, -1.6cm) {$(\hat\beta_0, \hat\beta_1)_{k}$};
 
 \begin{scope}[->,>=latex]
 	% Entrada arriba
@@ -478,8 +478,8 @@ Las estimaciones que realicemos dependen de la muestra que usemos, de forma que 
 	\draw[->] ([yshift=1cm]MCO.east) to [out=40,in=180] (est1.west) ;
 	\draw[->] ([yshift=.4cm]MCO.east) to [out=40,in=180] (est2.west) ;
 	% Salida abajo
-	\draw[->] ([yshift=-1cm]MCO.east) to [out=-40,in=-180] (estk-1.west) ;
-	\draw[->] ([yshift=-.4cm]MCO.east) to [out=-40,in=-180] (estk.west) ;
+	\draw[->] ([yshift=-.4cm]MCO.east) to [out=-40,in=-180] (estk-1.west) ;
+	\draw[->] ([yshift=-1cm]MCO.east) to [out=-40,in=-180] (estk.west) ;
 \end{scope}
 
 \end{tikzpicture}
@@ -487,7 +487,7 @@ Las estimaciones que realicemos dependen de la muestra que usemos, de forma que 
 \label{fig:MCOcaja}
 \end{figure}
 
-No es necesario creer en mi palabra. A continuación simulamos 500 muestreos aleatorios de 1000 observaciones cada uno. Nos concentraremos únicamente en el parámetro de la pendiente, $\beta_1$. Fijamos el verdadero valor de dicho parámetro en $\beta_1=0.5$ (en el código \verb|b <- 0.5|). Al simular los datos tomados de una población normal, usando los parámetros que hemos definido, estimamos el parámetro $k$ veces y obtenemos $k$ valores para $\hat\beta_1$, los que vamos guardando en el vector \verb|beta1|. Finalmente hacemos un gráfico de densidad con los valores de dicho vector.
+No es necesario creer en mi palabra. A continuación simulamos 500 muestreos aleatorios de 1000 observaciones cada uno. Nos concentraremos únicamente en el parámetro de la pendiente, $\beta_1$. Fijamos el verdadero valor de dicho parámetro en $\beta_1=0.7$ (en el código \verb|b <- 0.7|). Al simular los datos tomados de una población normal, usando los parámetros que hemos definido, estimamos el parámetro $k$ veces y obtenemos $k$ valores para $\hat\beta_1$, los que vamos guardando en el vector \verb|beta1|. Finalmente hacemos un gráfico de densidad con los valores de dicho vector.
 
 % Simulacion de http://www.unc.edu/~carsey/teaching/ICPSR-2011/Sim%20Slides%20Handout.pdf
 <<>>=
