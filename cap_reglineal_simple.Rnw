@@ -487,23 +487,23 @@ Las estimaciones que realicemos dependen de la muestra que usemos, de forma que 
 \label{fig:MCOcaja}
 \end{figure}
 
-No es necesario creer en mi palabra. A continuación simulamos 500 muestreos aleatorios de 1000 observaciones cada uno.
+No es necesario creer en mi palabra. A continuación simulamos 500 muestreos aleatorios de 1000 observaciones cada uno. Nos concentraremos únicamente en el parámetro de la pendiente, $\beta_1$. Fijamos el verdadero valor de dicho parámetro en $\beta_1=0.5$ (en el código \verb|b <- 0.5|). Al simular los datos tomados de una población normal, usando los parámetros que hemos definido, estimamos el parámetro $k$ veces y obtenemos $k$ valores para $\hat\beta_1$, los que vamos guardando en el vector \verb|beta1|. Finalmente hacemos un gráfico de densidad con los valores de dicho vector.
 
 % Simulacion de http://www.unc.edu/~carsey/teaching/ICPSR-2011/Sim%20Slides%20Handout.pdf
 <<>>=
 set.seed(1102) # fijar la semilla para resultados replicables
 
 # Parámetros poblacionales ("verdaderos")
-a <- .2 # verdadero valor del intercepto
-b <- .5 # verdadero valor de la pendiente
+a <- 0.2 # verdadero valor del intercepto
+b <- 0.7 # verdadero valor de la pendiente
 
 # Parámetros de la simulación
-sims <- 500 # número de simulaciones 
+k <- 500 # número de simulaciones 
 n <- 1000 # tamaño muestral
 
 # Comenzar simulación
-beta1 <- numeric(length = sims) # vector vacío para guardar pendientes estimadas
-for(i in 1:sims) { # loop de 500 simulaciones
+beta1 <- numeric(length = k) # vector vacío para guardar pendientes estimadas
+for(i in 1:k) { # loop de 500 simulaciones
   x <- rnorm(n, mean=2, sd=1) # variable independiente
   u <- rnorm(n, mean=0, sd=1) # término de error
   y <- a + b*x + u # variable dependiente
@@ -517,6 +517,11 @@ ggplot(tibble(beta1), aes(beta1)) +
   geom_density()
 @
 
+Lo que este gráfico nos muestra es que a pesar de que existe un único valor poblacional para uno de los parámetros estimados ($\beta_1$ en este caso), al estimar una regresión por MCO con distintas muestras obtendremos distintos valores estimados para dicho parámetro.
+En un caso real no conoceremos el valor poblacional del parámetro, ni podremos tomar \Sexpr{k} muestras distintas... ¡tendremos suerte si obtenemos 1 buena muestra! Por eso, es esencial tener presente esta distribución de $\hat\beta$ al estimar un modelo.
+
+Habrás notado que al tomar \Sexpr{k} muestras y estimar $\hat\beta_1$, los valores estimados se concentran en torno al verdadero valor de $\beta_1$, que es \Sexpr{b} en este ejemplo. ¡Esto es bueno... y no es casualidad! En realidad es una propiedad de los estimadores MCO.
+A continuación formalizaremos esta y otras propiedades, con el fin de entender qué debe ocurrir para que se cumplan.
 
 \section{Propiedades de los estimadores MCO}
 
