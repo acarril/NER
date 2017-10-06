@@ -604,6 +604,39 @@ y_i = \beta_0 + \beta_1 x_i + \mu_i, \quad i = 1,\ldots,n. \tag{\ref{eq:modelo_l
 \end{equation}
 Sí, es lo mismo que arriba, pero con el subíndice. En términos de notación la diferencia es sutil; lo importante es entender lo que esta diferencia significa.
 
+<<warning=FALSE>>=
+# Cargar paquete para melt() y fijar semilla
+library(reshape2)
+set.seed(1102)
+
+# Definir función para guardar pendientes simuladas
+simbetas <- function(k, a=0.2, b=0.7, n=500) {
+  beta1 <- numeric(length = k)
+  for(i in 1:k) {
+    x <- rnorm(n, mean=2, sd=1)
+    u <- rnorm(n, mean=0, sd=1)
+    y <- a + b*x + u
+    estimacion <- lm(y ~ x)
+    beta1[i] <- coef(estimacion)[2]
+  }
+  beta1
+}
+
+# Aplicar la función con distintos números de simulaciones
+nsims <- c(20,60,400)
+betas <- lapply(nsims, simbetas)
+
+# Transformar datos para graficarlos
+betas <- melt(betas)
+betas <- mutate(betas, nsims = factor(L1, labels = nsims))
+
+# Graficar densidad de coeficientes estimados por n. de sims 
+ggplot(betas, aes(value)) +
+  geom_vline(xintercept = .7) +
+  geom_density(aes(color = nsims))
+@
+
+
 \paragraph{RLS.3: Variación en las variables independientes}
 Necesitamos que la (o las) variables independientes del modelo tengan algo de variación.
 Este supuesto es fácil, pero necesario matemáticamente.
