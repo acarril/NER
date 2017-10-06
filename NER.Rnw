@@ -8,31 +8,27 @@
 \usepackage[libertine]{newtxmath}
 \usepackage{microtype}
 \usepackage{amsmath}
-
 \usepackage[explicit]{titlesec}
-%\usepackage{lipsum}% just to generate text
-
-\newlength\chapnumb
-\setlength\chapnumb{4cm}
-\newcommand{\chaptertitlefont}{\normalfont\sffamily\Huge}
-
-\titleformat{\chapter}[block]
-{\normalfont\sffamily}{}{0pt}
-{\parbox[b]{\chapnumb}{%
-   \fontsize{120}{110}\selectfont\thechapter}%
-  \parbox[b]{\dimexpr\textwidth-\chapnumb\relax}{%
-    \raggedleft%
-    \hfill{\chaptertitlefont#1}\\
-    \rule{\dimexpr\textwidth-\chapnumb\relax}{0.4pt}}}
-\titleformat{name=\chapter,numberless}[block]
-{\normalfont\sffamily}{}{0pt}
-{\parbox[b]{\chapnumb}{%
-   \mbox{}}%
-  \parbox[b]{\dimexpr\textwidth-\chapnumb\relax}{%
-    \raggedleft%
-    \hfill{\chaptertitlefont#1}\\
-    \rule{\dimexpr\textwidth-\chapnumb\relax}{0.4pt}}}
-
+  % Estilo de los titulos de capitulos:
+  \newlength\chapnumb
+  \setlength\chapnumb{4cm}
+  \newcommand{\chaptertitlefont}{\normalfont\sffamily\Huge}
+  \titleformat{\chapter}[block]
+  {\normalfont\sffamily}{}{0pt}
+  {\parbox[b]{\chapnumb}{%
+     \fontsize{120}{110}\selectfont\thechapter}%
+    \parbox[b]{\dimexpr\textwidth-\chapnumb\relax}{%
+      \raggedleft%
+      \hfill{\chaptertitlefont#1}\\
+      \rule{\dimexpr\textwidth-\chapnumb\relax}{0.4pt}}}
+  \titleformat{name=\chapter,numberless}[block]
+  {\normalfont\sffamily}{}{0pt}
+  {\parbox[b]{\chapnumb}{%
+     \mbox{}}%
+    \parbox[b]{\dimexpr\textwidth-\chapnumb\relax}{%
+      \raggedleft%
+      \hfill{\chaptertitlefont#1}\\
+      \rule{\dimexpr\textwidth-\chapnumb\relax}{0.4pt}}}
 \usepackage{geometry}
 \usepackage{parskip}
 \usepackage{tcolorbox}
