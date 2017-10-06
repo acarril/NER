@@ -604,7 +604,54 @@ y_i = \beta_0 + \beta_1 x_i + \mu_i, \quad i = 1,\ldots,n. \tag{\ref{eq:modelo_l
 \end{equation}
 Sí, es lo mismo que arriba, pero con el subíndice. En términos de notación la diferencia es sutil; lo importante es entender lo que esta diferencia significa.
 
-<<warning=FALSE>>=
+Por ejemplo, supongamos que queremos estimar el efecto del peso de un auto sobre su rendimiento en carretera. Es decir que el modelo a estimar es
+\begin{equation*}
+rendimiento_i = \beta_0 + \beta_1 peso_i + \mu_i,
+\end{equation*}
+donde nos interesa en particular la estimación de $\beta_1$.
+
+Para efectos de este ejemplo supondremos que los datos de la población completa de automóviles del país se encuentra en la base \verb|mpg|. Usaremos la cilindrada del auto (en litros) como aproximación de su peso (\verb|displ|), y su rendimiento en carretera (en millas por galón) como variable independiente (\verb|hwy|). Estimar el coeficiente de interés es muy simple:
+
+<<>>=
+# Estimamos modelo "poblacional"
+lm(hwy ~ displ, data = mpg)
+
+# Guardamos el beta poblacional para usarlo en gráfico
+beta_pob <- coefficients(lm(hwy ~ displ, data = mpg))[2]
+@
+
+Como supusimos que el total de observaciones en \verb|mpg| corresponde a la población completa, para efectos de este ejemplo el parámetro poblacional "verdadero" es $\beta_1 = \Sexpr{beta_pob}$.
+
+Intentaremos ahora estimar dicho parámetro usando dos muestra tomadas de los datos poblacionales. Una muestra será completamente aleatoria, mientras que la otra sólo se extraerá del subconjunto de automóviles del año 1999. Ambas muestras serán del mismo tamaño (50 observaciones), y repetiremos este muestreo la misma cantidad de veces para ambos tipos de muestra (300 muestreos).
+
+<<message=FALSE>>=
+# Parámetros iniciales
+library(reshape2)
+set.seed(1102)
+k <- 300
+
+# Guardar matriz de coeficientes bajo distintas muestras
+betas <- matrix(data=NA, nrow=k, ncol=2)
+for(i in 1:k) {
+  autos <- sample_n(mpg, size = 50)
+  autos99 <- sample_n(filter(mpg, year==1999), size = 50)
+  betas[i,1] <- coef(lm(hwy ~ displ, data = autos))[2]
+  betas[i,2] <- coef(lm(hwy ~ displ, data = autos99))[2]
+}
+
+# Transformar matriz a base de datos usable para graficar
+betas <- melt(betas)
+betas <- mutate(betas, año = factor(Var2, labels = c("todos","1999")))
+
+# Graficar densidad de coefs. estimados por tipo de muestra
+ggplot(betas, aes(value)) +
+  geom_vline(xintercept = beta_pob) +
+  geom_density(aes(color=año))
+@
+
+Al tomar una muestra aleatoria de la población, la distribución de $\hat\beta_1$ se centra en torno al verdadero valor de $\beta_1$. Por otro lado, al tomar una muestra que no es aleatoria (en el ejemplo la muestra es condicional al año), la distribución de $\hat\beta_1$ no estará centrada en torno al verdadero valor del parámetro, es decir, es un estimador sesgado. En este caso particular hay un sesgo a la baja, ya que es de esperar que si sólo seleccionamos autos relativamente antiguos, estos serán en promedio menos eficientes.
+
+<<message=FALSE>>=
 # Cargar paquete para melt() y fijar semilla
 library(reshape2)
 set.seed(1102)
