@@ -1,4 +1,4 @@
-<<cap_reglineal_simple, echo=FALSE, cache=FALSE>>=
+<<cap_reglineal_simple, echo=FALSE>>=
 set_parent('NER.Rnw')
 @
 
@@ -9,9 +9,24 @@ rm(list=ls())
 @
 
 El modelo de regresión lineal es el caballo de batalla de la econometría aplicada.
-Muchas de las preguntas que abordaremos comienzan con dos variables, digamos $x$ e $y$. Nos interesará entonces ``explicar $y$ en términos de $x$''.
+[Intro motivacional]
+
+En este capítulo comenzaremos a usar R para cargar bases de datos, las que usaremos para estimar modelos lineales y crear gráficos. Estas herramientas nos ayudarán a ilustrar conceptos fundamentales del modelo de regresión lineal y los supuestos que lo sustentan. Nos apoyaremos de los siguientes paquetes, que deben ser cargados antes de correr los bloques que vendrán a continuación:
+
+<<packages, message=FALSE>>=
+library(tidyverse)
+library(haven)
+@
+
+\begin{Rbox}
+\verb|library()| es una función que nos permite cargar paquetes de R, los que contienen más funciones y datos. Usaremos \verb|library()| al comienzo de nuestro código, para mantener el orden. \paq{tidyverse} contiene una gran cantidad de paquetes (ver \autoref{sec:rbase_tidyverse}) y lo usaremos en todos los capítulos. \paq{haven} nos permite usar la función \verb|read_dta()| para leer una base de datos de Stata (con extensión \verb|*.dta|).
+\end{Rbox}
+
+Las preguntas que abordaremos en este capítulo involucran dos variables, que llamaremos $x$ e $y$.
+Nos interesará entonces ``explicar $y$ en términos de $x$''.
 Por ejemplo, $y$ podría ser la tasa de crímenes de varios barrios y $x$ el número de parques construidos en esos barrios.
-O $y$ podría ser el porcentaje de los votos obtenidos por un partido y $x$ su gasto en la campaña electoral, etc.
+O $y$ podría ser el porcentaje de los votos obtenidos por distintos candidatos y $x$ su gasto en la campaña electoral, etc.
+Si bien esto parece muy simple (y de ahí el nombre del capítulo), los conceptos que veremos acá serán generalizados muy fácilmente a más variables.
 
 Tomemos este último ejemplo y construyamos un caso concreto.
 La \autoref{fig:votos_plot} muestra datos de 173 campañas entre los dos candidatos finalistas en elecciones de congreso estadounidenses.
@@ -19,15 +34,17 @@ Nos enfocamos en las variables de gasto y votos obtenidos por el ``candidato A''
 El eje $x$ corresponde al porcentaje gastado por este candidato (\verb|shareA|), mientras que el eje $y$ indica el porcentaje de los votos que obtuvo (\verb|voteA|).
 El código para cargar los datos y crear el gráfico se muestra a continuación:
 
-<<'votos_plot', message=FALSE, fig.cap="Relación entre porcentaje de gasto (\\texttt{shareA}) y porcentaje de votos obtenidos (\\texttt{voteA})">>=
-library(tidyverse)
-library(haven)
+<<'votos_plot', fig.cap="Relación entre porcentaje de gasto (\\texttt{shareA}) y porcentaje de votos obtenidos (\\texttt{voteA})">>=
+# Leer datos (Stata) y asignarlos al objetos 'votos'
 votos <- read_dta("http://fmwww.bc.edu/ec-p/data/wooldridge/vote1.dta")
+# Imprimir las primeras observaciones de las variables que nos interesan
+select(votos, voteA, shareA)
+# Graficar ambas variables
 ggplot(votos, aes(shareA, voteA)) + geom_point()
 @
 
 \begin{Rbox}
-\verb|library()| permite cargar paquetes de R, los que contienen más funciones y datos. \paq{haven} es un paquete que nos permite usar la función \verb|read_dta()| para leer una base de datos de Stata (con extensión \verb|*.dta|), y \paq{tidyverse} carga \paq{ggplot2}, un paquete que nos permite usar las funciones \verb|ggplot()| y \verb|geom_point()| para crear el gráfico de puntos.
+Usando \verb|haven::read_dta()| podemos leer una base de datos de Stata (con extensión \verb|*.dta|), la que asignamos al objeto \verb|votos|. Luego usamos \verb|dplyr::select()| para seleccionar algunas variables e imprimirlas. Finalmente usamos las funciones \verb|ggplot2::ggplot()| y \verb|ggplot2::geom_point()| para crear un gráfico de puntos.
 \end{Rbox}
 
 Al intentar modelar la relación entre $x$ e $y$ surgen una serie de preguntas. Quizás la más inmediata es: ``¿cuál es la relación funcional entre ambas variables?''
@@ -288,7 +305,7 @@ Usamos \verb|haven::read_dta()| para leer bases de datos de Stata, como ya hicim
 Sólo por conveniencia, podemos escribir la línea de regresión definida en \eqref{eq:linea_regresion} usando los nombres de las variables que nos interesan: salario mensual en dólares (\verb|wage|) y años de educación (\verb|educ|). Luego estimamos los coeficientes del modelo con \verb|lm()|, esta vez definiendo una fórmula donde \verb|wage| es la variable dependiente y \verb|educ| es la variable independiente:
 \begin{align*}
 \hat y &= \hat\beta_0 + \hat\beta_1 x \\
-\Longleftrightarrow \widehat{wage} &= \hat\beta_0 + \hat\beta_1 {educ}.
+\Leftrightarrow \widehat{wage} &= \hat\beta_0 + \hat\beta_1 {educ}.
 \end{align*}
 
 <<'ingresos_lm', fig.cap="Modelo de regresión lineal relacionando años de educación (\\texttt{educ}) y salario (\\texttt{wage})", echo=1:2>>=

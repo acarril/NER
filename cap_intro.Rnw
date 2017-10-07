@@ -50,6 +50,7 @@ x <- 1+2
 @
 
 \section{R base vs. tidyverse}
+\label{sec:rbase_tidyverse}
 
 Una de las críticas más comunes que se hace a R es que hay muchas (¿demasiadas?) maneras de lograr un mismo resultado. Por ejemplo, R base tiene un sistema propio para crear gráficos, pero también existe \paq{ggplot2} para lograr el mismo objetivo.
 Esta multiplicidad de métodos puede hacer que R sea más difícil de aprender que lo necesario.
