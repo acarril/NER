@@ -7,7 +7,7 @@ set_parent('NER.Rnw')
 En las últimas décadas la economía ha ido adoptando a los computadores para realizar econometría aplicada.
 Sin embargo, la manera en que se enseña econometría sigue siendo eminentemente teórica.
 La gran mayoría de los textos de econometría deriva los modelos como ejercicios de álgebra lineal, y más tarde (o nunca) intentan conectar esto con el trabajo aplicado, usando ejemplos específicos y pequeños extractos de código (si es que hay algo de código).
-Este libro intenta dar la vuelta a este paradigma, apoyándose en R.
+Este libro intenta dar la vuelta a este paradigma, apoyándose en R desde un comienzo y en forma continua durante el desarrollo de las ideas.
 
 %A mi parecer, existen actualmente dos maneras de abordar la enseñanza de econometría. La primera es la clásica, o \emph{matemática}: derivando los modelos desde como ejercicios de álgebra lineal, y en general priorizando aspectos técnicos por sobre los conceptuales o aplicados. Vemos esto en libros que discuten en extensión los supuestos detrás de las formas funcionales o supuestos de distribución, pero que dedican pocas palabras a técnicas aplicadas como métodos de regresión discontinua.
 
@@ -54,7 +54,7 @@ x <- 1+2
 Una de las críticas más comunes que se hace a R es que hay muchas (¿demasiadas?) maneras de lograr un mismo resultado. Por ejemplo, R base tiene un sistema propio para crear gráficos, pero también existe \paq{ggplot2} para lograr el mismo objetivo.
 Esta multiplicidad de métodos puede hacer que R sea más difícil de aprender que lo necesario.
 
-R es un lenguaje antiguo, y muchas de sus funcionalidades básicas ---lo que llamamos \kw{R base}--- operan bajo paradigmas anticuados. Uno de los más grandes aportes a la programación en R del útltimo tiempo fue realizado por Hadley Wickham, autor del \paq{tidyverse}. Este es un conjunto de paquetes que modernizan cómo usamos R para manipular datos, y están diseñados para trabajar bien entre ellos.
+R es un lenguaje antiguo, y muchas de sus funcionalidades básicas ---lo que llamamos \kw{R base}--- operan bajo paradigmas anticuados. Uno de los más grandes aportes a la programación en R del útltimo tiempo fue realizado por Hadley Wickham, principal autor del \paq{tidyverse}. Este es un conjunto de paquetes que modernizan cómo usamos R para manipular datos, y están diseñados para trabajar bien entre ellos.
 
 En un artículo para R-bloggers\footnote{\url{https://www.r-bloggers.com/teach-the-tidyverse-to-beginners/}}, David Robinson resume los dos principales ``curriculums'' de aprendizaje de R:
 \begin{itemize}
@@ -62,7 +62,7 @@ En un artículo para R-bloggers\footnote{\url{https://www.r-bloggers.com/teach-t
 \item \textbf{tidyverse primero}: comenzar usando \paq{dplyr} para manipular marcos de datos y \paq{ggplot2} para crear gráficos. Luego introducir rápidamente el uso de \paq{tidyr} y \paq{purrr}. Usar el operador \verb|%>%| casi inmediatamente, pero dejar el uso de \verb|$| y \verb|[[]]| para más adelante. Este enfoque se concentra en un sólo marco de datos.
 \end{itemize}
 
-Mi opinión (y la de muchos otros) es que aprender a usar las herramientas del \paq{tidyverse} es más fácil y más productivo. La filosofía detrás del \paq{tidyverse} es similar a la de Python: "Debería haber una ---y preferiblemente sólo una--- forma obvia de lograr algo''. Esta filosofía es buena al aprender un lenguaje de programación, ya que entrega consistencia y evita confusiones.
+Mi opinión (y la de muchos otros) es que aprender a usar las herramientas del \paq{tidyverse} es más fácil y más productivo. La filosofía detrás del \paq{tidyverse} es similar a la de Python: "Debería haber una ---y preferiblemente sólo una--- forma obvia de lograr algo''. Esta filosofía es buena al aprender un lenguaje de programación, ya que es más consistente y evita confusiones.
 Es por esto que en este documento prefiero usar herramientas del \paq{tidyverse} cada vez que sea posible.
 
 Por ejemplo, en R base existen al menos tres formas de crear una variable nueva a partir de otra existente.
@@ -78,5 +78,8 @@ mtcars[, "libras"] <- mtcars[, "wt"] / 1000
 mtcars <- mtcars %>% mutate(libras = wt / 1000)
 @
 
-
 Sin embargo, también hay elementos de R base que son importantes de aprender; de hecho, muchas cosas en R no son posibles sin ellos. Iremos introduciendo estos elementos a medida que nos sean útil para el tema en cuestión.
+
+\section{Detalles técnicos}
+
+Este documento fue compilado usando R 
