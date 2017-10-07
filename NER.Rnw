@@ -89,18 +89,17 @@
   #1,
 }
 
-% Code chunk
+% Knitr setup
 <<setup, include=FALSE>>=
 library(knitr)
 library(highr)
-knitr::opts_chunk$set(cache = FALSE, fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', fig.pos = "htb", dev='pdf')
-## First have a look at the default inline hook function
-knit_hooks$get("inline")
+knitr::opts_chunk$set(cache = TRUE, fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', fig.pos = "htb", dev='pdf')
 
-## Then customize it to your own liking
+## Personalizar inline hook
+knit_hooks$get("inline")
 inline_hook <- function(x) {
-    if(is.numeric(x) & abs(x)>0.01) x <- round(x, 2)
-    paste(as.character(x), collapse=", ")
+  if(is.numeric(x) & abs(x)>0.01) x <- round(x, 2)
+  paste(as.character(x), collapse=", ")
 }
 knit_hooks$set(inline = inline_hook)
 @
