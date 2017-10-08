@@ -80,7 +80,3 @@ mtcars <- mtcars %>% mutate(libras = wt / 1000)
 @
 
 Sin embargo, también hay elementos de R base que son importantes de aprender; de hecho, muchas cosas en R no son posibles sin ellos. Iremos introduciendo estos elementos a medida que nos sean útil para el tema en cuestión.
-
-\section{Detalles técnicos}
-
-Este documento fue compilado usando R 
