@@ -6,8 +6,15 @@
   \setmonofont[Scale=.9]{Ubuntu Mono}
 \usepackage[libertine, mono=false]{libertine}
 \usepackage[libertine]{newtxmath}
+\usepackage{geometry}
 \usepackage{microtype}
-\usepackage{amsmath}
+\usepackage{fancyhdr} % Headers pulentos
+  \pagestyle{fancy}
+  \renewcommand{\sectionmark}[1]{\markright{#1}}
+  \renewcommand{\chaptermark}[1]{
+  \markboth{\thechapter~$\cdot$~#1}{}}
+  \fancyhead[L]{\nouppercase{\small\leftmark}}
+  \fancyhead[R]{\small\rightmark}
 \usepackage[explicit]{titlesec}
   % Estilo de los titulos de capitulos:
   \newlength\chapnumb
@@ -29,11 +36,10 @@
       \raggedleft%
       \hfill{\chaptertitlefont#1}\\
       \rule{\dimexpr\textwidth-\chapnumb\relax}{0.4pt}}}
-\usepackage{geometry}
 \usepackage{parskip}
 \usepackage{tcolorbox}
-\usepackage{tocloft}
-  \setlength{\cftsubsecindent}{5em}
+%\usepackage{tocloft}
+%  \setlength{\cftsubsecindent}{5em}
 \usepackage{mathtools}
   \newtagform{brackets}{[}{]}
   \usetagform{brackets}
@@ -73,6 +79,12 @@
 % Eliminar numeración en títulos menores que secciones
 \setcounter{secnumdepth}{1}
 
+% Cambiar titulo de TOC (necesita polyglossia)
+\addto\captionsspanish{%
+  \renewcommand{\contentsname}%
+    {Contenidos}%
+}
+
 % Color box para R
 % new tcolorbox environment
 % #1: tcolorbox options
@@ -109,7 +121,7 @@ knit_hooks$set(inline = inline_hook)
 %\thanks{Estas notas son un intento de condensar lo justo y necesario para poder seguir un curso de econometría con R.Luego de recopilar material de muchas clases y ayudantías de econometría, en general pensadas para ser aplicadas en Stata, decidí que podía intentar hacer estas clases en R y usar esta guía como material de apoyo.Mi prioridad fue ser breve y conciso, por lo que estas notas no son un buen comienzo para aprender R (o econometría); son un complemento.Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acarril@fen.uchile.cl}.}
 \author{Alvaro Carril}
 \date{Versión 1.1.\Sexpr{as.numeric(format(Sys.Date(),"%Y%m%d"))} \\
-  \includegraphics[width=\textwidth]{figs/scatterplot3d_portada}
+  \includegraphics[width=.9\textwidth]{figs/scatterplot3d_portada}
 }
 
 
@@ -124,9 +136,9 @@ knit_hooks$set(inline = inline_hook)
 <<cap_intro, child='cap_intro.Rnw'>>=
 @
 
-%% Regresión lineal bivariada:
-%<<cap_reglineal_simple, child='cap_reglineal_simple.Rnw'>>=
-%@
+% Regresión lineal bivariada:
+<<cap_reglineal_simple, child='cap_reglineal_simple.Rnw'>>=
+@
 
 %% Introducción, prefacio:
 %<<cap_OLD, child='cap_OLD.Rnw'>>=
