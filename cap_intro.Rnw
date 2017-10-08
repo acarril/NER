@@ -7,7 +7,7 @@ set_parent('NER.Rnw')
 En las últimas décadas la economía ha ido adoptando a los computadores para realizar econometría aplicada.
 Sin embargo, la manera en que se enseña econometría sigue siendo eminentemente teórica.
 La gran mayoría de los textos de econometría deriva los modelos como ejercicios de álgebra lineal, y más tarde (o nunca) intentan conectar esto con el trabajo aplicado, usando ejemplos específicos y pequeños extractos de código (si es que hay algo de código).
-Este libro intenta dar la vuelta a este paradigma, apoyándose en R desde un comienzo y en forma continua durante el desarrollo de las ideas.
+Este libro intenta dar la vuelta a este paradigma, apoyándose en R desde un comienzo y en forma continua para el desarrollo de conceptos.
 
 %A mi parecer, existen actualmente dos maneras de abordar la enseñanza de econometría. La primera es la clásica, o \emph{matemática}: derivando los modelos desde como ejercicios de álgebra lineal, y en general priorizando aspectos técnicos por sobre los conceptuales o aplicados. Vemos esto en libros que discuten en extensión los supuestos detrás de las formas funcionales o supuestos de distribución, pero que dedican pocas palabras a técnicas aplicadas como métodos de regresión discontinua.
 
@@ -17,11 +17,48 @@ Este libro intenta dar la vuelta a este paradigma, apoyándose en R desde un com
 
 R es un ambiente de software y un lenguaje de programación interpretado para manipular datos, hacer análisis estadístico y visualizar datos. Es una implementación de S, un lenguaje de programación matemático orientado a objetos más antiguo. Es software libre y de código abierto, constantemente desarrollado y ampliado por colaboradores de múltiples disciplinas.
 
-R es mucho más flexible que la mayoría de los paquetes estadísticos normalmente usados por economistas. Es un lenguaje de programación completamente desarrollado, no sólo un programa con tests y métodos pre-programados.
+R es mucho más flexible que la mayoría de los paquetes estadísticos normalmente usados por economistas. Es un lenguaje de programación completamente desarrollado, no sólo un programa con tests y métodos pre-programados. Es una alternativa más flexible, poderosa y barata con respecto a otros paquetes estadísticos comunes, como Stata o SPSS.
+
+\section{¿Por qué R?}
+
+Creo que R será el lenguaje \eng{de facto} usado por economistas en el futuro próximo.
+Históricamente, economistas y econometristas han favorecido otros programas para realizar análisis estadístico: Gauss, Matlab, Eviews, SAS, SPSS y Stata, por nombrar algunos.
+Todos tienen sus ventajas, pero comparten una característica común: son programas comerciales, lo que en muchos casos implican preios prohibitivamente altos, ciclos de desarrollo relativamente largos y en general una falta de incorporación de lo que se está haciendo ``en la frontera''.
+
+En respuesta a esto, muchas ciencias (de las que economía va a la saga) se han movido al uso de software libre para realizar análisis estadístico. Lenguajes como Python, Julia y R han avanzado enormemente en años recientes y hoy constituyen una fuerte alternativa frente a los paquetes comerciales, subsanando todos los incovenientes mencionados.
+
+
+Si bien Stata sigue dominando el área, la migración hacia R ya está en progreso. Muchos cursos de econometría 
+
+\section{¿Puedo usar este documento sin R?}
+
+Si.
+El objetivo detrás de este apunte es aprender econometría primero y R después.
+El uso de R siempre es para \emph{apoyar} una explicación, usándolo como herramienta de aplicación de las ideas expuestas.
+Siempre muestro el código de lo que está sucediendo ``detrás del telón'', pero lo hago para aumentar la transparencia de los ejemplos y permitir que sean replicados por el lector que así lo quiera.
+A quien no le interese, puede enfocarse directamente en los datos y resultados calculados (en los bloques de código) y en los gráficos creados (inmediatamente después de los bloques).
+He puesto especial cuidado en que el texto sea legible aún para quien quiera obviar el código.
+Por otro lado, para quien le interese ahondar \emph{aún más} en el código, he creado unos bloques que explican el código que va siendo usado, en caso que los comentarios no sean suficientes.
+
+De esta forma, me gusta pensar que este apunte tiene tres formas de ser leído:
+
+\begin{enumerate}
+  \item Como un apunte de econometría en el que no se aprende nada de R, concentrándose en los textos y figuras pero saltando todo el código y sus explicaciones.
+  \item Como un apunte de econometría donde el código y sus comentarios ayudan a esclarecer los mecanismos detrás de los conceptos explicados.
+  \item Como un apunte de econometría y suscinta introducción a R, estudiando el código con sus explicaciones y replicando estos \eng{scripts} en tu propio computador.
+\end{enumerate}
+
+\begin{quote}
+  [Ejemplo]
+\end{quote}
+
+\begin{Rbox}
+\verb|library()| es una función que nos permite cargar paquetes de R, los que contienen más funciones y datos. Usaremos \verb|library()| al comienzo de nuestro código, para mantener el orden. \paq{tidyverse} contiene una gran cantidad de paquetes (ver \autoref{sec:rbase_tidyverse}) y lo usaremos en todos los capítulos. \paq{haven} nos permite usar la función \verb|read_dta()| para leer una base de datos de Stata (con extensión \verb|*.dta|).
+\end{Rbox}
 
 \section{Obtener R}
 
-La instalación base de R puede obtenerse directamente de \url{https://cloud.r-project.org/}. Una vez instalado puedes usar RGui para interactuar con R. Sin embargo, esta opción no es demasiado sexy:
+La instalación base de R puede obtenerse directamente de \url{https://cloud.r-project.org/} (en Windows tienes que elegir la opción \eng{base}). Una vez instalado puedes usar RGui para interactuar con R. Sin embargo, esta opción no es demasiado sexy:
 
 \begin{center}
 \vspace{\baselineskip}
@@ -31,7 +68,85 @@ La instalación base de R puede obtenerse directamente de \url{https://cloud.r-p
 
 Mi recomendación es usar RStudio, un IDE (\eng{integrated development environment}) que nos ayudará a trabajar mucho más cómodamente con R. RStudio incluye una consola, un editor de código con resaltado de sintaxis, explorador de objetos y una larga lista de cosas que puede que no entiendas aún, pero que seguro harán tu vida más fácil. Con toda seguridad se \emph{ve} mejor que RGui. Puedes descargar RStudio de \url{https://www.rstudio.com/}, y también es gratis (asegúrate de haber instalado R antes de instalar RStudio).
 
+Si usas Mac, algunas funciones de R necesitarán de un Servidor X11, el cual ya no es incluido por Apple. Este paso es opcional, pero si quieres prevenirte de no recibir errores inesperados en el uso de alguna función más adelante, puedes descargar XQuartz de \url{https://www.xquartz.org/} e instalarlo ahora en tu sistema.
+
 \includegraphics[width=\linewidth]{sss/rstudio-mac}
+
+
+\section{Trabajando en R}
+
+R es un ambiente de software y un lenguaje de programación interpretado para hacer análisis estadístico. En este libro interactuaremos con R principalmente a través de RStudio, que es un ambiente de desarrollo integrado (IDE, por sus siglas en inglés) para programar en R. La interfaz de RStudio se muestra en la \autoref{fig:rstudio_main}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{figs/rstudio_main}
+  \caption{RStudio 1.0.136 en macOS 10.12.2}
+  \label{fig:rstudio_main}
+\end{figure}
+
+Daremos instrucciones a R a través de dos métodos. El más inmediato es a través la \kw{Consola}, donde ejecutaremos comandos de a uno, escribiéndolos en el \eng{command prompt} o símbolo de sistema (\verb|>|) del panel \eng{Console}, en la esquina inferior izquierda. El segundo método será a través de un conjunto de comandos escritos en un \eng{\kw{script}}, que es un archivo de extensión \verb|.R| con varias instrucciones para que R ejecute de manera no interactiva. El documento ``Untitled1'' que deberías ver en tu ventana de RStudio es para escribir y guardar scripts (si no lo vez, \textsf{Archivo, Nuevo, R Script}).
+Por el momento puedes usar la consola para ir siguiendo lo que vayamos haciendo.
+
+
+\section{R en 5 minutos}
+
+Revisaremos ahora brevemente los conceptos más fundamentales de R: crear objetos mediante asignaciones y manipularlos mediante funciones. No te preocupes si no sabes para qué sirve cada una de las funciones; lo importante aquí es puedas entender los conceptos y que puedas replicar los ejemplos.
+
+R es un lenguaje de programación orientado a objetos, lo que significa que mucho del trabajo consiste en crearlos y manipularlos. Un \kw{objeto} es un elemento con nombre al que le hemos asignado un valor en el sentido amplio de la palabra: los valores pueden ser datos, funciones, gráficos o resultados, entre otros.
+Entonces una de las operaciones más comunes es la asignación de un valor a un objeto, la que se realiza con el \kw{operador de asignación} \verb|<-|, y tiene la siguiente sintaxis general:
+
+<<eval=FALSE>>=
+objeto <- valor
+@
+
+Por ejemplo, podemos crear el objeto \verb|x| asignándole el valor 10. Para hacerlo escribe la siguiente línea en tu Consola y presiona \textsf{Enter} $\hookleftarrow$ para ejecutarla:
+<<>>=
+x <- 10
+@
+
+En RStudio, un buen atajo para memorizar rápido es usar \textsf{Alt -} para insertar el operación de asignación.
+Si has tenido éxito, deberías ver el objeto \verb|x| asignado con valor 10 en tu panel de \eng{Environment}, o Ambiente (arriba a la derecha). En adelante no diré explícitamente que hay que ejecutar cada línea con \textsf{Enter} $\hookleftarrow$, ya que se sobreentiende (espero).
+
+Una asignación casi siempre es silenciosa, es decir, no se mostrará su resultado. Para \kw{examinar un objeto} simplemente escribimos su nombre:
+<<>>=
+x
+@
+
+Una manera de mostrar inmediatamente el resultado de una asignación es encerrando la expresión completa entre paréntesis. Por ejemplo, definimos un segundo objeto escribiendo
+<<>>=
+(y <- 2*3)
+@
+
+El símbolo \verb|[1]| que antecede a los resultados anteriores indica que se trata del primer resultado. Por ejemplo, si ejecutas el código \verb|1:42| para obtener una secuencia de 40 enteros deberías algo como lo siguiente (dependiendo del ancho de tu Consola):
+<<>>=
+1:42
+@
+
+Para manipular objetos usaremos \kw{funciones}, que permiten realizar una gran variedad de operaciones con distintos tipos de objetos. Por ejemplo, podemos combinar \verb|x| e \verb|y| en un solo objeto usando la función \verb|c()|:
+<<>>=
+valores <- c(x,y)
+valores
+@
+
+Existe una cantidad enorme de funciones para manipular objetos. De hecho, este libro es en esencia un manual sobre qué funciones usar y cómo usarlas para lograr analizar datos de manera efectiva. Comenzaremos de forma sencilla, calculando el promedio de los valores \verb|x| e \verb|y| usando la función \verb|mean()|:
+<<>>=
+mean(valores)
+@
+
+%\begin{sloppypar}
+Notar que podemos asignar el resultado de una función a un objeto (como en \verb|valores <- c(x,y)|) o usar la función directamente, sin guardar su resultado (como en \verb|mean(valores)|). Normalmente asignaremos el resultado de la función si es que queremos usar dicho resultado para otra operación, como en el primer caso.
+%\end{sloppypar}
+
+Finalmente, podemos escribir \kw{comentarios} usando el símbolo \verb|#|. Cuando R encuentre este símbolo, todo lo que siga después en la misma línea será ignorado. Por ejemplo, 
+<<>>=
+# Podemos hacer composición de funciones!
+mean(c(0, 1, 1, 2, 3, 5, 8, 13))  # Secuencia de Fibonacci (1ros términos)
+@
+
+Espero que hayas podido seguir los ejemplos que hemos desarrollado recién. Si aún no tienes todo claro, tranquilo; a medida que avancemos iremos reforzando estos conceptos. Sin embargo, si por alguna razón no pudiste ejecutar el código, te sugiero resolver el problema antes de continuar.
+
+
+\hrulefill
 
 \subsection{Usar R interactivamente y a través de scripts}
 
