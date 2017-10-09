@@ -50,11 +50,12 @@ De esta forma, me gusta pensar que este apunte tiene tres formas de ser leído:
 
 \begin{quote}
   [Ejemplo]
+  \begin{Rbox}
+  \verb|library()| es una función que nos permite cargar paquetes de R, los que contienen más funciones y datos. Usaremos \verb|library()| al comienzo de nuestro código, para mantener el orden. \paq{tidyverse} contiene una gran cantidad de paquetes (ver \autoref{sec:rbase_tidyverse}) y lo usaremos en todos los capítulos. \paq{haven} nos permite usar la función \verb|read_dta()| para leer una base de datos de Stata (con extensión \verb|*.dta|).
+  \end{Rbox}
 \end{quote}
 
-\begin{Rbox}
-\verb|library()| es una función que nos permite cargar paquetes de R, los que contienen más funciones y datos. Usaremos \verb|library()| al comienzo de nuestro código, para mantener el orden. \paq{tidyverse} contiene una gran cantidad de paquetes (ver \autoref{sec:rbase_tidyverse}) y lo usaremos en todos los capítulos. \paq{haven} nos permite usar la función \verb|read_dta()| para leer una base de datos de Stata (con extensión \verb|*.dta|).
-\end{Rbox}
+
 
 \section{Obtener R}
 
@@ -84,7 +85,11 @@ R es un ambiente de software y un lenguaje de programación interpretado para ha
   \label{fig:rstudio_main}
 \end{figure}
 
-Daremos instrucciones a R a través de dos métodos. El más inmediato es a través la \kw{Consola}, donde ejecutaremos comandos de a uno, escribiéndolos en el \eng{command prompt} o símbolo de sistema (\verb|>|) del panel \eng{Console}, en la esquina inferior izquierda. El segundo método será a través de un conjunto de comandos escritos en un \eng{\kw{script}}, que es un archivo de extensión \verb|.R| con varias instrucciones para que R ejecute de manera no interactiva. El documento ``Untitled1'' que deberías ver en tu ventana de RStudio es para escribir y guardar scripts (si no lo vez, \textsf{Archivo, Nuevo, R Script}).
+Daremos instrucciones a R a través de dos métodos:
+\begin{enumerate}
+  \item Usando la \kw{Consola}, donde ejecutaremos comandos de a uno, escribiéndolos en el \eng{command prompt} o símbolo de sistema (\verb|>|) del panel \eng{Console}, en la esquina inferior izquierda.
+  \item A través de un conjunto de comandos escritos en un \eng{\kw{script}}, que es un archivo de extensión \verb|.R| con varias instrucciones que serán ejecutadas de manera no interactiva. El documento \sys{Untitled1} que deberías ver en tu ventana de RStudio es para escribir y guardar scripts (si no lo vez, elige \ppath{File, New File, R Script}).
+\end{enumerate}
 Por el momento puedes usar la consola para ir siguiendo lo que vayamos haciendo.
 
 
@@ -92,7 +97,7 @@ Por el momento puedes usar la consola para ir siguiendo lo que vayamos haciendo.
 
 Revisaremos ahora brevemente los conceptos más fundamentales de R: crear objetos mediante asignaciones y manipularlos mediante funciones. No te preocupes si no sabes para qué sirve cada una de las funciones; lo importante aquí es puedas entender los conceptos y que puedas replicar los ejemplos.
 
-R es un lenguaje de programación orientado a objetos, lo que significa que mucho del trabajo consiste en crearlos y manipularlos. Un \kw{objeto} es un elemento con nombre al que le hemos asignado un valor en el sentido amplio de la palabra: los valores pueden ser datos, funciones, gráficos o resultados, entre otros.
+R es un lenguaje de programación orientado a objetos, lo que significa que mucho del trabajo consiste en crearlos y manipularlos. Un \kw{objeto} es un elemento con nombre al que le hemos asignado un ``valor'' en el sentido amplio de la palabra: los valores pueden ser datos, funciones, gráficos o resultados, entre otros.
 Entonces una de las operaciones más comunes es la asignación de un valor a un objeto, la que se realiza con el \kw{operador de asignación} \verb|<-|, y tiene la siguiente sintaxis general:
 
 <<eval=FALSE>>=
@@ -104,10 +109,10 @@ Por ejemplo, podemos crear el objeto \verb|x| asignándole el valor 10. Para hac
 x <- 10
 @
 
-En RStudio, un buen atajo para memorizar rápido es usar \textsf{Alt -} para insertar el operación de asignación.
+En RStudio, un buen atajo para memorizar rápido es usar \sys{Alt --} para insertar el operación de asignación.
 Si has tenido éxito, deberías ver el objeto \verb|x| asignado con valor 10 en tu panel de \eng{Environment}, o Ambiente (arriba a la derecha). En adelante no diré explícitamente que hay que ejecutar cada línea con \textsf{Enter} $\hookleftarrow$, ya que se sobreentiende (espero).
 
-Una asignación casi siempre es silenciosa, es decir, no se mostrará su resultado. Para \kw{examinar un objeto} simplemente escribimos su nombre:
+Una asignación casi siempre es silenciosa, es decir, no se mostrará su resultado. Para examinar un objeto que hayamos creado, simplemente escribimos su nombre:
 <<>>=
 x
 @
@@ -117,7 +122,7 @@ Una manera de mostrar inmediatamente el resultado de una asignación es encerran
 (y <- 2*3)
 @
 
-El símbolo \verb|[1]| que antecede a los resultados anteriores indica que se trata del primer resultado. Por ejemplo, si ejecutas el código \verb|1:42| para obtener una secuencia de 40 enteros deberías algo como lo siguiente (dependiendo del ancho de tu Consola):
+El símbolo \verb|[1]| que antecede a los resultados anteriores indica que se trata del primer resultado. Por ejemplo, si ejecutas el código \verb|1:42| para obtener una secuencia de 42 enteros deberías algo como lo siguiente (dependiendo del ancho de tu consola):
 <<>>=
 1:42
 @
@@ -128,13 +133,13 @@ valores <- c(x,y)
 valores
 @
 
-Existe una cantidad enorme de funciones para manipular objetos. De hecho, este libro es en esencia un manual sobre qué funciones usar y cómo usarlas para lograr analizar datos de manera efectiva. Comenzaremos de forma sencilla, calculando el promedio de los valores \verb|x| e \verb|y| usando la función \verb|mean()|:
+Existe una cantidad enorme de funciones para manipular objetos. De cierta forma, este documento es un manual sobre qué funciones usar y cómo usarlas para manipular y analizar datos. Comenzaremos de forma sencilla, calculando el promedio de los valores \verb|x| e \verb|y| usando la función \verb|mean()|:
 <<>>=
 mean(valores)
 @
 
 %\begin{sloppypar}
-Notar que podemos asignar el resultado de una función a un objeto (como en \verb|valores <- c(x,y)|) o usar la función directamente, sin guardar su resultado (como en \verb|mean(valores)|). Normalmente asignaremos el resultado de la función si es que queremos usar dicho resultado para otra operación, como en el primer caso.
+Notar que podemos asignar el resultado de una función a un objeto (\verb|valores <- c(x,y)|) o usar la función directamente, sin guardar su resultado (\verb|mean(valores)|). Normalmente asignaremos el resultado de la función si es que queremos usar dicho resultado para otra operación, como en el primer caso.
 %\end{sloppypar}
 
 Finalmente, podemos escribir \kw{comentarios} usando el símbolo \verb|#|. Cuando R encuentre este símbolo, todo lo que siga después en la misma línea será ignorado. Por ejemplo, 
@@ -145,24 +150,8 @@ mean(c(0, 1, 1, 2, 3, 5, 8, 13))  # Secuencia de Fibonacci (1ros términos)
 
 Espero que hayas podido seguir los ejemplos que hemos desarrollado recién. Si aún no tienes todo claro, tranquilo; a medida que avancemos iremos reforzando estos conceptos. Sin embargo, si por alguna razón no pudiste ejecutar el código, te sugiero resolver el problema antes de continuar.
 
+\section{Usar R interactivamente y a través de scripts}
 
-\hrulefill
-
-\subsection{Usar R interactivamente y a través de scripts}
-
-\subsection{Trabajando con datos}
-
-\subsubsection{Objetos y asignaciones}
-
-R es un lenguaje interpretado, lo que significa que ejecuta nuestras instrucciones directamente, sin compilar un programa previo. Podemos usar R interactivamente a través de la consola:
-<<>>=
-1+2
-@
-
-La mayoría de las operaciones y funciones en R no guardan el resultado de su ejecución. Por ejemplo, el resultado anterior (\verb|3|) es calculado pero no puede ser reutilizado sin volverse a calcular. Para lograr esto tenemos que asignar el resultado de la operación a un objeto:
-<<>>=
-x <- 1+2
-@
 
 \section{R base vs. tidyverse}
 \label{sec:rbase_tidyverse}
