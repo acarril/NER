@@ -95,10 +95,6 @@
 }
 
 % Color box para R
-% new tcolorbox environment
-% #1: tcolorbox options
-% #2: color
-% #3: box title
 \newtcolorbox{Rbox}[1][]
 {
   title = El c\'odigo R,
@@ -114,9 +110,11 @@
 <<setup, include=FALSE>>=
 library(knitr)
 library(highr)
+
+# Chunk opts
 knitr::opts_chunk$set(cache = TRUE, comment = '#>', fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', fig.pos = "htb", dev='pdf')
 
-## Personalizar inline hook
+# Personalizar inline hook
 knit_hooks$get("inline")
 inline_hook <- function(x) {
   if(is.numeric(x) & abs(x)>0.01) x <- round(x, 2)
@@ -124,15 +122,15 @@ inline_hook <- function(x) {
 }
 knit_hooks$set(inline = inline_hook)
 
-#
-#Sys.setenv(TZ="CL")
+# Fijar zona horaria manualmente para evitar warning en child docs (inline en versión)
+Sys.setenv(TZ="Etc/GMT-4")
 @
 
 
 \title{Notas de Econometría en R}
 %\thanks{Estas notas son un intento de condensar lo justo y necesario para poder seguir un curso de econometría con R.Luego de recopilar material de muchas clases y ayudantías de econometría, en general pensadas para ser aplicadas en Stata, decidí que podía intentar hacer estas clases en R y usar esta guía como material de apoyo.Mi prioridad fue ser breve y conciso, por lo que estas notas no son un buen comienzo para aprender R (o econometría); son un complemento.Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acarril@fen.uchile.cl}.}
 \author{Alvaro Carril}
-\date{Versión 1.1.\Sexpr{as.numeric(format(Sys.Date(tz="UTC"),"%Y%m%d"))} \\ \vfill
+\date{Versión 1.1.\Sexpr{as.numeric(format(Sys.Date(),"%Y%m%d"))} \\ \vfill
   \includegraphics[width=.9\textwidth]{figs/scatterplot3d_portada}
 }
 
@@ -148,9 +146,9 @@ knit_hooks$set(inline = inline_hook)
 <<cap_intro, child='cap_intro.Rnw'>>=
 @
 
-%% Regresión lineal bivariada:
-%<<cap_reglineal_simple, child='cap_reglineal_simple.Rnw'>>=
-%@
+% Regresión lineal bivariada:
+<<cap_reglineal_simple, child='cap_reglineal_simple.Rnw'>>=
+@
 
 %% Introducción, prefacio:
 %<<cap_OLD, child='cap_OLD.Rnw'>>=
