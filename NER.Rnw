@@ -8,6 +8,7 @@
 \usepackage[libertine]{newtxmath}
 \usepackage{geometry}
 \usepackage{microtype}
+\usepackage{etoolbox}
 \usepackage{fancyhdr} % Headers pulentos
   \pagestyle{fancy}
   \renewcommand{\sectionmark}[1]{\markright{#1}}
@@ -69,12 +70,20 @@
 \newcommand*{\eng}[1]{\textsl{#1}}
 \newcommand*{\paq}[1]{\textbf{#1}\index{#1@\textbf{#1}}}
 \newcommand*{\kw}[1]{\textbf{#1}\index{#1}}
+\newcommand*{\sys}[1]{\textsf{#1}}
 
 \newcommand{\Var}{\operatorname{Var}}
 \newcommand{\Cov}{\operatorname{Cov}}
 \newcommand{\E}{\operatorname{E}}
 \newcommand{\sd}{\operatorname{sd}}
 \newcommand{\se}{\operatorname{se}}
+
+% Comando para directorio de programa (necesita etoolbox):
+\newcommand{\ppath}[2][$\;\triangleright\;$]{%
+  \def\nextitem{\def\nextitem{#1}}% Separator
+  \renewcommand*{\do}[1]{\nextitem\sys{##1}}% How to process each item
+  \docsvlist{#2}% Process list
+}
 
 % Eliminar numeración en títulos menores que secciones
 \setcounter{secnumdepth}{1}
@@ -114,13 +123,16 @@ inline_hook <- function(x) {
   paste(as.character(x), collapse=", ")
 }
 knit_hooks$set(inline = inline_hook)
+
+#
+#Sys.setenv(TZ="CL")
 @
 
 
 \title{Notas de Econometría en R}
 %\thanks{Estas notas son un intento de condensar lo justo y necesario para poder seguir un curso de econometría con R.Luego de recopilar material de muchas clases y ayudantías de econometría, en general pensadas para ser aplicadas en Stata, decidí que podía intentar hacer estas clases en R y usar esta guía como material de apoyo.Mi prioridad fue ser breve y conciso, por lo que estas notas no son un buen comienzo para aprender R (o econometría); son un complemento.Si hay algún error o quieres hacer algún comentario, mi correo es \texttt{acarril@fen.uchile.cl}.}
 \author{Alvaro Carril}
-\date{Versión 1.1.\Sexpr{as.numeric(format(Sys.Date(),"%Y%m%d"))} \\ \vfill
+\date{Versión 1.1.\Sexpr{as.numeric(format(Sys.Date(tz="UTC"),"%Y%m%d"))} \\ \vfill
   \includegraphics[width=.9\textwidth]{figs/scatterplot3d_portada}
 }
 
