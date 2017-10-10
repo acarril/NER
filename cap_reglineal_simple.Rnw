@@ -542,6 +542,63 @@ En un caso real no conoceremos el valor poblacional del parámetro, ni podremos 
 Habrás notado que al tomar \Sexpr{k} muestras y estimar $\hat\beta_1$, los valores estimados se concentran en torno al verdadero valor de $\beta_1$, que es \Sexpr{b} en este ejemplo. ¡Esto es bueno... y no es casualidad! En realidad es una propiedad de los estimadores MCO.
 A continuación formalizaremos esta y otras propiedades, con el fin de entender qué debe ocurrir para que se cumplan.
 
+\hrulefill
+
+Hasta ahora hemos aprendido a calcular e interpretar los parámetros de un modelo lineal simple. Sin embargo, recordemos que nuestra estimación de $\hat\beta_0$ y $\hat\beta_1$ proviene de una muestra aleatoria de la población.
+En esta sección analizaremos las propiedades estadísticas de $\hat\beta_0$ y $\hat\beta_1$, lo que nos dará herramientas para analizar qué tanto se acercan nuestras estimaciones a los verdaderos parámetros poblacionales.
+
+Primero nos detendremos a entender el problema en sí: ¿en qué se diferencian los parámetros estimados ($\hat\beta_0$ y $\hat\beta_1$) de los verdaderos parámetros poblacionales ($\beta_0$ y $\beta_1$)?
+
+Cuando planteamos el modelo de regresión lineal simple (ecuación \eqref{eq:modelo_lineal_simple_poblacional}), supusimos que las variables $x$ e $y$ se relacionaban por medio de una función lineal, y que 
+
+Si bien en estricto rigor suponemos que el ``tamaño'' de la población es infinito, fijamos $N=1.000.000$ para efectos de nuestra población simulada.
+Luego definimos un error \verb|u| con media 0 (es uno de nuestros supuestos) y desviación estándar \verb|sigma| $=5$. Finalmente generamos \verb|y| como una función lineal de \verb|x|, con intercepto 2 y pendiente 10, e incluyendo nuestro error \verb|u|$\sim \mathcal{N}(0, 5)$.\footnote{No es necesario asumir que $\mu \sim \mathcal{N}$, ya que bastaría con que $\E(\mu)=0$. Es un error común pensar que MCO requiere errores con distribución normal.}
+
+<<>>=
+# Parámetros iniciales
+set.seed(03072017)
+N <- 1000000
+sigma <- 5
+
+# Variables poblacionales
+x <- runif(N)
+u <- rnorm(N, 0, sigma)
+y <- 2 + 10*x + u
+poblacion <- data.frame(y,x)
+@
+
+Al haber creado nosotros mismos los datos poblacionales, estamos seguros de los verdaderos valores de los parámetros: $\beta_0=2$ y $\beta_1=10$. La única desviación que se dará en nuestra simulación es debido a que la población no es infinita (aunque se le acerca bastante).
+
+<<>>=
+# Estimar parámetros poblacionales
+lm(y~x, data = poblacion)
+@
+
+Verificamos que en nuestra población simulada los parámetros son ...
+A continuación extraemos una muestra aleatoria de 100 observaciones ($n=100$) de la población. Esto es lo que nosotros suponemos que hacemos cuando tenemos, por ejemplo, una base de datos con puntajes SIMCE para de 100 estudiantes.
+Luego estimamos los coeficientes $\hat\beta_0$ y $\hat\beta_1$ para esta muestra en particular.
+
+<<echo=-4>>=
+# Extraer una muestra aleatoria de la población y estimar sus parámetros
+muestra <- poblacion[sample(1:N, 100),]
+lm(y~x, data = muestra)
+modelo_muestral <- lm(y~x, data = muestra)
+coefficients(modelo_muestral)
+@
+
+Observamos que los coeficientes estimados en esta muestra particular son bastante distintos de los reales: $\hat\beta_0 = \Sexpr{coefficients(modelo_muestral)[1]}$ y $\hat\beta_1 = \Sexpr{coefficients(modelo_muestral)[2]}$.
+Este fenómeno no es exclusivo a los estimadores, y en realidad ocurre para cualquier tipo de estadística que es calculada para la muestra de una población.
+
+Por ejemplo, supón una población (un poco ridícula) de 4 personas, y observamos sus pesos en kilogramos:
+\begin{equation*}
+P = \{74, 62, 65, 71\}.
+\end{equation*}
+Si tomamos muestras de 2 personas repetidas veces, obtendremos distintas estimaciones del promedio poblacional. Algunos promedios muestrales serán iguales al promedio poblacional, mientras que otros no. Lo importante es que al tomar varias muestras y guardar registro de los promedios muestrales,
+
+ninguna muestra de menos de 2 observaciones nos entregará este promedio. Al extraer repetidas muestras obtendremos una distribución muestral: algunos promedios de nuestra muestra se repetirán más que otros.
+
+\hrulefill
+
 \section{Propiedades de los estimadores MCO}
 
 Hasta ahora hemos aprendido a calcular e interpretar los parámetros de un modelo lineal simple.
@@ -550,7 +607,7 @@ Hasta ahora hemos aprendido a calcular e interpretar los parámetros de un model
 %Con esto en mente estudiaremos las propiedades de la distribución de $\hat\beta_0$ y $\hat\beta_1$ bajo distintas muestras aleatorias.
 En la \autoref{sec:distribucion_estimadores} enfatizamos que los estimadores MCO ($\hat\beta_0$ y $\hat\beta_1$, o en general $\hat\beta$) tienen una distribución de probabilidad.
 Intuitivamente, la razón por la que esto ocurre es porque nuestra estimación de $\hat\beta_0$ y $\hat\beta_1$ depende de la muestra aleatoria particular que tengamos de la población; si tomáramos distintas muestras, obtendríamos distintos valores para $\hat\beta$.
-Entonces nuestra estimación de $\hat\beta$ es solo una realización de infinidad de posibilidades, como se muestra en la \autoref{fig:parametros_distribucion}.
+Entonces nuestra estimación de $\hat\beta$ es solo una realización de infinidad de posibilidades, como se representa en la \autoref{fig:parametros_distribucion}.
 
 \begin{figure}[htb]
   \centering
@@ -703,7 +760,11 @@ ggplot(betas, aes(value)) +
 
 
 \paragraph{RLS.3: Variación en las variables independientes}
-Necesitamos que la (o las) variables independientes del modelo tengan algo de variación.
+Necesitamos que la (o las) variables independientes del modelo tengan algo de variación. Un poco más formalmente,
+\begin{equation}
+\{x_i, i=1,\ldots,n \} \; \text{no son todos iguales.}
+\end{equation}
+
 Este supuesto es fácil, pero necesario matemáticamente.
 Por ejemplo, supongamos que queremos estimar un modelo como
 \begin{equation*}
@@ -723,7 +784,7 @@ ggplot(data, aes(estudio, nota)) +
 ¿Cuál es la la línea que mejor se ajusta a los datos? \footnote{Y recuerda que una función $f: X\to Y$ corresponde a cualquier subconjunto $S$ del conjunto $X\times Y$ que satisface que si $(x,y)\in S$ y $(x,y')\in S$, entonces $y = y'$. O, en otras palabras, una función válida asigna a cada elemento de $X$ exactamente un elemento en $Y$. O, en otras palabras, una función no puede ser una línea vertical.}
 
 \paragraph{RLS.4: Media condicional cero}
-El error $u$ debe tener un valor esperado igual a cero, condicional a los valores de las variables independientes:
+El error $u$ debe tener un valor esperado igual a cero, condicional a los valores de la variable independiente:
 \begin{equation}
 E(\mu | x) = 0.
 \end{equation}
@@ -731,32 +792,37 @@ En una muestra aleatoria esto significa que
 \begin{equation*}
 E(\mu_i | x_i) = 0 \quad \forall\; i = 1,\ldots, n.
 \end{equation*}
+En palabras, el valor esperado de la media de los términos de error debe ser cero, condicional a la variable independiente. En otras palabras, la distribución del error tiene media 0 y no depende de $x$. Esto significa que no puede haber relación entre las variables independientes y el término de error.
 
-Hemos supuesto que la esperanza del error es cero, es decir, que $\E(\mu)=0$.
-Mencionamos que no perdemos nada al hacer esto, ya que siempre podemos acomodar el intercepto de manera de asegurarnos que $\E(\mu)=0$. Entonces este supuesto es muy poco restrictivo.
-El supuesto clave es asumir que $\mu$ y $x$ son independientes, de forma que $\E(\mu | x) = E(x) = 0$.
-Sin embargo, si existe una correlación entre $\mu$ y $x$ esto implicará que $\E(\mu | x) \neq 0$.
+¿Cómo llegamos a esta conclusión? Ya habíamos supuesto que la esperanza del error es cero, es decir, que $\E(\mu)=0$.
+Mencionamos que no perdemos nada haciendo esto, ya que siempre podemos acomodar el intercepto de manera de asegurarnos que $\E(\mu)=0$. Entonces este no es un supuesto demasiado fuerte.
+El punto clave es que necesitamos que $\mu$ y $x$ sean independientes, ya que sólo de esa forma $\E(\mu | x) = E(\mu)$  (que ya supusimos es igual a 0).
+Por otro lado, si existe una correlación entre $\mu$ y $x$ esto implicará que $\E(\mu | x) \neq 0$, y habremos violado el supuesto. 
 
-Este es probablemente el supuesto más importante a la hora de determinar si una regresión lineal simple entregará parámetros insesgados. Esto ocurre porque es imposible determinar si el supuesto efectivamente se cumple o no, ya que depende de que hayamos especificado la forma funcional correcta y no omitido variables relevantes.
+Para contemplar otra forma de entender este supuesto es conveniente escribirlo en términos de la esperanza condicional de $y$:
+\begin{equation*}
+E(y | x) = \beta_0 + \beta_1 x.
+\end{equation*}
+La equivalencia debiese ser evidente: si esperamos que en promedio el error sea 0, entonces debemos esperar que en promedio $y$ sea $\beta_0 + \beta_1 x$. Visto de esta forma, RLS.4 nos indica que $y$ sólo depende linealmente en $x$, y de ninguna otra variable. Entonces es fácil anticipar que violaremos este supuesto cuando omitamos alguna variable relevante en nuestro modelo, o cuando la forma funcional esté mal especificada. Exploraremos estos casos en detalle más adelante.
+
+El supuesto de media condicional cero es probablemente el supuesto más ``importante'' a la hora de determinar si una regresión lineal entregará parámetros insesgados.
+Esto ocurre porque es imposible determinar si el supuesto efectivamente se cumple o no, ya que depende de que se cumplan condiciones que no son directamente comprobables.
+Volveremos varias veces sobre este supuesto a lo largo del libro.
 
 %todo: completar! Berry (1993) https://www.quora.com/In-linear-regression-why-we-use-the-assumption-of-zero-conditional-mean-rather-than-independency-between-x-and-error-term-along-with-E-u-0
 
-\hrulefill
-
-Usando los supuestos RLS.1 a RLS.4 se puede demostrar que los estimadores MCO son insesgados, es decir, que\footnote{La demostración completa corresponde al Teorema 2.1 de \textcite[cap. 2]{wooldridge_introductory_2016}.}
+Finalmente, usando los supuestos RLS.1 a RLS.4 se puede demostrar que los estimadores MCO son insesgados, es decir, que\footnote{La demostración completa corresponde al Teorema 2.1 de \textcite[cap. 2]{wooldridge_introductory_2016}.}
 \begin{equation}
 \E(\hat\beta_0) = \beta_0 \text{ y } \E(\hat\beta_1) = \beta_1.
 \end{equation}
 
-En general, si cualquiera de los supuestos no se cumple entonces perderemos la propiedad de insesgamiento. RLS.1 requiere que $y$ y $x$ estén relacionados linealmente, lo que ciertamente puede no cumplirse. Hay que recordar, sin embargo, que la relación es solamente lineal en \emph{parámetros}, no en variables, por lo que ciertamente podemos transformar $x$ e $y$ para capturar relaciones no lineales más interesantes.
-RLS.2 asume que nuestros datos corresponden a una muestra aleatoria de la población, lo que claramente no siempre se cumple en datos de corte transversal. Por ejemplo, es posible que solamente tengamos datos de micro y pequeñas empresas, o que solamente observemos jefas de hogar de los quintiles más pobres.
+En general, si cualquiera de los RLS.1 a RLS.4 no se cumplen, entonces perderemos la propiedad de insesgamiento. RLS.1 requiere que $y$ y $x$ estén relacionados linealmente. Hay que recordar, sin embargo, que la relación es solamente lineal en \emph{parámetros}, no en variables, por lo que podemos transformar $x$ e $y$ para capturar relaciones no lineales más interesantes.
+RLS.2 asume que nuestros datos corresponden a una muestra aleatoria de la población, lo que no siempre se cumple en datos de corte transversal. Por ejemplo, es posible que solamente tengamos datos de micro y pequeñas empresas, o que solamente observemos jefas de hogar de los quintiles más pobres.
 
-RLS.3 es extremadamente básico y con mucha seguridad se cumplirá en cualquier tipo de datos. Sin embargo, RSL.4 ciertamente representa un problema potencial. Si no se cumple que la media condicional del error es 0, esto es equivalente a decir que existe alguna correlación entre $x$ y $\mu$.
+RLS.3 es bastante débil, y con mucha seguridad se cumplirá en la gran mayoría de datos. Sin embargo, RSL.4 representa un problema potencial. Si no se cumple que la media condicional del error es 0, esto es equivalente a decir que existe alguna correlación entre $x$ y $\mu$.
 Una razón por la que esto puede ocurrir es porque dejamos de incluir una variable relevante en nuestro modelo, de forma que esta afecta a $x$ por medio de $\mu$.
 
 \begin{figure}[htb]
-\centering
-\begin{subfigure}{.55\textwidth}
   \centering
   \begin{tikzpicture}
     \begin{axis}[
@@ -777,32 +843,7 @@ Una razón por la que esto puede ocurrir es porque dejamos de incluir una variab
   \end{tikzpicture}
   \caption{Estimador insesgado (azul) vs. estimador sesgado (rojo)}
 %  \label{fig:estimadores_sesgo}
-\end{subfigure}%
-\begin{subfigure}{.55\textwidth}
-  \centering
-  \begin{tikzpicture}
-    \begin{axis}[
-    no markers, domain=0:10, samples=100,
-    axis lines*=left, xlabel=, ylabel=$f(\hat\beta)$,
-    every axis y label/.style={at=(current axis.above origin),anchor=south},
-    every axis x label/.style={at=(current axis.right of origin),anchor=west},
-    height=2.4in, width=3.2in,
-    xtick={5},
-    xticklabels={$\beta$},
-    ytick=\empty,
-    enlargelimits=false, clip=false, axis on top,
-    grid = major
-    ]
-    \addplot [very thick,cyan!50!black] {gauss(5,0.5)};
-    \addplot [very thick,magenta!50!black] {gauss(5,1.2)};
-    \end{axis}
-  \end{tikzpicture}
-  \caption{Estimadores insesgados con distinta varianza}
-  \label{fig:estimadores_varianza2}
-\end{subfigure}
-\caption{Valor esperado y varianza de los estimadores}
-\label{fig:estimadores_OLS_propiedades}
-\end{figure}
+\end{figure}%
 
 Además de requerir que el estimador se centre en torno al verdadero valor del parámetro, también queremos saber qué tan lejos podemos esperar que $\hat\beta$ se aleje de $\beta$ en promedio. Esto nos permitirá elegir el estimador más eficiente, es decir, de entre todos los estimadores insesgados elegir aquél que tenga la menor varianza.
 La \autoref{fig:estimadores_varianza} muestra la distribución de dos estimadores insesgados. Sin embargo, el estimador representado por la curva roja tiene relativamente mayor varianza que el representado por la azul.
@@ -813,66 +854,7 @@ Sin embargo, estas propiedades sólo existirán en la medida que se cumplan algu
 Es importante tener en cuenta que las propiedades estadísticas no tienen nada que ver con una muestra en particular, si no que es una propiedad que los estimadores cumplirán cuando se realice un muestreo aleatorio repetidamente.
 
 
-\subsection{Valor esperado de los estimadores}
-
-Hasta ahora hemos aprendido a calcular e interpretar los parámetros de un modelo lineal simple. Sin embargo, recordemos que nuestra estimación de $\hat\beta_0$ y $\hat\beta_1$ proviene de una muestra aleatoria de la población.
-En esta sección analizaremos las propiedades estadísticas de $\hat\beta_0$ y $\hat\beta_1$, lo que nos dará herramientas para analizar qué tanto se acercan nuestras estimaciones a los verdaderos parámetros poblacionales.
-
-Primero nos detendremos a entender el problema en sí: ¿en qué se diferencian los parámetros estimados ($\hat\beta_0$ y $\hat\beta_1$) de los verdaderos parámetros poblacionales ($\beta_0$ y $\beta_1$)?
-
-Cuando planteamos el modelo de regresión lineal simple (ecuación \eqref{eq:modelo_lineal_simple_poblacional}), supusimos que las variables $x$ e $y$ se relacionaban por medio de una función lineal, y que 
-
-Si bien en estricto rigor suponemos que el ``tamaño'' de la población es infinito, fijamos $N=1.000.000$ para efectos de nuestra población simulada.
-Luego definimos un error \verb|u| con media 0 (es uno de nuestros supuestos) y desviación estándar \verb|sigma| $=5$. Finalmente generamos \verb|y| como una función lineal de \verb|x|, con intercepto 2 y pendiente 10, e incluyendo nuestro error \verb|u|$\sim \mathcal{N}(0, 5)$.\footnote{No es necesario asumir que $\mu \sim \mathcal{N}$, ya que bastaría con que $\E(\mu)=0$. Es un error común pensar que MCO requiere errores con distribución normal.}
-
-<<>>=
-# Parámetros iniciales
-set.seed(03072017)
-N <- 1000000
-sigma <- 5
-
-# Variables poblacionales
-x <- runif(N)
-u <- rnorm(N, 0, sigma)
-y <- 2 + 10*x + u
-poblacion <- data.frame(y,x)
-@
-
-Al haber creado nosotros mismos los datos poblacionales, estamos seguros de los verdaderos valores de los parámetros: $\beta_0=2$ y $\beta_1=10$. La única desviación que se dará en nuestra simulación es debido a que la población no es infinita (aunque se le acerca bastante).
-
-<<>>=
-# Estimar parámetros poblacionales
-lm(y~x, data = poblacion)
-@
-
-Verificamos que en nuestra población simulada los parámetros son ...
-A continuación extraemos una muestra aleatoria de 100 observaciones ($n=100$) de la población. Esto es lo que nosotros suponemos que hacemos cuando tenemos, por ejemplo, una base de datos con puntajes SIMCE para de 100 estudiantes.
-Luego estimamos los coeficientes $\hat\beta_0$ y $\hat\beta_1$ para esta muestra en particular.
-
-<<echo=-4>>=
-# Extraer una muestra aleatoria de la población y estimar sus parámetros
-muestra <- poblacion[sample(1:N, 100),]
-lm(y~x, data = muestra)
-modelo_muestral <- lm(y~x, data = muestra)
-coefficients(modelo_muestral)
-@
-
-Observamos que los coeficientes estimados en esta muestra particular son bastante distintos de los reales: $\hat\beta_0 = \Sexpr{coefficients(modelo_muestral)[1]}$ y $\hat\beta_1 = \Sexpr{coefficients(modelo_muestral)[2]}$.
-Este fenómeno no es exclusivo a los estimadores, y en realidad ocurre para cualquier tipo de estadística que es calculada para la muestra de una población.
-
-Por ejemplo, supón una población (un poco ridícula) de 4 personas, y observamos sus pesos en kilogramos:
-\begin{equation*}
-P = \{74, 62, 65, 71\}.
-\end{equation*}
-Si tomamos muestras de 2 personas repetidas veces, obtendremos distintas estimaciones del promedio poblacional. Algunos promedios muestrales serán iguales al promedio poblacional, mientras que otros no. Lo importante es que al tomar varias muestras y guardar registro de los promedios muestrales,
-
-ninguna muestra de menos de 2 observaciones nos entregará este promedio. Al extraer repetidas muestras obtendremos una distribución muestral: algunos promedios de nuestra muestra se repetirán más que otros.
-
-\hrulefill
-
-
-
-\section{Varianza de los estimadores}
+\section{Varianza muestral de los estimadores}
 
 Además de asegurarnos que la distribución muestral de $\hat\beta$ esté centrada alrededor de $\beta$ ---es decir, que $\hat\beta$ sea insesgado---, es importante saber qué tan dispersa es esta distribución de $\hat\beta$.
 La \autoref{fig:estimadores_varianza} muestra el caso de dos estimadores insesgados donde uno tiene una distribución con mayor varianza que el otro.
@@ -908,6 +890,8 @@ Asumimos que el error $\mu$ tiene la misma varianza condicional para todos los v
 \begin{equation}
 \Var(\mu | x) = \sigma^2.
 \end{equation}
+
+Para entender bien este supuesto es conveniente 
 
 Cuando $\Var(\mu | x)$ depende de $x$ (cambia con $x$) decimos que el término de error presenta \kw{heterocedasticidad}, o varianza no constante.
 La heterocedasticidad es un problema que es más difícil de pronunciar que de entender: ocurre cuando la dispersión de una variable dependiente no es constante para distintos valores de la variable independiente.
@@ -1040,7 +1024,7 @@ declare function={
 Podemos generar fácilmente un conjunto de datos que presenten heterocedasticidad:
 
 <<warning=FALSE>>=
-n <- 500                           # Número de observaciones
+n <- 250                           # Número de observaciones
 x <- (1:n)/n                       # Generamos 'x' con valores entre 0 y 1
 u <- rnorm(n, sd=1)                # Valores aleatorios de una normal
 i <- order(runif(n, max=dnorm(u))) # Crear índice ordenado para el error
@@ -1058,7 +1042,7 @@ Usando los supuestos SLR.1 a SLR.5 podemos demostrar que
 \Var(\hat\beta_1) &= \frac{\sigma^2}{\sum_{i=1}^n (x_i - \overline x)^2}.\label{eq:var_hat_beta1}
 \end{align}
 
-Usualmente nos interesará $\Var(\hat\beta_1)$.
+Usualmente nos interesará $\Var(\hat\beta_1)$, ya que es la varianza del parámetro que acompaña a la variable independiente.
 Vemos que esta varianza depende positivamente de la varianza del error $\sigma^2$. Esto tiene sentido, ya que a mayor varianza de los factores no observables que afectan $y$, es más difícil estimar con precisión $\beta_1$.
 Por otro lado, $\Var(\hat\beta_1)$ depende negativamente de la variación total de $x$, representada por $SST_x = \sum_{i=1}^n (x_i - \overline x)^2$. Esto es así porque entre más dispersos estén los valores de la variable independiente, más fácil será detectar la relación entre $\E(y|x)$ y $x$.
 Además, a medida que el tamaño muestral aumente, también lo hará la variación total en $x_i$, de forma que una muestra más grande siempre resultará en una menor varianza de $\hat\beta_1$.
