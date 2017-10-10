@@ -798,7 +798,7 @@ Una razón por la que esto puede ocurrir es porque dejamos de incluir una variab
     \end{axis}
   \end{tikzpicture}
   \caption{Estimadores insesgados con distinta varianza}
-  \label{fig:estimadores_varianza}
+  \label{fig:estimadores_varianza2}
 \end{subfigure}
 \caption{Valor esperado y varianza de los estimadores}
 \label{fig:estimadores_OLS_propiedades}
@@ -874,29 +874,40 @@ ninguna muestra de menos de 2 observaciones nos entregará este promedio. Al ext
 
 \section{Varianza de los estimadores}
 
-Además de asegurarnos que la distribución muestral de $\hat\beta$ esté centrada alrededor de $\beta$ ---es decir, que $\hat\beta$ es insesgado---, es importante saber qué tan dispersa es esta distribución de $\hat\beta$.
+Además de asegurarnos que la distribución muestral de $\hat\beta$ esté centrada alrededor de $\beta$ ---es decir, que $\hat\beta$ sea insesgado---, es importante saber qué tan dispersa es esta distribución de $\hat\beta$.
 La \autoref{fig:estimadores_varianza} muestra el caso de dos estimadores insesgados donde uno tiene una distribución con mayor varianza que el otro.
 Parece lógico querer elegir, de entre todos los estimadores insesgados, aquel con menor varianza (ie. el azul).
 
-Para poder calcular la varianza de los estimadores MCO es necesario agregar un último supuesto:
+\begin{figure}[htb]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+    no markers, domain=0:10, samples=100,
+    axis lines*=left, xlabel=, ylabel=$f(\hat\beta)$,
+    every axis y label/.style={at=(current axis.above origin),anchor=south},
+    every axis x label/.style={at=(current axis.right of origin),anchor=west},
+    height=2.4in, width=3.2in,
+    xtick={5},
+    xticklabels={$\beta$},
+    ytick=\empty,
+    enlargelimits=false, clip=false, axis on top,
+    grid = major
+    ]
+    \addplot [very thick,cyan!50!black] {gauss(5,0.5)};
+    \addplot [very thick,magenta!50!black] {gauss(5,1.2)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Estimadores insesgados con distinta varianza}
+  \label{fig:estimadores_varianza}
+\end{figure}
+
+Para poder calcular la varianza de los estimadores MCO es necesario\footnote{En realidad no es \emph{estrictamente} necesario, pero simplifica mucho los cálculos.} agregar un último supuesto:
 
 \paragraph{RLS.5: Homocedasticidad}\index{homocedasticidad} 
 Asumimos que el error $\mu$ tiene la misma varianza condicional para todos los valores de la variable independiente. Es decir,
 \begin{equation}
 \Var(\mu | x) = \sigma^2.
 \end{equation}
-
-Usando los supuestos SLR.1 a SLR.5 podemos demostrar que
-
-\begin{align}
-\Var(\hat\beta_0) &= \frac{\sigma^2/n \sum_{i=1}^n x_i^2}{\sum_{i=1}^n (x_i - \overline x)^2} \label{eq:var_hat_beta0} \\
-\Var(\hat\beta_1) &= \frac{\sigma^2}{\sum_{i=1}^n (x_i - \overline x)^2}.\label{eq:var_hat_beta1}
-\end{align}
-
-Usualmente nos interesará $\Var(\hat\beta_1)$.
-Vemos que esta varianza depende positivamente de la varianza del error $\sigma^2$. Esto tiene sentido, ya que a mayor varianza de los factores no observables que afectan $y$, es más difícil estimar con precisión $\beta_1$.
-Por otro lado, $\Var(\hat\beta_1)$ depende negativamente de la variación total de $x$, representada por $SST_x = \sum_{i=1}^n (x_i - \overline x)^2$. Esto es así porque entre más dispersos estén los valores de la variable independiente, más fácil será detectar la relación entre $\E(y|x)$ y $x$.
-Además, a medida que el tamaño muestral aumente, también lo hará la variación total en $x_i$, de forma que una muestra más grande siempre resultará en una menor varianza de $\hat\beta_1$.
 
 Cuando $\Var(\mu | x)$ depende de $x$ (cambia con $x$) decimos que el término de error presenta \kw{heterocedasticidad}, o varianza no constante.
 La heterocedasticidad es un problema que es más difícil de pronunciar que de entender: ocurre cuando la dispersión de una variable dependiente no es constante para distintos valores de la variable independiente.
@@ -1040,7 +1051,20 @@ plot(x, y)
 abline(coef(modelo), col = "Red")
 @
 
+Usando los supuestos SLR.1 a SLR.5 podemos demostrar que
+
+\begin{align}
+\Var(\hat\beta_0) &= \frac{\sigma^2/n \sum_{i=1}^n x_i^2}{\sum_{i=1}^n (x_i - \overline x)^2} \label{eq:var_hat_beta0} \\
+\Var(\hat\beta_1) &= \frac{\sigma^2}{\sum_{i=1}^n (x_i - \overline x)^2}.\label{eq:var_hat_beta1}
+\end{align}
+
+Usualmente nos interesará $\Var(\hat\beta_1)$.
+Vemos que esta varianza depende positivamente de la varianza del error $\sigma^2$. Esto tiene sentido, ya que a mayor varianza de los factores no observables que afectan $y$, es más difícil estimar con precisión $\beta_1$.
+Por otro lado, $\Var(\hat\beta_1)$ depende negativamente de la variación total de $x$, representada por $SST_x = \sum_{i=1}^n (x_i - \overline x)^2$. Esto es así porque entre más dispersos estén los valores de la variable independiente, más fácil será detectar la relación entre $\E(y|x)$ y $x$.
+Además, a medida que el tamaño muestral aumente, también lo hará la variación total en $x_i$, de forma que una muestra más grande siempre resultará en una menor varianza de $\hat\beta_1$.
+
 En presencia de heterocedasticidad una estimación por MCO seguirá entregando coeficientes consistentes e insesgados. Sin embargo, no podremos estimar correctamente la matriz de varianzas-covarianzas, lo que producirá que los errores estándar de los coeficientes estén sesgados. Esto conduce a errores en tests de inferencia, como (por ejemplo) al determinar si un coeficiente es significativo.
+
 
 \subsection{Estimando la varianza del error}
 
@@ -1184,3 +1208,23 @@ Además de estos elementos directamente accesibles guardados en \verb|modelo|, e
 <<>>=
 summary(modelo)
 @
+
+\section{Problemas}
+
+\begin{question}
+ The first exercise in chapter one.
+\end{question}
+\begin{solution}
+ <<>>=
+ggplot(simdatos, aes(x, residuos)) +
+  geom_hline(yintercept = 0, color = "gray") +
+  geom_point()
+@
+\end{solution}
+\begin{question}
+ The second exercise in chapter one.
+\end{question}
+\begin{solution}
+ The answer to the second exercise in chapter one.
+\end{solution}
+
