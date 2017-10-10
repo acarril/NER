@@ -86,7 +86,7 @@
 }
 
 % Eliminar numeración en títulos menores que secciones
-\setcounter{secnumdepth}{1}
+%\setcounter{secnumdepth}{1}
 
 % Cambiar titulo de TOC (necesita polyglossia)
 \addto\captionsspanish{%
@@ -112,7 +112,7 @@ library(knitr)
 library(highr)
 
 # Chunk opts
-knitr::opts_chunk$set(cache = TRUE, comment = '#>', fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', fig.pos = "htb", dev='pdf')
+knitr::opts_chunk$set(cache = FALSE, comment = '#>', fig.path="figs/", fig.width=4.8, fig.height=3.6, out.width="4in", out.height="3in", fig.align='center', fig.pos = "htb", dev='pdf')
 
 # Personalizar inline hook
 knit_hooks$get("inline")
