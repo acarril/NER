@@ -897,7 +897,7 @@ Parece lógico querer elegir, de entre todos los estimadores insesgados, aquel c
     \addplot [very thick,magenta!50!black] {gauss(5,1.2)};
     \end{axis}
   \end{tikzpicture}
-  \caption{Estimadores insesgados con distinta varianza}
+  \caption{Densidades de estimadores insesgados con distinta varianza}
   \label{fig:estimadores_varianza}
 \end{figure}
 
@@ -1039,16 +1039,16 @@ declare function={
 
 Podemos generar fácilmente un conjunto de datos que presenten heterocedasticidad:
 
-<<fig.width=4.5, fig.height=4.5>>=
-set.seed(314)
-n <- 256                           # Número de observaciones
+<<warning=FALSE>>=
+n <- 500                           # Número de observaciones
 x <- (1:n)/n                       # Valores de `x`
 e <- rnorm(n, sd=1)                # Valores aleatorios de una normal
 i <- order(runif(n, max=dnorm(e))) # Ubicamos los más grandes al final
 y <- 1 + 5 * x + e[rev(i)]         # Generamos `y` con el error `e`.
-modelo <- lm(y ~ x)                # Guardamos el modelo lineal
-plot(x, y)
-abline(coef(modelo), col = "Red")
+data <- as_tibble(x, y)            # Crear marco de datos con variables.
+ggplot(data, aes(x, y)) +          # Graficar datos y regresión lineal
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
 @
 
 Usando los supuestos SLR.1 a SLR.5 podemos demostrar que
@@ -1209,7 +1209,7 @@ Además de estos elementos directamente accesibles guardados en \verb|modelo|, e
 summary(modelo)
 @
 
-\section{Problemas}
+\section*{Problemas}
 
 \begin{question}
  The first exercise in chapter one.
