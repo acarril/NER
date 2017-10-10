@@ -1041,11 +1041,11 @@ Podemos generar fácilmente un conjunto de datos que presenten heterocedasticida
 
 <<warning=FALSE>>=
 n <- 500                           # Número de observaciones
-x <- (1:n)/n                       # Valores de `x`
-e <- rnorm(n, sd=1)                # Valores aleatorios de una normal
-i <- order(runif(n, max=dnorm(e))) # Ubicamos los más grandes al final
-y <- 1 + 5 * x + e[rev(i)]         # Generamos `y` con el error `e`.
-data <- as_tibble(x, y)            # Crear marco de datos con variables.
+x <- (1:n)/n                       # Generamos 'x' con valores entre 0 y 1
+u <- rnorm(n, sd=1)                # Valores aleatorios de una normal
+i <- order(runif(n, max=dnorm(u))) # Crear índice ordenado para el error
+y <- 1 + 5 * x + u[rev(i)]         # Generamos 'y' con error ordenado por índice
+data <- as_tibble(x, y)            # Crear marco de datos con variables
 ggplot(data, aes(x, y)) +          # Graficar datos y regresión lineal
   geom_point() + 
   geom_smooth(method = "lm", se = FALSE)
@@ -1212,14 +1212,10 @@ summary(modelo)
 \section*{Problemas}
 
 \begin{question}
- The first exercise in chapter one.
+ Crea un estimador que sea insesgado pero no sea de mínima varianza. Usa datos simulados para contrastarlo con el estimador MCO.
 \end{question}
 \begin{solution}
- <<>>=
-ggplot(simdatos, aes(x, residuos)) +
-  geom_hline(yintercept = 0, color = "gray") +
-  geom_point()
-@
+\url{https://stats.stackexchange.com/questions/153348/other-unbiased-estimators-than-the-blue-ols-solution-for-linear-models}
 \end{solution}
 \begin{question}
  The second exercise in chapter one.
