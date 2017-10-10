@@ -16,6 +16,7 @@ En este capítulo comenzaremos a usar R para cargar bases de datos, las que usar
 <<packages, message=FALSE>>=
 library(tidyverse)
 library(haven)
+library(reshape2)
 @
 
 \begin{Rbox}
@@ -531,7 +532,7 @@ for(i in 1:k) { # loop de 500 simulaciones
 
 # Graficar densidad de 500 pendientes estimadas
 ggplot(tibble(beta1), aes(beta1)) +
-  geom_vline(xintercept = b, color = "forestgreen") +
+  geom_vline(xintercept = b) +
   geom_density()
 @
 
@@ -641,9 +642,8 @@ Como supusimos que el total de observaciones en \verb|mpg| corresponde a la pobl
 
 Intentaremos ahora estimar dicho parámetro usando dos muestra tomadas de los datos poblacionales. Una muestra será completamente aleatoria, mientras que la otra sólo se extraerá del subconjunto de automóviles del año 1999. Ambas muestras serán del mismo tamaño (50 observaciones), y repetiremos este muestreo la misma cantidad de veces para ambos tipos de muestra (300 muestreos).
 
-<<message=FALSE>>=
+<<message=FALSE, warning=FALSE>>=
 # Parámetros iniciales
-library(reshape2)
 set.seed(1102)
 k <- 300
 
@@ -663,14 +663,14 @@ betas <- mutate(betas, año = factor(Var2, labels = c("todos","1999")))
 # Graficar densidad de coefs. estimados por tipo de muestra
 ggplot(betas, aes(value)) +
   geom_vline(xintercept = beta_pob) +
-  geom_density(aes(color=año))
+  geom_density(aes(color = año)) +
+  scale_x_continuous(name = expression(hat(beta)), limits = c(-5, -2.5))
 @
 
 Al tomar una muestra aleatoria de la población, la distribución de $\hat\beta_1$ se centra en torno al verdadero valor de $\beta_1$. Por otro lado, al tomar una muestra que no es aleatoria (en el ejemplo la muestra es condicional al año), la distribución de $\hat\beta_1$ no estará centrada en torno al verdadero valor del parámetro, es decir, es un estimador sesgado. En este caso particular hay un sesgo a la baja, ya que es de esperar que si sólo seleccionamos autos relativamente antiguos, estos serán en promedio menos eficientes.
 
 <<message=FALSE>>=
 # Cargar paquete para melt() y fijar semilla
-library(reshape2)
 set.seed(1102)
 
 # Definir función para guardar pendientes simuladas
@@ -697,7 +697,8 @@ betas <- mutate(betas, nsims = factor(L1, labels = nsims))
 # Graficar densidad de coeficientes estimados por n. de sims 
 ggplot(betas, aes(value)) +
   geom_vline(xintercept = .7) +
-  geom_density(aes(color = nsims))
+  geom_density(aes(color = nsims)) + 
+  labs(x = expression(hat(beta)))
 @
 
 
@@ -722,24 +723,27 @@ ggplot(data, aes(estudio, nota)) +
 ¿Cuál es la la línea que mejor se ajusta a los datos? \footnote{Y recuerda que una función $f: X\to Y$ corresponde a cualquier subconjunto $S$ del conjunto $X\times Y$ que satisface que si $(x,y)\in S$ y $(x,y')\in S$, entonces $y = y'$. O, en otras palabras, una función válida asigna a cada elemento de $X$ exactamente un elemento en $Y$. O, en otras palabras, una función no puede ser una línea vertical.}
 
 \paragraph{RLS.4: Media condicional cero}
-El error $u$ debe tener un valor esperado igual a cero, condicional a los valores de las variables independientes. En una muestra aleatoria esto significa que
+El error $u$ debe tener un valor esperado igual a cero, condicional a los valores de las variables independientes:
 \begin{equation}
-E(\mu_i | x_i) = 0 \quad \forall\; i = 1,\ldots, n.
+E(\mu | x) = 0.
 \end{equation}
+En una muestra aleatoria esto significa que
+\begin{equation*}
+E(\mu_i | x_i) = 0 \quad \forall\; i = 1,\ldots, n.
+\end{equation*}
 
 Hemos supuesto que la esperanza del error es cero, es decir, que $\E(\mu)=0$.
-Mencionamos que no perdemos nada al hacer esto, ya que siempre podemos acomodar el intercepto de manera de asegurarnos que $\E(\mu)=0$.
-
-Si ocurre que $\mu$ y $x$ son independientes entonces $\E(\mu | x) = E(x) = 0$.
+Mencionamos que no perdemos nada al hacer esto, ya que siempre podemos acomodar el intercepto de manera de asegurarnos que $\E(\mu)=0$. Entonces este supuesto es muy poco restrictivo.
+El supuesto clave es asumir que $\mu$ y $x$ son independientes, de forma que $\E(\mu | x) = E(x) = 0$.
 Sin embargo, si existe una correlación entre $\mu$ y $x$ esto implicará que $\E(\mu | x) \neq 0$.
 
-Este es probablemente el supuesto más importante a la hora de determinar si una regresión lineal simple entregará parámetros insesgados.
+Este es probablemente el supuesto más importante a la hora de determinar si una regresión lineal simple entregará parámetros insesgados. Esto ocurre porque es imposible determinar si el supuesto efectivamente se cumple o no, ya que depende de que hayamos especificado la forma funcional correcta y no omitido variables relevantes.
 
 %todo: completar! Berry (1993) https://www.quora.com/In-linear-regression-why-we-use-the-assumption-of-zero-conditional-mean-rather-than-independency-between-x-and-error-term-along-with-E-u-0
 
 \hrulefill
 
-Usando los supuestos RLS.1 a RLS.4 se puede demostrar que los estimadores MCO son insesgados, es decir, que
+Usando los supuestos RLS.1 a RLS.4 se puede demostrar que los estimadores MCO son insesgados, es decir, que\footnote{La demostración completa corresponde al Teorema 2.1 de \textcite[cap. 2]{wooldridge_introductory_2016}.}
 \begin{equation}
 \E(\hat\beta_0) = \beta_0 \text{ y } \E(\hat\beta_1) = \beta_1.
 \end{equation}
@@ -752,7 +756,7 @@ Una razón por la que esto puede ocurrir es porque dejamos de incluir una variab
 
 \begin{figure}[htb]
 \centering
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.55\textwidth}
   \centering
   \begin{tikzpicture}
     \begin{axis}[
@@ -774,7 +778,7 @@ Una razón por la que esto puede ocurrir es porque dejamos de incluir una variab
   \caption{Estimador insesgado (azul) vs. estimador sesgado (rojo)}
 %  \label{fig:estimadores_sesgo}
 \end{subfigure}%
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.55\textwidth}
   \centering
   \begin{tikzpicture}
     \begin{axis}[
@@ -796,7 +800,7 @@ Una razón por la que esto puede ocurrir es porque dejamos de incluir una variab
   \caption{Estimadores insesgados con distinta varianza}
   \label{fig:estimadores_varianza}
 \end{subfigure}
-\caption{Heterocedasticidad}
+\caption{Valor esperado y varianza de los estimadores}
 \label{fig:estimadores_OLS_propiedades}
 \end{figure}
 
@@ -809,10 +813,7 @@ Sin embargo, estas propiedades sólo existirán en la medida que se cumplan algu
 Es importante tener en cuenta que las propiedades estadísticas no tienen nada que ver con una muestra en particular, si no que es una propiedad que los estimadores cumplirán cuando se realice un muestreo aleatorio repetidamente.
 
 
-
-\hrulefill
-
-\section{Valor esperado de los estimadores}
+\subsection{Valor esperado de los estimadores}
 
 Hasta ahora hemos aprendido a calcular e interpretar los parámetros de un modelo lineal simple. Sin embargo, recordemos que nuestra estimación de $\hat\beta_0$ y $\hat\beta_1$ proviene de una muestra aleatoria de la población.
 En esta sección analizaremos las propiedades estadísticas de $\hat\beta_0$ y $\hat\beta_1$, lo que nos dará herramientas para analizar qué tanto se acercan nuestras estimaciones a los verdaderos parámetros poblacionales.
